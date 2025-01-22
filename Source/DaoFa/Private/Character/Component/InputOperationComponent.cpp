@@ -2,6 +2,12 @@
 
 
 #include "Character/Component/InputOperationComponent.h"
+#include "Character/BaseCharacter.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "InputActionValue.h"
+#include "Character/Animation/BaseAnimInstance.h"
+
 
 // Sets default values for this component's properties
 UInputOperationComponent::UInputOperationComponent()
@@ -20,7 +26,11 @@ void UInputOperationComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	
+	OwnerCharacter = Cast<ABaseCharacter>(GetOwner());
+	if (OwnerCharacter != nullptr)
+	{
+		OwnerAnimInstance = Cast<UBaseAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
+	}
 }
 
 
@@ -31,4 +41,154 @@ void UInputOperationComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 
 	// ...
 }
+
+void UInputOperationComponent::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	// Set up action bindings
+	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
+
+		// Jumping
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &UInputOperationComponent::Jump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &UInputOperationComponent::StopJumping);
+		// Moving
+		EnhancedInputComponent->BindAction(WalkAction, ETriggerEvent::Triggered, this, &UInputOperationComponent::Walk);
+		EnhancedInputComponent->BindAction(WalkAction, ETriggerEvent::Completed, this, &UInputOperationComponent::StopWalk);
+		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Started, this, &UInputOperationComponent::Run);
+		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Completed, this, &UInputOperationComponent::StopRun);
+		// Looking
+		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &UInputOperationComponent::Look);
+		//Dodge
+		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Started, this, &UInputOperationComponent::Dodge);
+	}
+}
+
+void UInputOperationComponent::SetInputMappingContext(ULocalPlayer* LocalPlayer)
+{
+	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer))
+	{
+		Subsystem->AddMappingContext(DefaultMappingContext, 1);
+	}
+}
+
+
+
+void UInputOperationComponent::Jump()
+{
+	if (OwnerCharacter != nullptr && OwnerAnimInstance != nullptr && OwnerAnimInstance->UpdateInput(InputAnimation::Jump))
+	{
+		OwnerCharacter->Jump();
+	}
+}
+
+void UInputOperationComponent::StopJumping()
+{
+	if (OwnerCharacter != nullptr )
+	{
+		OwnerCharacter->StopJumping();
+	}
+}
+
+void UInputOperationComponent::Walk(const FInputActionValue& Value)
+{
+
+	if (OwnerCharacter != nullptr && OwnerAnimInstance != nullptr)
+	{
+		if (IsRunning && OwnerAnimInstance->UpdateInput(InputAnimation::Run))
+		{
+			OwnerCharacter->SetSpeedToRun();
+			BaseWalk(Value);
+		}
+		else if (OwnerAnimInstance->UpdateInput(InputAnimation::Walk))
+		{
+			OwnerCharacter->SetSpeedToWalk();
+			BaseWalk(Value);
+		}
+
+	}
+
+}
+
+void UInputOperationComponent::BaseWalk(const FInputActionValue& Value)
+{
+	FVector2D MovementVector = Value.Get<FVector2D>();
+	// find out which way is forward
+	const FRotator Rotation = OwnerCharacter->Controller->GetControlRotation();
+	const FRotator YawRotation(0, Rotation.Yaw, 0);
+	// get forward vector
+	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	// get right vector 
+	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+	// add movement 
+	OwnerCharacter->AddMovementInput(ForwardDirection, MovementVector.Y);
+	OwnerCharacter->AddMovementInput(RightDirection, MovementVector.X);
+}
+
+void UInputOperationComponent::StopWalk()
+{
+	if (OwnerCharacter != nullptr && OwnerAnimInstance != nullptr )
+	{
+		OwnerAnimInstance->UpdateInput(InputAnimation::Idle);
+	}
+}
+
+void UInputOperationComponent::Run()
+{
+	IsRunning = true;
+}
+
+void UInputOperationComponent::StopRun()
+{
+	IsRunning=false;
+}
+
+void UInputOperationComponent::Look(const FInputActionValue& Value)
+{
+	// input is a Vector2D
+	FVector2D LookAxisVector = Value.Get<FVector2D>();
+	if (OwnerCharacter != nullptr)
+	{
+		// add yaw and pitch input to controller
+		OwnerCharacter->AddControllerYawInput(LookAxisVector.X);
+		OwnerCharacter->AddControllerPitchInput(-LookAxisVector.Y);
+	}
+}
+
+void UInputOperationComponent::Dodge()
+{
+	if (OwnerAnimInstance != nullptr && OwnerAnimInstance->UpdateInput(InputAnimation::Dodge))
+	{
+	}
+}
+
+void UInputOperationComponent::FirstAttack(const FInputActionValue& Value)
+{
+	if (OwnerAnimInstance != nullptr && OwnerAnimInstance->UpdateInput(InputAnimation::FirstAttack))
+	{
+	}
+}
+
+void UInputOperationComponent::SecondAttack(const FInputActionValue& Value)
+{
+	if (OwnerAnimInstance != nullptr && OwnerAnimInstance->UpdateInput(InputAnimation::SecondAttack))
+	{
+	}
+}
+
+void UInputOperationComponent::Spell(const FInputActionValue& Value)
+{
+}
+
+void UInputOperationComponent::ChangeSpellToSmall(const FInputActionValue& Value)
+{
+}
+
+void UInputOperationComponent::ChangeSpellToBig(const FInputActionValue& Value)
+{
+}
+
+void UInputOperationComponent::OpenPack(const FInputActionValue& Value)
+{
+}
+
+
 
