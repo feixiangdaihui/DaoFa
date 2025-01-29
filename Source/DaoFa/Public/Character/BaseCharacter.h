@@ -9,6 +9,7 @@
 class USpringArmComponent;
 class UCameraComponent;
 class UInputOperationComponent;
+class UAttributeComponent;
 
 UCLASS()
 class DAOFA_API ABaseCharacter : public ACharacter
@@ -37,6 +38,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Input")
 	TObjectPtr<UInputOperationComponent> InputOperationComponent;
 
+
+
 	virtual void NotifyControllerChanged() override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -46,8 +49,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
-
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Attribute")
+	TObjectPtr<UAttributeComponent> AttributeComponent;
 	UFUNCTION()
 	void SetSpeedToWalk();
 

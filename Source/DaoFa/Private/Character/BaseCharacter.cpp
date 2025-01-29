@@ -7,6 +7,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Character/Component/InputOperationComponent.h"
+#include "Character/Component/AttributeComponent/AttributeComponent.h"
 
 // Sets default values
 ABaseCharacter::ABaseCharacter()
@@ -44,6 +45,8 @@ ABaseCharacter::ABaseCharacter()
 
 
 	InputOperationComponent = CreateDefaultSubobject<UInputOperationComponent>(TEXT("InputOperationComponent"));
+	AttributeComponent = CreateDefaultSubobject<UAttributeComponent>(TEXT("AttributeComponent"));
+
 
 }
 

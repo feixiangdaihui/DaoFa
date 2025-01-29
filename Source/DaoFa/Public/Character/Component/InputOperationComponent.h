@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Character/Interface/InputUpdateInterface.h"
 #include "InputOperationComponent.generated.h"
 
 class UInputAction;
@@ -12,13 +13,14 @@ class UInputComponent;
 struct FInputActionValue;
 class UInputMappingContext;
 class UBaseAnimInstance;
+class UAttributeComponent;
 
 
 //负责告诉动画实例类现在的输入状态
 //动画实例类根据输入状态来判断是否播放动画
 //该类从而判断是否进行移动或者其他
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class DAOFA_API UInputOperationComponent : public UActorComponent
+class DAOFA_API UInputOperationComponent : public UActorComponent, public IInputUpdateInterface
 {
 	GENERATED_BODY()
 
@@ -32,14 +34,25 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	float JumpLockTime = 1.0f;
+	float JumpLockTimer = 0.0f;
+	float DodgeLockTime = 1.0f;
+	float DodgeLockTimer = 0.0f;
+
 private:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	virtual bool UpdateInput(InputAnimation Input, int val = -1) override;
 
-	TObjectPtr<ABaseCharacter> OwnerCharacter;
+	
 
-	TObjectPtr<UBaseAnimInstance> OwnerAnimInstance;
+
+	ABaseCharacter* OwnerCharacter;
+
+	UAttributeComponent* OwnerAttributeComponent;
+
+	UBaseAnimInstance* OwnerAnimInstance;
 	
 	/* Jump Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))

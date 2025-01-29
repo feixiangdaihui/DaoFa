@@ -7,6 +7,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Character/Animation/BaseAnimInstance.h"
+#include "Character/Component/AttributeComponent/AttributeComponent.h"
 
 
 // Sets default values for this component's properties
@@ -30,6 +31,16 @@ void UInputOperationComponent::BeginPlay()
 	if (OwnerCharacter != nullptr)
 	{
 		OwnerAnimInstance = Cast<UBaseAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
+		OwnerAttributeComponent = OwnerCharacter->AttributeComponent;
+		if (OwnerAttributeComponent == nullptr)
+			UE_LOG(LogTemp, Error, TEXT("OwnerAttributeComponent is nullptr"));
+		if (OwnerAnimInstance == nullptr)
+			UE_LOG(LogTemp, Error, TEXT("OwnerAnimInstance is nullptr"));
+	
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("OwnerCharacter is nullptr"));
 	}
 }
 
@@ -41,6 +52,18 @@ void UInputOperationComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 
 	// ...
 }
+
+bool UInputOperationComponent::UpdateInput(InputAnimation Input, int val)
+{
+	if (OwnerAnimInstance!=nullptr&&OwnerAnimInstance->UpdateInput(Input, val))
+	{
+		if (OwnerAttributeComponent != nullptr)
+			return OwnerAttributeComponent->UpdateInput(Input, val);
+	}
+	return false;
+}
+
+
 
 void UInputOperationComponent::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -74,7 +97,7 @@ void UInputOperationComponent::SetInputMappingContext(ULocalPlayer* LocalPlayer)
 
 void UInputOperationComponent::Jump()
 {
-	if (OwnerCharacter != nullptr && OwnerAnimInstance != nullptr && OwnerAnimInstance->UpdateInput(InputAnimation::Jump))
+	if (UpdateInput(InputAnimation::Jump))
 	{
 		OwnerCharacter->Jump();
 	}
@@ -91,14 +114,14 @@ void UInputOperationComponent::StopJumping()
 void UInputOperationComponent::Walk(const FInputActionValue& Value)
 {
 
-	if (OwnerCharacter != nullptr && OwnerAnimInstance != nullptr)
+	if (OwnerCharacter != nullptr && OwnerAnimInstance != nullptr&&OwnerAttributeComponent!=nullptr)
 	{
-		if (IsRunning && OwnerAnimInstance->UpdateInput(InputAnimation::Run))
+		if(IsRunning&& UpdateInput(InputAnimation::Run))
 		{
 			OwnerCharacter->SetSpeedToRun();
 			BaseWalk(Value);
 		}
-		else if (OwnerAnimInstance->UpdateInput(InputAnimation::Walk))
+		else if (UpdateInput(InputAnimation::Walk))
 		{
 			OwnerCharacter->SetSpeedToWalk();
 			BaseWalk(Value);
@@ -125,10 +148,7 @@ void UInputOperationComponent::BaseWalk(const FInputActionValue& Value)
 
 void UInputOperationComponent::StopWalk()
 {
-	if (OwnerCharacter != nullptr && OwnerAnimInstance != nullptr )
-	{
-		OwnerAnimInstance->UpdateInput(InputAnimation::Idle);
-	}
+	UpdateInput(InputAnimation::Idle);
 }
 
 void UInputOperationComponent::Run()
@@ -139,6 +159,8 @@ void UInputOperationComponent::Run()
 void UInputOperationComponent::StopRun()
 {
 	IsRunning=false;
+	if (OwnerAttributeComponent != nullptr)
+		OwnerAttributeComponent->UpdateInput(InputAnimation::EndRun);
 }
 
 void UInputOperationComponent::Look(const FInputActionValue& Value)
@@ -155,9 +177,12 @@ void UInputOperationComponent::Look(const FInputActionValue& Value)
 
 void UInputOperationComponent::Dodge()
 {
-	if (OwnerAnimInstance != nullptr && OwnerAnimInstance->UpdateInput(InputAnimation::Dodge))
+	if (UpdateInput(InputAnimation::Dodge))
 	{
+		if(OwnerAnimInstance!=nullptr)
+			OwnerAnimInstance->SetIsMontageForbiden(false);
 	}
+
 }
 
 void UInputOperationComponent::FirstAttack(const FInputActionValue& Value)

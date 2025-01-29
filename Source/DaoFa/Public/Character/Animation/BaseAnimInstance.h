@@ -35,6 +35,8 @@ public:
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
 	virtual void NativeBeginPlay() override;
+
+	void SetIsMontageForbiden(bool value) { IsMontageForbiden = value; }
 	
 
 protected:

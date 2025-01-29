@@ -12,7 +12,8 @@ TMap<InputAnimation, TArray<InputAnimation>> UBaseAnimInstance::InputBlendAgree 
 	{InputAnimation::FirstAttack,{InputAnimation::Idle}},
 	{InputAnimation::SecondAttack,{InputAnimation::Idle}},
 	{InputAnimation::Spell,{InputAnimation::Idle,InputAnimation::Spell,InputAnimation::Walk}},
-	{InputAnimation::Dodge,{InputAnimation::Idle}}
+	{InputAnimation::Dodge,{InputAnimation::Idle,InputAnimation::Jump}}
+
 };
 TSet<InputAnimation> UBaseAnimInstance::FlexibleState = { InputAnimation::Run, InputAnimation::Idle ,InputAnimation::Walk ,InputAnimation::Jump };
 
@@ -32,13 +33,14 @@ bool UBaseAnimInstance::UpdateInput(InputAnimation Input, int val)
 				CurrentSequenceState = Input;
 				return true;
 			}
-			else
+			else if (InputBlendAgree.Contains(Input))
 			{
 				CurrentMontageState = Input;
 				MontageStateValue = val;
-				IsMontageForbiden = false;
 				return true;
 			}
+			else
+				return true;
 		}
 	}
 	return false;

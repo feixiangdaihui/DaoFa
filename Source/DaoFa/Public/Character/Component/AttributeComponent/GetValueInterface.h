@@ -4,26 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "InputUpdateInterface.generated.h"
-UENUM(BlueprintType)
-enum class InputAnimation : uint8
-{
-	Walk,
-	Run,
-	Idle,
-	Jump,
-	Fall,
-	FirstAttack,
-	SecondAttack,
-	Spell,
-	Dodge,
-	EndRun,
-	NONE,
+#include "GetValueInterface.generated.h"
 
-};
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
-class UInputUpdateInterface : public UInterface
+class UGetValueInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -31,13 +16,17 @@ class UInputUpdateInterface : public UInterface
 /**
  * 
  */
-class DAOFA_API IInputUpdateInterface
+class DAOFA_API IGetValueInterface
 {
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
+	virtual float GetCurrentValue() const = 0;
+	virtual float GetMaxValue() const = 0;
+	virtual float GetPercentage() const = 0;
+	virtual bool IsFull() const = 0;
+	virtual bool IsEmpty() const = 0;
 
-	virtual bool UpdateInput(InputAnimation Input, int val = -1) = 0;
 
 };
