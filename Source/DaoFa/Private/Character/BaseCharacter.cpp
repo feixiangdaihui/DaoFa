@@ -8,6 +8,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Character/Component/InputOperationComponent.h"
 #include "Character/Component/AttributeComponent/AttributeComponent.h"
+#include "Character/Component/PackComponent/PackComponent.h"
 
 // Sets default values
 ABaseCharacter::ABaseCharacter()
@@ -46,7 +47,7 @@ ABaseCharacter::ABaseCharacter()
 
 	InputOperationComponent = CreateDefaultSubobject<UInputOperationComponent>(TEXT("InputOperationComponent"));
 	AttributeComponent = CreateDefaultSubobject<UAttributeComponent>(TEXT("AttributeComponent"));
-
+	PackComponent = CreateDefaultSubobject<UPackComponent>(TEXT("PackComponent"));
 
 }
 
@@ -91,4 +92,11 @@ void ABaseCharacter::SetSpeedToRun()
 {
 	GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
 }
+
+void ABaseCharacter::InitSumEquipmentBar(USumEquipmentBarWidget* SumEquipmentBarWidget)
+{
+	InputOperationComponent->InitSumEquipmentBar(SumEquipmentBarWidget);
+	PackComponent->InitSumEquipmentBar(SumEquipmentBarWidget);
+}
+
 

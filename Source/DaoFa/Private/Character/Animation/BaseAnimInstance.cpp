@@ -6,41 +6,52 @@
 #include "GameFramework/CharacterMovementComponent.h"
 
 
-//记录蒙太奇无法与其他哪些动画序列同时进行
+//记录哪些状态可以共存
+//IdleWalkRun持续输入的状态无需单独记录
+//具有先后顺序，不一定完全对称（意味着可以从A到B，但不一定可以从B到A）
 TMap<InputAnimation, TArray<InputAnimation>> UBaseAnimInstance::InputBlendAgree =
 {
 	{InputAnimation::FirstAttack,{InputAnimation::Idle}},
 	{InputAnimation::SecondAttack,{InputAnimation::Idle}},
 	{InputAnimation::Spell,{InputAnimation::Idle,InputAnimation::Spell,InputAnimation::Walk}},
-	{InputAnimation::Dodge,{InputAnimation::Idle,InputAnimation::Jump}}
-
+	{InputAnimation::Dodge,{InputAnimation::Idle}},
+	{InputAnimation::Jump,{InputAnimation::Run, InputAnimation::Idle ,InputAnimation::Walk} }
 };
-TSet<InputAnimation> UBaseAnimInstance::FlexibleState = { InputAnimation::Run, InputAnimation::Idle ,InputAnimation::Walk ,InputAnimation::Jump };
+TSet<InputAnimation> UBaseAnimInstance::FlexibleState = { InputAnimation::Run, InputAnimation::Idle ,InputAnimation::Walk  };
 
 
 
-bool UBaseAnimInstance::UpdateInput(InputAnimation Input, int val)
+
+
+void UBaseAnimInstance::UpdateInput(InputAnimation Input)
 {
-	
 	if (OwnerCharacter)
 	{
-		if (CurrentMontageState!=InputAnimation::NONE&&!InputBlendAgree[CurrentMontageState].Contains(Input))
+
+		if (FlexibleState.Contains(Input))
+		{
+			CurrentSequenceState = Input;
+		}
+		else 
+		{
+			IsMontageForbiden = false;
+			CurrentMontageState = Input;
+
+		}
+
+	}
+
+}
+
+bool UBaseAnimInstance::CheckInput(InputAnimation Input)
+{
+	if (OwnerCharacter)
+	{
+		if (CurrentMontageState != InputAnimation::NONE && !InputBlendAgree[CurrentMontageState].Contains(Input))
 			return false;
 		else
 		{
-			if (FlexibleState.Contains(Input))
-			{
-				CurrentSequenceState = Input;
-				return true;
-			}
-			else if (InputBlendAgree.Contains(Input))
-			{
-				CurrentMontageState = Input;
-				MontageStateValue = val;
-				return true;
-			}
-			else
-				return true;
+			return true;
 		}
 	}
 	return false;

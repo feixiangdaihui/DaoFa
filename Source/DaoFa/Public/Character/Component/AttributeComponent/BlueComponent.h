@@ -10,7 +10,7 @@
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class DAOFA_API UBlueComponent : public UActorComponent, public IGetValueInterface, public ISetValueInterface
+class DAOFA_API  UBlueComponent: public UActorComponent, public IGetValueInterface, public ISetValueInterface
 {
 	GENERATED_BODY()
 
@@ -89,9 +89,25 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Blue")
 	virtual void AddPercentage(float Value) override { SetCurrentValue(CurrentBlue + MaxBlue * Value); }
 	UFUNCTION(BlueprintCallable, Category = "Blue")
-	virtual void SubtractValue(float Value) override { SetCurrentValue(CurrentBlue - Value); }
+	virtual bool SubtractValue(float Value) override
+	{ 
+		if (CurrentBlue >= Value) 
+		{ 
+			SetCurrentValue(CurrentBlue - Value); 
+			return true;
+		} 
+		return false; 
+	}
 	UFUNCTION(BlueprintCallable, Category = "Blue")
-	virtual void SubtractPercentage(float Value) override { SetCurrentValue(CurrentBlue - MaxBlue * Value); }
+	virtual bool SubtractPercentage(float Value) override
+	{
+		if (CurrentBlue >= Value * MaxBlue)
+		{
+			SetCurrentValue(CurrentBlue - Value * MaxBlue);
+			return true;
+		}
+		return false;
+	}
 
 
 	

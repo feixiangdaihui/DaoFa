@@ -13,6 +13,8 @@ UCLASS()
 class DAOFA_API ABasePlayerController : public APlayerController
 {
 	GENERATED_BODY()
-
-
+public:
+	UFUNCTION(BlueprintCallable, Category = "Input")
+	void GatherToPauseGame();
+	void GatherToUnPauseGame();
 };

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Character/Interface/InputUpdateInterface.h"
+#include "Hud/Interface/InitSumEquipmentBarInterface.h"
 #include "InputOperationComponent.generated.h"
 
 class UInputAction;
@@ -13,14 +14,13 @@ class UInputComponent;
 struct FInputActionValue;
 class UInputMappingContext;
 class UBaseAnimInstance;
-class UAttributeComponent;
-
-
+class USumEquipmentBarWidget;
+class ABaseHud;
 //负责告诉动画实例类现在的输入状态
 //动画实例类根据输入状态来判断是否播放动画
 //该类从而判断是否进行移动或者其他
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class DAOFA_API UInputOperationComponent : public UActorComponent, public IInputUpdateInterface
+class DAOFA_API UInputOperationComponent : public UActorComponent, public IInputUpdateInterface,public IInitSumEquipmentBarInterface
 {
 	GENERATED_BODY()
 
@@ -34,25 +34,27 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	float JumpLockTime = 1.0f;
-	float JumpLockTimer = 0.0f;
-	float DodgeLockTime = 1.0f;
-	float DodgeLockTimer = 0.0f;
+	
 
 private:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	virtual bool UpdateInput(InputAnimation Input, int val = -1) override;
+	virtual void UpdateInput(InputAnimation Input) override;
 
-	
+	virtual bool CheckInput(InputAnimation Input) override;
+
+	TArray<TScriptInterface<IInputUpdateInterface>> InputUpdateInterfaces;
 
 
 	ABaseCharacter* OwnerCharacter;
 
-	UAttributeComponent* OwnerAttributeComponent;
+
+	ABaseHud* OwnerHud;
 
 	UBaseAnimInstance* OwnerAnimInstance;
+
+	USumEquipmentBarWidget* OwnerSumEquipmentBarWidget;
 	
 	/* Jump Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -88,21 +90,23 @@ private:
 
 	/* ChangeSpellToSmall Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* ChangeSpellToSmallAction;
+	UInputAction* ChangeChosenEquipmentBarToSmallAction;
 
 	/* ChangeSpellToBig Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* ChangeSpellToBigAction;
+	UInputAction* ChangeChosenEquipmentBarToBigAction;
 
 	/* OpenPack Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* OpenPackAction;
 
+	bool IsPackOpen = false;
+
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
 
-
+public:
 	void Jump();
 
 	void StopJumping();
@@ -127,12 +131,13 @@ private:
 
 	void Spell(const FInputActionValue& Value);
 
-	void ChangeSpellToSmall(const FInputActionValue& Value);
+	void ChangeChosenEquipmentBarToSmall(const FInputActionValue& Value);
 
-	void ChangeSpellToBig(const FInputActionValue& Value);
+	void ChangeChosenEquipmentBarToBig(const FInputActionValue& Value);
 
-	void OpenPack(const FInputActionValue& Value);
+	void OpenPack();
 
+	virtual void InitSumEquipmentBar(USumEquipmentBarWidget* SumEquipmentBarWidget) override;
 
 	bool IsRunning = false;
 

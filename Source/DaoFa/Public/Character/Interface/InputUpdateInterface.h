@@ -38,6 +38,8 @@ class DAOFA_API IInputUpdateInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 
-	virtual bool UpdateInput(InputAnimation Input, int val = -1) = 0;
+	virtual void UpdateInput(InputAnimation Input) = 0;
+
+	virtual bool CheckInput(InputAnimation Input) = 0;
 
 };

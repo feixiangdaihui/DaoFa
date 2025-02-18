@@ -42,9 +42,4 @@ void UAttributeComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	// ...
 }
 
-bool UAttributeComponent::UpdateInput(InputAnimation Input, int val)
-{
-	
-	return PhysicalPowerComponent->UpdateInput(Input, val);
-}
 

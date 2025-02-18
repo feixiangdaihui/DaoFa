@@ -82,11 +82,34 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Health")
 	virtual void AddPercentage(float Value) override { SetCurrentValue(CurrentHealth + MaxHealth * Value); }
 	UFUNCTION(BlueprintCallable, Category = "Health")
-	virtual void SubtractValue(float Value) override { SetCurrentValue(CurrentHealth - Value); }
+	virtual bool SubtractValue(float Value) override
+	{ 
+		if (CurrentHealth - Value < 0)
+		{
+			CurrentHealth = 0;
+			return false;
+		}
+		else
+		{
+			CurrentHealth -= Value;
+			return true;
+		}
+	}
 	UFUNCTION(BlueprintCallable, Category = "Health")
-	virtual void SubtractPercentage(float Value) override { SetCurrentValue(CurrentHealth - MaxHealth * Value); }
-	
-	
+	virtual bool SubtractPercentage(float Value) override
+	{
+		if (CurrentHealth - Value * MaxHealth < 0)
+		{
+			CurrentHealth = 0;
+			return false;
+		}
+		else
+		{
+			CurrentHealth -= Value * MaxHealth;
+			return true;
+		}
+
+	}
 
 
 

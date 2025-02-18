@@ -29,6 +29,10 @@ void UPhysicalPowerComponent::RecoverPhysicalPowerBySecond(float DeltaTime)
 	{
 		return;
 	}
+	if (IsRun)
+	{
+		return;
+	}
 	//每秒回复体力
 	CurrentPhysicalPower += RecoverPhysicalPowerAmountBySecond * DeltaTime;
 	if (CurrentPhysicalPower > MaxPhysicalPower)
@@ -71,13 +75,20 @@ void UPhysicalPowerComponent::TickComponent(float DeltaTime, ELevelTick TickType
 	{
 		JumpLockTimer -= DeltaTime;
 	}
+	if (DodgeLockTimer > 0)
+	{
+		DodgeLockTimer -= DeltaTime;
+	}
+	if (RunLockTimer > 0)
+	{
+		RunLockTimer -= DeltaTime;
+	}
 
 	// ...
 }
 
-bool UPhysicalPowerComponent::UpdateInput(InputAnimation Input, int val)
+void UPhysicalPowerComponent::UpdateInput(InputAnimation Input)
 {
-	
 	switch (Input)
 	{
 	case::InputAnimation::Idle:
@@ -90,27 +101,51 @@ bool UPhysicalPowerComponent::UpdateInput(InputAnimation Input, int val)
 		IsRun = false;
 		break;
 	case InputAnimation::Run:
+		IsRun = true;
+		break;
+	case InputAnimation::Jump:
+
+		LossPhysicalPower(JumpLoss);
+		JumpLockTimer = JumpLockTime;
+		break;
+	case InputAnimation::Dodge:
+		LossPhysicalPower(DodgeLoss);
+		DodgeLockTimer = DodgeLockTime;
+		break;
+	default:
+		break;
+	}
+}
+
+bool UPhysicalPowerComponent::CheckInput(InputAnimation Input)
+{
+	switch (Input)
+	{
+	case InputAnimation::Run:
 		if (IsEmpty())
 		{
+			RunLockTimer = RunLockTime;
 			return false;
 		}
-		IsRun = true;
+		if (RunLockTimer > 0)
+			return false;
 		break;
 	case InputAnimation::Jump:
 		if (JumpLockTimer > 0)
 			return false;
-		if (LossPhysicalPower(JumpLoss))
-		{
-			JumpLockTimer = JumpLockTime;
-			return true;
-		}
+		if (CurrentPhysicalPower < JumpLoss)
+			return false;
 		break;
 	case InputAnimation::Dodge:
-		return LossPhysicalPower(DodgeLoss);
+		if (DodgeLockTimer > 0)
+			return false;
+		if (CurrentPhysicalPower < DodgeLoss)
+			return false;
 		break;
 	default:
 		break;
 	}
 	return true;
 }
+
 

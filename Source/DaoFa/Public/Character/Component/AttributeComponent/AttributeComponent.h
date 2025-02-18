@@ -13,7 +13,7 @@ class UBlueComponent;
 class ABaseCharacter;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class DAOFA_API UAttributeComponent : public UActorComponent, public IInputUpdateInterface
+class DAOFA_API UAttributeComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
@@ -42,6 +42,5 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	// IInputUpdateInterface
-	virtual bool UpdateInput(InputAnimation Input, int val = -1) override;
 		
 };

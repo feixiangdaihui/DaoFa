@@ -29,7 +29,7 @@ public:
 	virtual void SetEmpty() = 0;
 	virtual void AddValue(float Value) = 0;
 	virtual void AddPercentage(float Value) = 0;
-	virtual void SubtractValue(float Value) = 0;
-	virtual void SubtractPercentage(float Value) = 0;
+	virtual bool SubtractValue(float Value) = 0;
+	virtual bool SubtractPercentage(float Value) = 0;
 
 };

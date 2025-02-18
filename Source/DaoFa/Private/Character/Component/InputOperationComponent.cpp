@@ -8,8 +8,9 @@
 #include "InputActionValue.h"
 #include "Character/Animation/BaseAnimInstance.h"
 #include "Character/Component/AttributeComponent/AttributeComponent.h"
-
-
+#include "Character/Component/AttributeComponent/PhysicalPowerComponent.h"
+#include "Character/Component/PackComponent/SumEquipmentBarWidget.h"
+#include "Hud/BaseHud.h"
 // Sets default values for this component's properties
 UInputOperationComponent::UInputOperationComponent()
 {
@@ -31,17 +32,21 @@ void UInputOperationComponent::BeginPlay()
 	if (OwnerCharacter != nullptr)
 	{
 		OwnerAnimInstance = Cast<UBaseAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
-		OwnerAttributeComponent = OwnerCharacter->AttributeComponent;
-		if (OwnerAttributeComponent == nullptr)
-			UE_LOG(LogTemp, Error, TEXT("OwnerAttributeComponent is nullptr"));
-		if (OwnerAnimInstance == nullptr)
-			UE_LOG(LogTemp, Error, TEXT("OwnerAnimInstance is nullptr"));
+		UAttributeComponent* OwnerAttributeComponent = OwnerCharacter->AttributeComponent;
+		UPhysicalPowerComponent* OwnerPhysicalPowerComponent = OwnerAttributeComponent->PhysicalPowerComponent;
+		OwnerHud = Cast<ABaseHud>(OwnerCharacter->GetWorld()->GetFirstPlayerController()->GetHUD());
+
+		if (OwnerAnimInstance != nullptr)
+			InputUpdateInterfaces.Add(OwnerAnimInstance);
+		if (OwnerPhysicalPowerComponent != nullptr)
+			InputUpdateInterfaces.Add(OwnerPhysicalPowerComponent);
 	
 	}
 	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("OwnerCharacter is nullptr"));
 	}
+
 }
 
 
@@ -53,15 +58,25 @@ void UInputOperationComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 	// ...
 }
 
-bool UInputOperationComponent::UpdateInput(InputAnimation Input, int val)
+void UInputOperationComponent::UpdateInput(InputAnimation Input)
 {
-	if (OwnerAnimInstance!=nullptr&&OwnerAnimInstance->UpdateInput(Input, val))
+	for (auto InputUpdateInterface : InputUpdateInterfaces)
 	{
-		if (OwnerAttributeComponent != nullptr)
-			return OwnerAttributeComponent->UpdateInput(Input, val);
+		InputUpdateInterface->UpdateInput(Input);
 	}
-	return false;
 }
+
+bool UInputOperationComponent::CheckInput(InputAnimation Input)
+{
+	for (auto InputUpdateInterface : InputUpdateInterfaces)
+	{
+		if (!InputUpdateInterface->CheckInput(Input))
+			return false;
+	}
+	return true;
+}
+
+
 
 
 
@@ -82,6 +97,15 @@ void UInputOperationComponent::SetupPlayerInputComponent(UInputComponent* Player
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &UInputOperationComponent::Look);
 		//Dodge
 		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Started, this, &UInputOperationComponent::Dodge);
+
+		//ChangeChosenEquipmentBar
+		EnhancedInputComponent->BindAction(ChangeChosenEquipmentBarToSmallAction, ETriggerEvent::Started, this, &UInputOperationComponent::ChangeChosenEquipmentBarToSmall);
+		EnhancedInputComponent->BindAction(ChangeChosenEquipmentBarToBigAction, ETriggerEvent::Started, this, &UInputOperationComponent::ChangeChosenEquipmentBarToBig);
+
+		//Pack
+		EnhancedInputComponent->BindAction(OpenPackAction, ETriggerEvent::Started, this, &UInputOperationComponent::OpenPack);
+		OpenPackAction->bTriggerWhenPaused = true;
+
 	}
 }
 
@@ -97,9 +121,10 @@ void UInputOperationComponent::SetInputMappingContext(ULocalPlayer* LocalPlayer)
 
 void UInputOperationComponent::Jump()
 {
-	if (UpdateInput(InputAnimation::Jump))
+	if (CheckInput(InputAnimation::Jump))
 	{
 		OwnerCharacter->Jump();
+		UpdateInput(InputAnimation::Jump);
 	}
 }
 
@@ -108,23 +133,27 @@ void UInputOperationComponent::StopJumping()
 	if (OwnerCharacter != nullptr )
 	{
 		OwnerCharacter->StopJumping();
+		UpdateInput(InputAnimation::NONE);
 	}
 }
 
 void UInputOperationComponent::Walk(const FInputActionValue& Value)
 {
 
-	if (OwnerCharacter != nullptr && OwnerAnimInstance != nullptr&&OwnerAttributeComponent!=nullptr)
+	if (OwnerCharacter != nullptr )
 	{
-		if(IsRunning&& UpdateInput(InputAnimation::Run))
+		if(IsRunning&& CheckInput(InputAnimation::Run))
 		{
 			OwnerCharacter->SetSpeedToRun();
+			UpdateInput(InputAnimation::Run);
 			BaseWalk(Value);
 		}
-		else if (UpdateInput(InputAnimation::Walk))
+		else if (CheckInput(InputAnimation::Walk))
 		{
 			OwnerCharacter->SetSpeedToWalk();
+			UpdateInput(InputAnimation::Walk);
 			BaseWalk(Value);
+
 		}
 
 	}
@@ -159,8 +188,6 @@ void UInputOperationComponent::Run()
 void UInputOperationComponent::StopRun()
 {
 	IsRunning=false;
-	if (OwnerAttributeComponent != nullptr)
-		OwnerAttributeComponent->UpdateInput(InputAnimation::EndRun);
 }
 
 void UInputOperationComponent::Look(const FInputActionValue& Value)
@@ -177,42 +204,62 @@ void UInputOperationComponent::Look(const FInputActionValue& Value)
 
 void UInputOperationComponent::Dodge()
 {
-	if (UpdateInput(InputAnimation::Dodge))
+	if (CheckInput(InputAnimation::Dodge))
 	{
-		if(OwnerAnimInstance!=nullptr)
-			OwnerAnimInstance->SetIsMontageForbiden(false);
+		UpdateInput(InputAnimation::Dodge);
 	}
 
 }
 
 void UInputOperationComponent::FirstAttack(const FInputActionValue& Value)
 {
-	if (OwnerAnimInstance != nullptr && OwnerAnimInstance->UpdateInput(InputAnimation::FirstAttack))
-	{
-	}
+	
 }
 
 void UInputOperationComponent::SecondAttack(const FInputActionValue& Value)
 {
-	if (OwnerAnimInstance != nullptr && OwnerAnimInstance->UpdateInput(InputAnimation::SecondAttack))
-	{
-	}
+	
 }
 
 void UInputOperationComponent::Spell(const FInputActionValue& Value)
 {
 }
 
-void UInputOperationComponent::ChangeSpellToSmall(const FInputActionValue& Value)
+void UInputOperationComponent::ChangeChosenEquipmentBarToSmall(const FInputActionValue& Value)
 {
+	if (OwnerSumEquipmentBarWidget)
+	{
+		OwnerSumEquipmentBarWidget->ChangeChosenEquipmentBarToSmall();
+	}
 }
 
-void UInputOperationComponent::ChangeSpellToBig(const FInputActionValue& Value)
+void UInputOperationComponent::ChangeChosenEquipmentBarToBig(const FInputActionValue& Value)
 {
+	if (OwnerSumEquipmentBarWidget)
+	{
+		OwnerSumEquipmentBarWidget->ChangeChosenEquipmentBarToBig();
+	}
 }
 
-void UInputOperationComponent::OpenPack(const FInputActionValue& Value)
+
+void UInputOperationComponent::OpenPack()
 {
+	if (IsPackOpen)
+	{
+
+		OwnerHud->ClosePack();
+		IsPackOpen = false;
+	}
+	else
+	{
+		OwnerHud->OpenPack();
+		IsPackOpen = true;
+	}
+}
+
+void UInputOperationComponent::InitSumEquipmentBar(USumEquipmentBarWidget* SumEquipmentBarWidget)
+{
+	OwnerSumEquipmentBarWidget = SumEquipmentBarWidget;
 }
 
 

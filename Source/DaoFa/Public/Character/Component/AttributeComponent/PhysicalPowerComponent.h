@@ -50,6 +50,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PhysicalPower")
 	bool IsRun = false;
 
+	//跑步锁
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PhysicalPower")
+	float RunLockTime = 1.0f;
+	float RunLockTimer = 0.0;
+
 
 	//一次性消耗体力
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PhysicalPower")
@@ -62,11 +67,15 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "PhysicalPower")
 	bool LossPhysicalPower(float value);
 
+	//跳跃锁
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PhysicalPower")
 	float JumpLockTime = 1.0f;
 	float JumpLockTimer = 0.0;
 
-
+	//翻滚锁
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PhysicalPower")
+	float DodgeLockTime = 1.0f;
+	float DodgeLockTimer = 0.0;
 
 
 public:	
@@ -85,7 +94,8 @@ public:
 	virtual bool IsEmpty() const override { return CurrentPhysicalPower == 0; }
 
 	UFUNCTION(BlueprintCallable, Category = "PhysicalPower")
-	virtual bool UpdateInput(InputAnimation Input, int val = -1);
+	virtual void UpdateInput(InputAnimation Input) override;
+	virtual bool CheckInput(InputAnimation Input) override;
 
 
 

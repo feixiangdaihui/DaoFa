@@ -4,15 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Hud/Interface/InitSumEquipmentBarInterface.h"
 #include "BaseCharacter.generated.h"
 
 class USpringArmComponent;
 class UCameraComponent;
 class UInputOperationComponent;
 class UAttributeComponent;
-
+class UPackComponent;
 UCLASS()
-class DAOFA_API ABaseCharacter : public ACharacter
+class DAOFA_API ABaseCharacter : public ACharacter, public IInitSumEquipmentBarInterface
 {
 	GENERATED_BODY()
 
@@ -35,8 +36,7 @@ protected:
 	float WalkSpeed = 250.f;
 	float RunSpeed = 500.f;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Input")
-	TObjectPtr<UInputOperationComponent> InputOperationComponent;
+
 
 
 
@@ -48,15 +48,22 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Input")
+	TObjectPtr<UInputOperationComponent> InputOperationComponent;
 	// Called to bind functionality to input
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Attribute")
 	TObjectPtr<UAttributeComponent> AttributeComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Pack")
+	TObjectPtr<UPackComponent> PackComponent;
+
 	UFUNCTION()
 	void SetSpeedToWalk();
 
 	UFUNCTION()
 	void SetSpeedToRun();
 
+	virtual void InitSumEquipmentBar(USumEquipmentBarWidget* SumEquipmentBarWidget) override;
 
 
 };
