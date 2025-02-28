@@ -19,7 +19,8 @@ UCLASS()
 class DAOFA_API UBaseAnimInstance : public UAnimInstance ,public IInputUpdateInterface
 {
 	GENERATED_BODY()
-	
+
+
 	
 	static TMap<InputAnimation, TArray<InputAnimation>> InputBlendAgree;
 
@@ -40,15 +41,25 @@ public:
 
 	virtual void NativeBeginPlay() override;
 
+	UFUNCTION(BlueprintCallable, Category = "Animation")
 	void SetIsMontageForbiden(bool value) { IsMontageForbiden = value; }
-	
+
+
 
 protected:
 	//记录一次性完成的动画状态
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Animation")
-	InputAnimation CurrentMontageState=InputAnimation::NONE;
+	InputAnimation CurrentMontageState = InputAnimation::NONE;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Animation")
 	bool IsMontageForbiden = false;
+
+	FOnMontageEnded MontageEndDelegate;
+
+
+
+
+
 
 
 	//记录持续更新类的动画状态

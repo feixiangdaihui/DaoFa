@@ -16,13 +16,13 @@ void UEquipmentBarWidget::WearEquipment(TScriptInterface<IShowTrigger> Equipment
 			{
 				if (i != Index)
 				{
-					if(EquipmentBar[Index])
+					if(EquipmentBar[Index]!=nullptr)
 					{
 						EquipmentBar[i] = EquipmentBar[Index];
 						OnEquipmentWear(i);
 					}
 					else
-						OnEquipmentTakeOff(i);
+						TakeOffEquipment(Equipment);
 					EquipmentBar[Index] = Equipment;
 					OnEquipmentWear(Index);
 				}
@@ -70,6 +70,11 @@ void UEquipmentBarWidget::TriggeredByShortPress(int Index)
 			EquipmentBar[Index]->TriggeredByShortPress();
 		}
 	}
+}
+
+bool UEquipmentBarWidget::IsEquipmentValid(int Index)
+{
+	return EquipmentBar[Index].GetObject() != nullptr;
 }
 
 UEquipmentBarWidget::UEquipmentBarWidget(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)

@@ -42,4 +42,30 @@ void UAttributeComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	// ...
 }
 
+TScriptInterface<IGetValueInterface> UAttributeComponent::GetHealthValue()
+{
+	return HealthComponent;
+
+}
+
+TScriptInterface<IGetValueInterface> UAttributeComponent::GetPhysicalPowerValue()
+{
+	return PhysicalPowerComponent;
+}
+
+TScriptInterface<IGetValueInterface> UAttributeComponent::GetBlueValue()
+{
+	return BlueComponent;
+}
+
+TScriptInterface<ISetValueInterface> UAttributeComponent::SetHealthValue()
+{
+	return HealthComponent;
+}
+
+TScriptInterface<ISetValueInterface> UAttributeComponent::SetBlueValue()
+{
+	return BlueComponent;
+}
+
 

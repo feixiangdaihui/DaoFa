@@ -30,6 +30,8 @@ public:
 	void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent);
 	//设置输入映射上下文为当前组件所指定的上下文
 	void SetInputMappingContext(ULocalPlayer* LocalPlayer);
+
+	virtual void InitSumEquipmentBar(USumEquipmentBarWidget* SumEquipmentBarWidget) override;
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -86,7 +88,20 @@ private:
 
 	/** Spell Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	TArray<UInputAction*> SpellAction;
+	UInputAction* SpellAction0;
+
+	/** Spell Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* SpellAction1;
+
+	/** Spell Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* SpellAction2;
+
+	/** Spell Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* SpellAction3;
+
 
 	/* ChangeSpellToSmall Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -106,7 +121,6 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
 
-public:
 	void Jump();
 
 	void StopJumping();
@@ -129,7 +143,11 @@ public:
 
 	void SecondAttack(const FInputActionValue& Value);
 
-	void Spell(const FInputActionValue& Value);
+
+	//1表示开始释放技能，0表示结束释放技能
+	void Spell(int Num, bool Begin);
+	float HoldStartTime[4] = { 0,0,0,0 };
+	float LongPressTime = 0.5f;
 
 	void ChangeChosenEquipmentBarToSmall(const FInputActionValue& Value);
 
@@ -137,7 +155,7 @@ public:
 
 	void OpenPack();
 
-	virtual void InitSumEquipmentBar(USumEquipmentBarWidget* SumEquipmentBarWidget) override;
+
 
 	bool IsRunning = false;
 

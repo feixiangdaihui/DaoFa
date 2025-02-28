@@ -9,6 +9,8 @@
 #include "Character/Component/InputOperationComponent.h"
 #include "Character/Component/AttributeComponent/AttributeComponent.h"
 #include "Character/Component/PackComponent/PackComponent.h"
+#include "General/EnemyDetector.h"
+#include "Enemy/BaseEnemy.h"
 
 // Sets default values
 ABaseCharacter::ABaseCharacter()
@@ -46,8 +48,14 @@ ABaseCharacter::ABaseCharacter()
 
 
 	InputOperationComponent = CreateDefaultSubobject<UInputOperationComponent>(TEXT("InputOperationComponent"));
-	AttributeComponent = CreateDefaultSubobject<UAttributeComponent>(TEXT("AttributeComponent"));
-	PackComponent = CreateDefaultSubobject<UPackComponent>(TEXT("PackComponent"));
+
+	EnemyDetector = CreateDefaultSubobject<UEnemyDetector>(TEXT("EnemyDetector"));
+	EnemyDetector->DetectionRadius = 3000.0f;
+	EnemyDetector->HorizontalAngle = 90.0f;
+	EnemyDetector->VerticalAngle = 180.0f;
+	EnemyDetector->EnemyClasses.Empty();
+	EnemyDetector->EnemyClasses.Add(ABaseEnemy::StaticClass());
+
 
 }
 

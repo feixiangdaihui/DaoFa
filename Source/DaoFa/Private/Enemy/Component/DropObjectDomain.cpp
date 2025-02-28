@@ -41,7 +41,7 @@ void ADropObjectDomain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AAct
 			SpawnParameters.Owner = Character;
 			APackObject* PackObject = GetWorld()->SpawnActor<APackObject>(ObjectClass, Character->GetActorLocation(), FRotator::ZeroRotator, SpawnParameters);
 			PackObject->AttachToCharacter(Character);
-			Character->PackComponent->WearEquipment(PackObject);
+			Character->GetPackComponent()->WearEquipment(PackObject);
 		}
 	}
 }

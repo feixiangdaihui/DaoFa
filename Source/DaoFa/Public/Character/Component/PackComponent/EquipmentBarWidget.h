@@ -56,6 +56,6 @@ public:
 	void TriggeredByShortPress(int Index);
 
 
-
+	bool IsEquipmentValid(int Index);
 	
 };

@@ -11,7 +11,8 @@ class UHealthComponent;
 class UPhysicalPowerComponent;
 class UBlueComponent;
 class ABaseCharacter;
-
+class IGetValueInterface;
+class ISetValueInterface;
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class DAOFA_API UAttributeComponent : public UActorComponent
 {
@@ -29,7 +30,7 @@ protected:
 	
 
 
-public:	
+
 
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attribute")
@@ -41,6 +42,16 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	// IInputUpdateInterface
+public:
+	UHealthComponent* GetHealthComponent() { return HealthComponent.Get(); }
+	UPhysicalPowerComponent* GetPhysicalPowerComponent() { return PhysicalPowerComponent.Get(); }
+	UBlueComponent* GetBlueComponent() { return BlueComponent.Get(); }
+
+	TScriptInterface<IGetValueInterface> GetHealthValue();
+	TScriptInterface<IGetValueInterface> GetPhysicalPowerValue();
+	TScriptInterface<IGetValueInterface> GetBlueValue();
+
+	TScriptInterface<ISetValueInterface> SetHealthValue();
+	TScriptInterface<ISetValueInterface> SetBlueValue();
 		
 };

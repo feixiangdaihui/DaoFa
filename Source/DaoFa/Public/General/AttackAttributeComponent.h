@@ -7,7 +7,6 @@
 #include "General/ElementSetting.h"
 #include "AttackAttributeComponent.generated.h"
 
-const float INTERRUPT_START_PERCENT = 1.0f;
 UENUM()
 enum class EInterruptType
 {
@@ -44,21 +43,13 @@ enum class EAvoidInterruptAblity
 	NONE
 };
 
-USTRUCT()
-struct FAttackReturnValue
-{
-	GENERATED_BODY()
-public:
-	float Damage;
-	EInterruptType InterruptType;
-	EInterruptDir InterruptDir;
-};
 
+class ACreature;
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class DAOFA_API UAttackAttributeComponent : public UActorComponent
 {
 	GENERATED_BODY()
-
+	friend class UCalAttackLibrary;
 public:	
 	// Sets default values for this component's properties
 	UAttackAttributeComponent();
@@ -88,14 +79,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
 	EInterruptAblity InterruptAblity = EInterruptAblity::NONE;
 
-public:
-	EInterruptType CalculateInterrupt(float ActualDamagePercent,EAvoidInterruptAblity AvoidAblity);
-	
-	virtual float CalculateDamage(float Defense, GElement DefenseElement, float DamageMultiplier);
-	
-	EInterruptDir CalculateInterruptDir(AActor* OtherActor);
 
-	virtual FAttackReturnValue CalculateAttack(float Defense, GElement DefenseElement, float DamageMultiplier, float ActualDamagePercent, EAvoidInterruptAblity AvoidAblity, AActor* OtherActor);
 
 
 };

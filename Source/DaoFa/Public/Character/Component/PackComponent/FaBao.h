@@ -15,10 +15,6 @@ public:
 	// Sets default values for this actor's properties
 	AFaBao();
 
-	//骨骼体
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FaBao")
-	TObjectPtr<USkeletalMeshComponent> SkeletalMeshComponent;
-
 
 
 protected:
@@ -32,6 +28,5 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void AttachToCharacter(ABaseCharacter* Character) override;
 
 };

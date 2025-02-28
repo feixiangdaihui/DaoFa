@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "Creature.h"
 #include "Hud/Interface/InitSumEquipmentBarInterface.h"
 #include "BaseCharacter.generated.h"
 
@@ -12,8 +12,9 @@ class UCameraComponent;
 class UInputOperationComponent;
 class UAttributeComponent;
 class UPackComponent;
+class UEnemyDetector;
 UCLASS()
-class DAOFA_API ABaseCharacter : public ACharacter, public IInitSumEquipmentBarInterface
+class DAOFA_API ABaseCharacter : public ACreature, public IInitSumEquipmentBarInterface
 {
 	GENERATED_BODY()
 
@@ -24,6 +25,9 @@ class DAOFA_API ABaseCharacter : public ACharacter, public IInitSumEquipmentBarI
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FollowCamera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "EnemyDetector", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UEnemyDetector> EnemyDetector;
 
 public:
 	// Sets default values for this character's properties
@@ -51,11 +55,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Input")
 	TObjectPtr<UInputOperationComponent> InputOperationComponent;
 	// Called to bind functionality to input
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Attribute")
-	TObjectPtr<UAttributeComponent> AttributeComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Pack")
-	TObjectPtr<UPackComponent> PackComponent;
 
 	UFUNCTION()
 	void SetSpeedToWalk();
@@ -65,5 +65,6 @@ public:
 
 	virtual void InitSumEquipmentBar(USumEquipmentBarWidget* SumEquipmentBarWidget) override;
 
+	UEnemyDetector* GetEnemyDetector() const { return EnemyDetector; }
 
 };

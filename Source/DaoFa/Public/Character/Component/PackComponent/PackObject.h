@@ -9,6 +9,8 @@
 #include "PackObject.generated.h"
 class UBlueCostComponent;
 class UAttackAttributeComponent;
+class UPOAttackAttributeComponent;
+class UStateComponent;
 
 UENUM(BlueprintType)
 enum class EEquipmentType : uint8
@@ -67,14 +69,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
 	float LongPressDamageMultiplier;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
-	float StartBlueCost = 0.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
-	float OnGoingBlueCostBySecond = 0.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
-	float EndBlueCost = 0.0f;
 };
 
 
@@ -107,18 +101,24 @@ protected:
 
 	virtual void BeginPlay() override;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
-	UBlueCostComponent* BlueCostComponent;
+	TObjectPtr<UBlueCostComponent> BlueCostComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
-	UPOAttackAttributeComponent* POAttackAttributeComponent;
+	TObjectPtr<UPOAttackAttributeComponent> POAttackAttributeComponent;
 
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
     EEquipmentType EquipmentType;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
+	TObjectPtr<UStateComponent> StateComponent;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
 	int SizeInPack = 1;
+
+	ACreature* OwnerCreature;
+
 
 public:	
 	// Called every frame
@@ -135,7 +135,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "IShowTrigger")
 	virtual int GetQunatity() const { return Quantity; }
 
-	virtual void AttachToCharacter(class ABaseCharacter* Character);
+	virtual void AttachToCharacter(class ACreature* Creature);
+
+
+
+
+
 
 	UFUNCTION(BlueprintCallable, Category = "PackObject")
 	virtual EEquipmentType GetEquipmentType() { return EquipmentType; }
@@ -145,6 +150,17 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "PackObject")
 	FPackObjectInfo GetPackObjectInfo();
+
+	UFUNCTION(BlueprintCallable, Category = "PackObject")
+	UPOAttackAttributeComponent* GetPOAttackAttributeComponent() { return POAttackAttributeComponent; } 
+
+	UFUNCTION(BlueprintCallable, Category = "PackObject")
+	UStateComponent* GetStateComponent() { return StateComponent; }
+
+	UFUNCTION(BlueprintCallable, Category = "PackObject")
+	ACreature* GetOwnerCreature() { return OwnerCreature; }
+	
+	
 
 
 };

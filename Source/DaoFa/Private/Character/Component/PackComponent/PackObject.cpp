@@ -4,6 +4,8 @@
 #include "Character/Component/PackComponent/PackObject.h"
 #include "Character/Component/PackComponent/BlueCostComponent.h"
 #include "Character/BaseCharacter.h"
+#include "Character/Component/PackComponent/POAttackAttributeComponent.h"
+#include"General/StateComponent.h"
 // Sets default values
 APackObject::APackObject()
 {
@@ -11,12 +13,18 @@ APackObject::APackObject()
 	PrimaryActorTick.bCanEverTick = true;
 	BlueCostComponent = CreateDefaultSubobject<UBlueCostComponent>(TEXT("BlueCostComponent"));
 	POAttackAttributeComponent = CreateDefaultSubobject<UPOAttackAttributeComponent>(TEXT("AttackAttributeComponent"));
+	StateComponent = CreateDefaultSubobject<UStateComponent>(TEXT("StateComponent"));
 }
 
 // Called when the game starts or when spawned
 void APackObject::BeginPlay()
 {
 	Super::BeginPlay();
+	OwnerCreature = Cast<ACreature>(GetOwner());
+	if (!OwnerCreature)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("OwnerCreature is nullptr"));
+	}
 	
 
 }
@@ -28,10 +36,14 @@ void APackObject::Tick(float DeltaTime)
 
 }
 
-void APackObject::AttachToCharacter(ABaseCharacter* Character)
+void APackObject::AttachToCharacter(ACreature* Creature)
 {
-	AttachToActor(Character, FAttachmentTransformRules::SnapToTargetIncludingScale);
+	AttachToActor(Creature, FAttachmentTransformRules::SnapToTargetIncludingScale);
+	OwnerCreature = Creature;
 }
+
+
+
 
 FPackObjectInfo APackObject::GetPackObjectInfo()
 {
@@ -50,8 +62,5 @@ FPackObjectInfo APackObject::GetPackObjectInfo()
 	PackObjectInfo.InterruptAblity = POAttackAttributeComponent->InterruptAblity;
 	PackObjectInfo.ShortPressDamageMultiplier = POAttackAttributeComponent->ShortPressDamageMultiplier;
 	PackObjectInfo.LongPressDamageMultiplier = POAttackAttributeComponent->LongPressDamageMultiplier;
-	PackObjectInfo.StartBlueCost = BlueCostComponent->StartBlueCost;
-	PackObjectInfo.OnGoingBlueCostBySecond = BlueCostComponent->OnGoingBlueCostBySecond;
-	PackObjectInfo.EndBlueCost = BlueCostComponent->EndBlueCost;
 	return PackObjectInfo;
 }

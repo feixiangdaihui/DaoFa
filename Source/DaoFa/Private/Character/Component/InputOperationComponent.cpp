@@ -32,8 +32,8 @@ void UInputOperationComponent::BeginPlay()
 	if (OwnerCharacter != nullptr)
 	{
 		OwnerAnimInstance = Cast<UBaseAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
-		UAttributeComponent* OwnerAttributeComponent = OwnerCharacter->AttributeComponent;
-		UPhysicalPowerComponent* OwnerPhysicalPowerComponent = OwnerAttributeComponent->PhysicalPowerComponent;
+		UAttributeComponent* OwnerAttributeComponent = OwnerCharacter->GetAttributeComponent();
+		UPhysicalPowerComponent* OwnerPhysicalPowerComponent = OwnerAttributeComponent->GetPhysicalPowerComponent();
 		OwnerHud = Cast<ABaseHud>(OwnerCharacter->GetWorld()->GetFirstPlayerController()->GetHUD());
 
 		if (OwnerAnimInstance != nullptr)
@@ -105,6 +105,16 @@ void UInputOperationComponent::SetupPlayerInputComponent(UInputComponent* Player
 		//Pack
 		EnhancedInputComponent->BindAction(OpenPackAction, ETriggerEvent::Started, this, &UInputOperationComponent::OpenPack);
 		OpenPackAction->bTriggerWhenPaused = true;
+
+		//Spell
+		EnhancedInputComponent->BindAction(SpellAction0, ETriggerEvent::Started, this, &UInputOperationComponent::Spell, 0, true);
+		EnhancedInputComponent->BindAction(SpellAction0, ETriggerEvent::Completed, this, &UInputOperationComponent::Spell, 0, false);
+		EnhancedInputComponent->BindAction(SpellAction1, ETriggerEvent::Started, this, &UInputOperationComponent::Spell, 1, true);
+		EnhancedInputComponent->BindAction(SpellAction1, ETriggerEvent::Completed, this, &UInputOperationComponent::Spell, 1, false);
+		EnhancedInputComponent->BindAction(SpellAction2, ETriggerEvent::Started, this, &UInputOperationComponent::Spell, 2, true);
+		EnhancedInputComponent->BindAction(SpellAction2, ETriggerEvent::Completed, this, &UInputOperationComponent::Spell, 2, false);
+		EnhancedInputComponent->BindAction(SpellAction3, ETriggerEvent::Started, this, &UInputOperationComponent::Spell, 3, true);
+		EnhancedInputComponent->BindAction(SpellAction3, ETriggerEvent::Completed, this, &UInputOperationComponent::Spell, 3, false);
 
 	}
 }
@@ -221,8 +231,42 @@ void UInputOperationComponent::SecondAttack(const FInputActionValue& Value)
 	
 }
 
-void UInputOperationComponent::Spell(const FInputActionValue& Value)
+
+
+
+void UInputOperationComponent::Spell(int Num, bool Begin)
 {
+	if (Begin)
+	{
+		if (CheckInput(InputAnimation::SpellLoop))
+		{
+			if(OwnerSumEquipmentBarWidget->IsEquipmentValid(Num))
+			{
+				UpdateInput(InputAnimation::SpellLoop);
+				HoldStartTime[Num] = GetWorld()->GetTimeSeconds();
+			}
+		}
+	}
+	else
+	{
+		if (CheckInput(InputAnimation::SpellEnd))
+		{
+			if(HoldStartTime[Num]!=0)
+			{
+				UpdateInput(InputAnimation::SpellEnd);
+				float Druation = GetWorld()->GetTimeSeconds() - HoldStartTime[Num];
+				HoldStartTime[Num] = 0;
+				if (Druation > LongPressTime)
+				{
+					OwnerSumEquipmentBarWidget->TriggeredByLongPress(Num);
+				}
+				else
+				{
+					OwnerSumEquipmentBarWidget->TriggeredByShortPress(Num);
+				}
+			}
+		}
+	}
 }
 
 void UInputOperationComponent::ChangeChosenEquipmentBarToSmall(const FInputActionValue& Value)

@@ -17,6 +17,7 @@ enum class GElement : uint8
 	Water,
 	Fire,
 	Earth,
+	NOELEMENT,
 };
 UENUM(BlueprintType)
 enum class GElementRestrain : uint8
@@ -34,4 +35,5 @@ class DAOFA_API UElementSetting : public UObject
 	GENERATED_BODY()
 public:
 	static GElementRestrain GetElementRestrain(GElement self, GElement other);
+	static float GetElementRestrainMultiplier(GElement self, GElement other);
 };

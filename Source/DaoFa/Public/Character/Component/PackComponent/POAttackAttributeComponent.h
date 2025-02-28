@@ -20,8 +20,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
 	float LongPressDamageMultiplier = 1.5f;
-public:
-	FAttackReturnValue CalculateLongPressAttack(float Defense, GElement DefenseElement, float DamageMultiplier, float ActualDamagePercent, EAvoidInterruptAblity AvoidAblity, AActor* OtherActor);
 
-	FAttackReturnValue CalculateShortPressAttack(float Defense, GElement DefenseElement, float DamageMultiplier, float ActualDamagePercent, EAvoidInterruptAblity AvoidAblity, AActor* OtherActor);
+public:
+	float GetShortPressDamageMultiplier() { return ShortPressDamageMultiplier; }
+	float GetLongPressDamageMultiplier() { return LongPressDamageMultiplier; }
 };

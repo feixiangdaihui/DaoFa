@@ -2,7 +2,9 @@
 
 
 #include "Character/Component/PackComponent/BlueCostComponent.h"
-#include "Character/Component/AttributeComponent/BlueComponent.h"
+#include "Character/Component/AttributeComponent/AttributeComponent.h"
+#include "Creature.h"
+#include "Character/Component/AttributeComponent/SetValueInterface.h"
 
 
 // Sets default values for this component's properties
@@ -20,6 +22,12 @@ UBlueCostComponent::UBlueCostComponent()
 void UBlueCostComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	AActor* CreatureActor = GetOwner()->GetOwner();
+	ACreature* Creature = Cast<ACreature>(CreatureActor);
+	if (Creature)
+	{
+		BlueValue = Creature->GetAttributeComponent()->SetBlueValue();
+	}
 
 	// ...
 	
@@ -34,20 +42,13 @@ void UBlueCostComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 	// ...
 }
 
-bool UBlueCostComponent::BlueCostAtStart(UBlueComponent* BlueComponent)
+bool UBlueCostComponent::BlueCost(float CostValue)
 {
-	return BlueComponent->SubtractValue(StartBlueCost);
+	return BlueValue->SubtractValue(CostValue);
 }
 
-bool UBlueCostComponent::BlueCostOnGoing(UBlueComponent* BlueComponent, float DeltaTime)
-{
-	return BlueComponent->SubtractValue(OnGoingBlueCostBySecond * DeltaTime);
-}
 
-bool UBlueCostComponent::BlueCostInTheEnd(UBlueComponent* BlueComponent)
-{
-	return BlueComponent->SubtractValue(EndBlueCost);
-}
+
 
 
 

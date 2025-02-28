@@ -7,6 +7,9 @@
 #include "Blueprint/UserWidget.h"
 #include "Character/Component/PackComponent/PackWidget.h"
 #include "PlayerController/BasePlayerController.h"
+#include "Hud/Widget/RealTimeWidget.h"
+#include "Character/Component/AttributeComponent/AttributeComponent.h"
+#include "Hud/Widget/EnemyInfoWidget.h"
 
 ABaseHud::ABaseHud()
 {
@@ -32,7 +35,21 @@ void ABaseHud::BeginPlay()
 		}
 		PackWidget = CreateWidget<UPackWidget>(GetWorld(), PackWidgetClass);
 		if (PackWidget)
-			PackWidget->InitPackWidget(OwnerCharacter->PackComponent);
+			PackWidget->InitPackWidget(OwnerCharacter->GetPackComponent());
+
+		RealTimeWidget = CreateWidget<URealTimeWidget>(GetWorld(), RealTimeWidgetClass);
+		if (RealTimeWidget)
+		{
+			RealTimeWidget->AddToViewport();
+			RealTimeWidget->InitRealTimeWidget(OwnerCharacter->GetAttributeComponent()->GetHealthValue(), OwnerCharacter->GetAttributeComponent()->GetBlueValue(), OwnerCharacter->GetAttributeComponent()->GetPhysicalPowerValue());
+		}
+
+		EnemyInfoWidget = CreateWidget<UEnemyInfoWidget>(GetWorld(), EnemyInfoWidgetClass);
+		if (EnemyInfoWidget)
+		{
+			EnemyInfoWidget->AddToViewport();
+			EnemyInfoWidget->InitEnemyInfoWidget(OwnerCharacter->GetEnemyDetector());
+		}
 
 		OwnerController = Cast<ABasePlayerController>(GetOwningPlayerController());
 	}

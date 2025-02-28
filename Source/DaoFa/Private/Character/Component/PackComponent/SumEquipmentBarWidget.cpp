@@ -53,17 +53,17 @@ void USumEquipmentBarWidget::TakeOffEquipment(APackObject* Equipment)
 
 
 
-void USumEquipmentBarWidget::TriggeredByLongPress(EEquipmentType TypeIndex, int SpecificIndex)
+void USumEquipmentBarWidget::TriggeredByLongPress( int SpecificIndex)
 {
-	switch (TypeIndex)
+	switch (CurrentChosenIndex)
 	{
-	case EEquipmentType::FASHU:
+	case 0:
 		FaShuEquipmentBar->TriggeredByLongPress(SpecificIndex);
 		break;
-	case EEquipmentType::FABAO:
+	case 1:
 		FaBaoEquipmentBar->TriggeredByLongPress(SpecificIndex);
 		break;
-	case EEquipmentType::FULU:
+	case 2:
 		FuLuEquipmentBar->TriggeredByLongPress(SpecificIndex);
 		break;
 	default:
@@ -71,17 +71,17 @@ void USumEquipmentBarWidget::TriggeredByLongPress(EEquipmentType TypeIndex, int 
 	}
 }
 
-void USumEquipmentBarWidget::TriggeredByShortPress(EEquipmentType TypeIndex, int SpecificIndex)
+void USumEquipmentBarWidget::TriggeredByShortPress( int SpecificIndex)
 {
-	switch (TypeIndex)
+	switch (CurrentChosenIndex)
 	{
-	case EEquipmentType::FASHU:
+	case 0:
 		FaShuEquipmentBar->TriggeredByShortPress(SpecificIndex);
 		break;
-	case EEquipmentType::FABAO:
+	case 1:
 		FaBaoEquipmentBar->TriggeredByShortPress(SpecificIndex);
 		break;
-	case EEquipmentType::FULU:
+	case 2:
 		FuLuEquipmentBar->TriggeredByShortPress(SpecificIndex);
 		break;
 	default:
@@ -112,5 +112,24 @@ void USumEquipmentBarWidget::SetChosenEquipmentBar(int Index)
 	FaShuEquipmentBar->SetChosen(Index == 0);
 	FaBaoEquipmentBar->SetChosen(Index == 1);
 	FuLuEquipmentBar->SetChosen(Index == 2);
+}
+
+bool USumEquipmentBarWidget::IsEquipmentValid(int Index)
+{
+	switch (CurrentChosenIndex)
+	{
+	case 0:
+		return FaShuEquipmentBar->IsEquipmentValid(Index);
+		break;
+	case 1:
+		return FaBaoEquipmentBar->IsEquipmentValid(Index);
+		break;
+	case 2:
+		return FuLuEquipmentBar->IsEquipmentValid(Index);
+		break;
+	default:
+		break;
+	}
+	return false;
 }
 

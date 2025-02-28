@@ -15,12 +15,14 @@ enum class InputAnimation : uint8
 	Fall,
 	FirstAttack,
 	SecondAttack,
-	Spell,
+	SpellLoop,
+	SpellEnd,
 	Dodge,
 	EndRun,
 	NONE,
-
 };
+
+
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
 class UInputUpdateInterface : public UInterface

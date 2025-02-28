@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "BlueCostComponent.generated.h"
 
-class UBlueComponent;
+class ISetValueInterface;
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class DAOFA_API UBlueCostComponent : public UActorComponent
 {
@@ -20,27 +20,17 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	TScriptInterface<ISetValueInterface> BlueValue;
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BlueCost")
-	float StartBlueCost = 0.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BlueCost")
-	float OnGoingBlueCostBySecond = 0.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BlueCost")
-	float EndBlueCost = 0.0f;
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "BlueCost")
-	bool BlueCostAtStart(UBlueComponent* BlueComponent);
-	
-	UFUNCTION(BlueprintCallable, Category = "BlueCost")
-	bool BlueCostOnGoing(UBlueComponent* BlueComponent, float DeltaTime);
+	bool BlueCost(float CostValue);
 
-	UFUNCTION(BlueprintCallable, Category = "BlueCost")
-	bool BlueCostInTheEnd(UBlueComponent* BlueComponent);
+	
+
 
 		
 };

@@ -13,9 +13,11 @@ TMap<InputAnimation, TArray<InputAnimation>> UBaseAnimInstance::InputBlendAgree 
 {
 	{InputAnimation::FirstAttack,{InputAnimation::Idle}},
 	{InputAnimation::SecondAttack,{InputAnimation::Idle}},
-	{InputAnimation::Spell,{InputAnimation::Idle,InputAnimation::Spell,InputAnimation::Walk}},
+	{InputAnimation::SpellLoop,{InputAnimation::Idle,InputAnimation::Walk,InputAnimation::SpellEnd}},
 	{InputAnimation::Dodge,{InputAnimation::Idle}},
-	{InputAnimation::Jump,{InputAnimation::Run, InputAnimation::Idle ,InputAnimation::Walk} }
+	{InputAnimation::Jump,{InputAnimation::Run, InputAnimation::Idle ,InputAnimation::Walk} },
+	{InputAnimation::SpellEnd ,{InputAnimation::Idle,InputAnimation::Walk}},
+
 };
 TSet<InputAnimation> UBaseAnimInstance::FlexibleState = { InputAnimation::Run, InputAnimation::Idle ,InputAnimation::Walk  };
 
@@ -36,7 +38,6 @@ void UBaseAnimInstance::UpdateInput(InputAnimation Input)
 		{
 			IsMontageForbiden = false;
 			CurrentMontageState = Input;
-
 		}
 
 	}
@@ -49,10 +50,7 @@ bool UBaseAnimInstance::CheckInput(InputAnimation Input)
 	{
 		if (CurrentMontageState != InputAnimation::NONE && !InputBlendAgree[CurrentMontageState].Contains(Input))
 			return false;
-		else
-		{
-			return true;
-		}
+		return true;
 	}
 	return false;
 }
@@ -73,3 +71,6 @@ void UBaseAnimInstance::NativeBeginPlay()
 	Super::NativeBeginPlay();
 	OwnerCharacter = Cast<ABaseCharacter>(GetOwningActor());
 }
+
+
+

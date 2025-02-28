@@ -12,9 +12,6 @@ AFaBao::AFaBao()
 
 
 	EquipmentType = EEquipmentType::FABAO;
-	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMeshComponent"));
-	SkeletalMeshComponent->SetupAttachment(RootComponent);
-	
 
 
 
@@ -26,7 +23,6 @@ AFaBao::AFaBao()
 void AFaBao::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -36,10 +32,5 @@ void AFaBao::Tick(float DeltaTime)
 
 }
 
-void AFaBao::AttachToCharacter(ABaseCharacter* Character)
-{
-	Super::AttachToCharacter(Character);
-	//设置骨骼体不可见
-	SkeletalMeshComponent->SetVisibility(false);
-}
+
 
