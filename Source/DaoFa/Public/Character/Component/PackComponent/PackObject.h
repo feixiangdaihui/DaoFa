@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Character/Component/PackComponent/ShowTrigger.h"
 #include "Character/Component/PackComponent/POAttackAttributeComponent.h"
 #include "PackObject.generated.h"
 class UBlueCostComponent;
@@ -74,7 +73,7 @@ public:
 
 
 UCLASS()
-class DAOFA_API APackObject : public AActor, public IShowTrigger
+class DAOFA_API APackObject : public AActor
 {
 	GENERATED_BODY()
 	
@@ -99,6 +98,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
 	int Quantity = 1;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
+	float LongPressTime = 1.0f;
+	float LongPressTimeCounter = 0.0f;
+
 	virtual void BeginPlay() override;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
 	TObjectPtr<UBlueCostComponent> BlueCostComponent;
@@ -107,7 +110,7 @@ protected:
 	TObjectPtr<UPOAttackAttributeComponent> POAttackAttributeComponent;
 
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PackObject")
     EEquipmentType EquipmentType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
@@ -120,24 +123,37 @@ protected:
 	ACreature* OwnerCreature;
 
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
+	bool IsLongPressPermit = true;
+
+	virtual void TriggeredByShortPress() {}
+
+	virtual void TriggeredByLongPress() {}
+
+
+	bool CanBeWearOrTakeOff = true;
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 
 	UFUNCTION(BlueprintCallable, Category = "IShowTrigger")
-	virtual UTexture2D* GetIcon()const override { return Icon; }
+	virtual UTexture2D* GetIcon()const  { return Icon; }
 
-	virtual void TriggeredByShortPress() {}
 
-	virtual void TriggeredByLongPress() {}
 
 	UFUNCTION(BlueprintCallable, Category = "IShowTrigger")
 	virtual int GetQunatity() const { return Quantity; }
 
+	UFUNCTION(BlueprintCallable, Category = "PackObject")
 	virtual void AttachToCharacter(class ACreature* Creature);
 
+	UFUNCTION(BlueprintCallable, Category = "PackObject")
+	bool GetCanBeWearOrTakeOff() { return CanBeWearOrTakeOff; }
 
+	bool TriggeredBegin();
+
+	bool TriggeredEnd();
 
 
 
@@ -161,6 +177,9 @@ public:
 	ACreature* GetOwnerCreature() { return OwnerCreature; }
 	
 	
+	virtual bool CheckShortPress();
+
+	virtual bool CheckLongPress();
 
 
 };

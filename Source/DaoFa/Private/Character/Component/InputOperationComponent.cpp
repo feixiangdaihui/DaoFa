@@ -240,10 +240,9 @@ void UInputOperationComponent::Spell(int Num, bool Begin)
 	{
 		if (CheckInput(InputAnimation::SpellLoop))
 		{
-			if(OwnerSumEquipmentBarWidget->IsEquipmentValid(Num))
+			if( OwnerSumEquipmentBarWidget->TriggeredBegin(Num))
 			{
 				UpdateInput(InputAnimation::SpellLoop);
-				HoldStartTime[Num] = GetWorld()->GetTimeSeconds();
 			}
 		}
 	}
@@ -251,19 +250,9 @@ void UInputOperationComponent::Spell(int Num, bool Begin)
 	{
 		if (CheckInput(InputAnimation::SpellEnd))
 		{
-			if(HoldStartTime[Num]!=0)
+			if (OwnerSumEquipmentBarWidget->TriggeredEnd(Num))
 			{
 				UpdateInput(InputAnimation::SpellEnd);
-				float Druation = GetWorld()->GetTimeSeconds() - HoldStartTime[Num];
-				HoldStartTime[Num] = 0;
-				if (Druation > LongPressTime)
-				{
-					OwnerSumEquipmentBarWidget->TriggeredByLongPress(Num);
-				}
-				else
-				{
-					OwnerSumEquipmentBarWidget->TriggeredByShortPress(Num);
-				}
 			}
 		}
 	}

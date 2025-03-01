@@ -42,6 +42,37 @@ void APackObject::AttachToCharacter(ACreature* Creature)
 	OwnerCreature = Creature;
 }
 
+bool APackObject::TriggeredBegin()
+{
+	if (CheckShortPress())
+	{
+		LongPressTimeCounter = GetWorld()->GetTimeSeconds();
+		return true;
+	}
+	else
+		return false;
+}
+
+bool APackObject::TriggeredEnd()
+{
+	if (LongPressTimeCounter == 0)
+		return false;
+	if (!IsLongPressPermit)
+	{
+		TriggeredByShortPress();
+		return true;
+	}
+	LongPressTimeCounter = GetWorld()->GetTimeSeconds() - LongPressTimeCounter;
+	if (LongPressTimeCounter > LongPressTime&& CheckLongPress())
+	{
+		TriggeredByLongPress();
+	}
+	else
+		TriggeredByShortPress();
+	LongPressTimeCounter = 0;
+	return true;
+}
+
 
 
 
@@ -63,4 +94,14 @@ FPackObjectInfo APackObject::GetPackObjectInfo()
 	PackObjectInfo.ShortPressDamageMultiplier = POAttackAttributeComponent->ShortPressDamageMultiplier;
 	PackObjectInfo.LongPressDamageMultiplier = POAttackAttributeComponent->LongPressDamageMultiplier;
 	return PackObjectInfo;
+}
+
+bool APackObject::CheckShortPress()
+{
+	return BlueCostComponent->CheckShortPressBlueCost();
+}
+
+bool APackObject::CheckLongPress()
+{
+	return BlueCostComponent->CheckLongPressBlueCost();
 }

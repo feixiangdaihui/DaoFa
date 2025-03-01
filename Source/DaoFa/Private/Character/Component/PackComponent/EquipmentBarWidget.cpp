@@ -2,9 +2,9 @@
 
 
 #include "Character/Component/PackComponent/EquipmentBarWidget.h"
-#include "Character/Component/PackComponent/ShowTrigger.h"
+#include "Character/Component/PackComponent/PackObject.h"
 
-void UEquipmentBarWidget::WearEquipment(TScriptInterface<IShowTrigger> Equipment, int Index)
+void UEquipmentBarWidget::WearEquipment(APackObject* Equipment, int Index)
 {
 
 	
@@ -12,7 +12,7 @@ void UEquipmentBarWidget::WearEquipment(TScriptInterface<IShowTrigger> Equipment
 	{
 		for (int i = 0; i < EquipmentBar.Num(); i++)
 		{
-			if (EquipmentBar[i].GetObject() == Equipment.GetObject())
+			if (EquipmentBar[i]  == Equipment )
 			{
 				if (i != Index)
 				{
@@ -34,12 +34,12 @@ void UEquipmentBarWidget::WearEquipment(TScriptInterface<IShowTrigger> Equipment
 	}
 }
 
-void UEquipmentBarWidget::TakeOffEquipment(TScriptInterface<IShowTrigger> Equipment)
+void UEquipmentBarWidget::TakeOffEquipment(APackObject* Equipment)
 {
 
 	for (int i = 0; i < EquipmentBar.Num(); i++)
 	{
-		if (EquipmentBar[i].GetObject() == Equipment.GetObject())
+		if (EquipmentBar[i]  == Equipment )
 		{
 			EquipmentBar[i] = nullptr;
 			OnEquipmentTakeOff(i);
@@ -50,32 +50,31 @@ void UEquipmentBarWidget::TakeOffEquipment(TScriptInterface<IShowTrigger> Equipm
 
 
 
-void UEquipmentBarWidget::TriggeredByLongPress(int Index)
+bool UEquipmentBarWidget::TriggeredEnd(int Index)
 {
 	if (Index >= 0 && Index < Size)
 	{
-		if (EquipmentBar[Index].GetObject())
+		if (EquipmentBar[Index] )
 		{
-			EquipmentBar[Index]->TriggeredByLongPress();
+			return EquipmentBar[Index]->TriggeredEnd();
 		}
 	}
+	return false;
 }
 
-void UEquipmentBarWidget::TriggeredByShortPress(int Index)
+bool UEquipmentBarWidget::TriggeredBegin(int Index)
 {
 	if (Index >= 0 && Index < Size)
 	{
-		if (EquipmentBar[Index].GetObject())
+		if (EquipmentBar[Index] )
 		{
-			EquipmentBar[Index]->TriggeredByShortPress();
+			return EquipmentBar[Index]->TriggeredBegin();
 		}
 	}
+	return false;
 }
 
-bool UEquipmentBarWidget::IsEquipmentValid(int Index)
-{
-	return EquipmentBar[Index].GetObject() != nullptr;
-}
+
 
 UEquipmentBarWidget::UEquipmentBarWidget(const FObjectInitializer& ObjectInitializer): Super(ObjectInitializer)
 {

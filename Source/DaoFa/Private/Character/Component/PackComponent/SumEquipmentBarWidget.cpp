@@ -53,40 +53,43 @@ void USumEquipmentBarWidget::TakeOffEquipment(APackObject* Equipment)
 
 
 
-void USumEquipmentBarWidget::TriggeredByLongPress( int SpecificIndex)
+
+bool USumEquipmentBarWidget::TriggeredEnd( int SpecificIndex)
 {
 	switch (CurrentChosenIndex)
 	{
 	case 0:
-		FaShuEquipmentBar->TriggeredByLongPress(SpecificIndex);
+		return FaShuEquipmentBar->TriggeredEnd(SpecificIndex);
 		break;
 	case 1:
-		FaBaoEquipmentBar->TriggeredByLongPress(SpecificIndex);
+		return FaBaoEquipmentBar->TriggeredEnd(SpecificIndex);
 		break;
 	case 2:
-		FuLuEquipmentBar->TriggeredByLongPress(SpecificIndex);
+		return FuLuEquipmentBar->TriggeredEnd(SpecificIndex);
 		break;
 	default:
 		break;
 	}
+	return false;
 }
 
-void USumEquipmentBarWidget::TriggeredByShortPress( int SpecificIndex)
+bool USumEquipmentBarWidget::TriggeredBegin( int SpecificIndex)
 {
 	switch (CurrentChosenIndex)
 	{
 	case 0:
-		FaShuEquipmentBar->TriggeredByShortPress(SpecificIndex);
+		return FaShuEquipmentBar->TriggeredBegin(SpecificIndex);
 		break;
 	case 1:
-		FaBaoEquipmentBar->TriggeredByShortPress(SpecificIndex);
+		return FaBaoEquipmentBar->TriggeredBegin(SpecificIndex);
 		break;
 	case 2:
-		FuLuEquipmentBar->TriggeredByShortPress(SpecificIndex);
+		return FuLuEquipmentBar->TriggeredBegin(SpecificIndex);
 		break;
 	default:
 		break;
 	}
+	return false;
 }
 
 void USumEquipmentBarWidget::ChangeChosenEquipmentBarToSmall()
@@ -114,22 +117,5 @@ void USumEquipmentBarWidget::SetChosenEquipmentBar(int Index)
 	FuLuEquipmentBar->SetChosen(Index == 2);
 }
 
-bool USumEquipmentBarWidget::IsEquipmentValid(int Index)
-{
-	switch (CurrentChosenIndex)
-	{
-	case 0:
-		return FaShuEquipmentBar->IsEquipmentValid(Index);
-		break;
-	case 1:
-		return FaBaoEquipmentBar->IsEquipmentValid(Index);
-		break;
-	case 2:
-		return FuLuEquipmentBar->IsEquipmentValid(Index);
-		break;
-	default:
-		break;
-	}
-	return false;
-}
+
 

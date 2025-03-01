@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "EquipmentBarWidget.generated.h"
-class IShowTrigger;
+class APackObject;
 class UTexture2D;
 /**
  * 
@@ -25,7 +25,7 @@ protected:
 	int Size = 4;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentBar")
-	TArray<TScriptInterface<IShowTrigger>> EquipmentBar;
+	TArray<APackObject*> EquipmentBar;
 
 	
 
@@ -45,17 +45,16 @@ public:
 	void SetChosen(bool IsChosen);
 
 	UFUNCTION(BlueprintCallable, Category = "EquipmentBar")
-	virtual void  WearEquipment(TScriptInterface<IShowTrigger> Equipment, int Index);
+	virtual void  WearEquipment(APackObject* Equipment, int Index);
 	
-	virtual void TakeOffEquipment(TScriptInterface<IShowTrigger> Equipment);
+	virtual void TakeOffEquipment(APackObject* Equipment);
 
 	UFUNCTION(BlueprintCallable, Category = "EquipmentBar")
-	void TriggeredByLongPress(int Index);
+	bool TriggeredBegin(int Index);
 
 	UFUNCTION(BlueprintCallable, Category = "EquipmentBar")
-	void TriggeredByShortPress(int Index);
+	bool TriggeredEnd(int Index);
 
 
-	bool IsEquipmentValid(int Index);
 	
 };

@@ -22,11 +22,15 @@ protected:
 	virtual void BeginPlay() override;
 
 
+	virtual void TriggeredByLongPress() override;
 
+	virtual void TriggeredByShortPress() override;
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void AttachToCharacter(ACreature* Creature) override;
+	
 
 };

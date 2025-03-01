@@ -25,11 +25,29 @@ void AFaBao::BeginPlay()
 	Super::BeginPlay();
 }
 
+void AFaBao::TriggeredByLongPress()
+{
+	Super::TriggeredByLongPress();
+	CanBeWearOrTakeOff = false;
+}
+
+void AFaBao::TriggeredByShortPress()
+{
+	Super::TriggeredByShortPress();
+	CanBeWearOrTakeOff = false;
+}
+
 // Called every frame
 void AFaBao::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AFaBao::AttachToCharacter(ACreature* Creature)
+{
+	Super::AttachToCharacter(Creature);
+	CanBeWearOrTakeOff = true;
 }
 
 

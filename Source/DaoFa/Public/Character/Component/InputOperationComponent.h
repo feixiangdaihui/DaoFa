@@ -146,8 +146,7 @@ private:
 
 	//1表示开始释放技能，0表示结束释放技能
 	void Spell(int Num, bool Begin);
-	float HoldStartTime[4] = { 0,0,0,0 };
-	float LongPressTime = 0.5f;
+
 
 	void ChangeChosenEquipmentBarToSmall(const FInputActionValue& Value);
 

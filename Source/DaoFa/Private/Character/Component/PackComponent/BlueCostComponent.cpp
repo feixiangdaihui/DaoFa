@@ -42,9 +42,16 @@ void UBlueCostComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 	// ...
 }
 
-bool UBlueCostComponent::BlueCost(float CostValue)
+
+
+bool UBlueCostComponent::CheckShortPressBlueCost()
 {
-	return BlueValue->SubtractValue(CostValue);
+	return BlueValue->SubtractValue(ShortPressBlueCost);
+}
+
+bool UBlueCostComponent::CheckLongPressBlueCost()
+{
+	return BlueValue->SubtractValue(LongPressBlueCost);
 }
 
 

@@ -10,8 +10,13 @@
 AFeiJian::AFeiJian()
 {
 	LongPressEnemyDetector = CreateDefaultSubobject<UEnemyDetector>(TEXT("LongPressEnemyDetector"));
-	LongPressEnemyDetector->DetectionRadius = 1000;
+	LongPressEnemyDetector->DetectionRadius = 3000;
+	LongPressEnemyDetector->HorizontalAngle = 360;
+	LongPressEnemyDetector->VerticalAngle = 360;
 	ShortPressEnemyDetector = CreateDefaultSubobject<UEnemyDetector>(TEXT("ShortPressEnemyDetector"));
+	ShortPressEnemyDetector->DetectionRadius = 3000;
+	ShortPressEnemyDetector->HorizontalAngle = 360;
+	ShortPressEnemyDetector->VerticalAngle = 360;
 
 
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent"));
@@ -77,6 +82,7 @@ void AFeiJian::Tick(float DeltaTime)
 
 void AFeiJian::TriggeredByShortPress()
 {
+	Super::TriggeredByShortPress();
 	TArray<AActor*> DetectedEnemies;
 	if (IsInHand)
 	{
@@ -109,12 +115,13 @@ void AFeiJian::TriggeredByShortPress()
 
 
 
-	BeginSpell(EndLocation);
+	BeginSpell(EndLocation, ShortSpellSpeed);
 	
 
 }
 void AFeiJian::TriggeredByLongPress() 
 {
+	Super::TriggeredByLongPress();
 	if (IsInHand)
 	{
 		TArray<AActor*> DetectedEnemies = ShortPressEnemyDetector->DetectEnemies();
@@ -138,7 +145,7 @@ void AFeiJian::TriggeredByLongPress()
 					//调整方向
 					AddActorLocalRotation(FRotator(180, 0, 0));
 					//飞剑从天而降
-					BeginSpell(EndLocation);
+					BeginSpell(EndLocation,LongSpellSpeed);
 					break;
 				}
 			}
@@ -155,7 +162,7 @@ void AFeiJian::TriggeredByLongPress()
 		SetActorRotation(NewRotation);
 		//保证竖着
 		AddActorLocalRotation(FRotator(-90, 0, 0));
-		BeginSpell(EndLocation);
+		BeginSpell(EndLocation,ShortSpellSpeed);
 		IsGoHome = true;
 		
 	}
@@ -164,6 +171,7 @@ void AFeiJian::TriggeredByLongPress()
 
 void AFeiJian::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	
 	if (IsSpell)
 	{
 		ACreature* Creature = Cast<ACreature>(OtherActor);
@@ -217,10 +225,10 @@ void AFeiJian::EndSpell()
 
 //开始施法
 //针对飞行的记录，ProjectileMovementComponent的处理，并且处理判断飞行距离
-void AFeiJian::BeginSpell(FVector EndLocation)
+void AFeiJian::BeginSpell(FVector EndLocation,float Speed)
 {
 	IsSpell = true;
-	ProjectileMovementComponent->Velocity = (EndLocation - GetActorLocation()).GetSafeNormal() * SpellSpeed;
+	ProjectileMovementComponent->Velocity = (EndLocation - GetActorLocation()).GetSafeNormal() * Speed;
 	ProjectileMovementComponent->Activate();
 	StartLocation = GetActorLocation();
 	if (GetOwner())

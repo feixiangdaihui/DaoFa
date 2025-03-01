@@ -39,16 +39,14 @@ protected:
 	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FeiJian")
-	float SpellSpeed = 100;
+	float ShortSpellSpeed = 1500;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FeiJian")
+	float LongSpellSpeed = 500;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FeiJian")
 	float MaxSpellDistance = 2000;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FeiJian")
-	float ShortPressBlueCost = 10;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FeiJian")
-	float LongPressBlueCost = 20;
 
 public:
 	AFeiJian();
@@ -77,7 +75,7 @@ private:
 
 	void EndSpell();
 
-	void BeginSpell(FVector EndLocation);
+	void BeginSpell(FVector EndLocation,float Speed);
 
 
 	

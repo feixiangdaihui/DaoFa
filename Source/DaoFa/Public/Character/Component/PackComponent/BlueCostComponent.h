@@ -24,11 +24,21 @@ protected:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	//分两段时间消耗蓝，如果蓝够则先扣除短按蓝，如果长按并且蓝够再扣除长按蓝，放出长按技能，否则放出短按技能
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BlueCost")
+	float ShortPressBlueCost = 0.0f;
+
+	//属于在短按基础上的额外消耗
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BlueCost")
+	float LongPressBlueCost = 0.0f;
+
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "BlueCost")
-	bool BlueCost(float CostValue);
+	bool CheckShortPressBlueCost();
 
+	UFUNCTION(BlueprintCallable, Category = "BlueCost")
+	bool CheckLongPressBlueCost();
 	
 
 
