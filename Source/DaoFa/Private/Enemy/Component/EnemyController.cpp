@@ -46,6 +46,14 @@ void UEnemyController::UpdateTarget()
 	}
 }
 
+void UEnemyController::UpdateTarget(ACreature* Target)
+{
+	if (IsValid(Target))
+	{
+		CurrentTarget = Target;
+	}
+}
+
 void UEnemyController::RotateToTarget()
 {
 	if (CurrentTarget)

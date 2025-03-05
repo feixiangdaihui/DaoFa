@@ -6,9 +6,9 @@
 #include "General/DefenseComponent.h"
 #include"General/AttackAttributeComponent.h"
 #include"Character/Component/AttributeComponent/AttributeComponent.h"
-#include "Character/Component/AttributeComponent/GetValueInterface.h"
+#include "Character/Component/AttributeComponent/HealthComponent.h"
 #include "General/ElementSetting.h"
-#include"General/StateComponent.h"
+
 
 bool UCalAttackLibrary::IsTest = true;
 
@@ -48,23 +48,26 @@ EInterruptType UCalAttackLibrary::CalculateInterrupt(EInterruptAblity InterruptA
 //计算公式：攻击力*角色与法宝不匹配度带来的伤害倍率*境界差异带来的伤害倍率/对方的防御力*元素克制倍率
 float UCalAttackLibrary::CalculateDamage(APackObject* SelfPackObejct, ACreature* OtherCreature, float DamageMultiplier)
 {
-	UDefenseComponent* DefenseComponent = OtherCreature->GetDefenseComponent();
+	return CalculateDamage(SelfPackObejct, OtherCreature->GetDefenseComponent(), OtherCreature->GetStateComponent()->GetState(), DamageMultiplier);
+	
+}
+
+float UCalAttackLibrary::CalculateDamage(APackObject* SelfPackObejct, UDefenseComponent* DefenseComponent, FState OtherState, float DamageMultiplier)
+{
+	
 	UPOAttackAttributeComponent* POAttackAttributeComponent = SelfPackObejct->GetPOAttackAttributeComponent();
-	UAttributeComponent* AttributeComponent = OtherCreature->GetAttributeComponent();
 	float BaseDamage = POAttackAttributeComponent->BaseDamage;
 	GElement DefenseElement = DefenseComponent->DefenseElement;
-	FState OtherState = OtherCreature->GetStateComponent()->GetState();
 	FState PackObjectState = SelfPackObejct->GetStateComponent()->GetState();
 	FState OwnerState = SelfPackObejct->GetOwnerCreature()->GetStateComponent()->GetState();
 	float Defense = DefenseComponent->Defense;
 	float ElementMultiplier = UElementSetting::GetElementRestrainMultiplier(POAttackAttributeComponent->Element, DefenseElement);
 	float OtherStateMultiplier = UStateComponent::CalCreatureStateDamageMultiplier(PackObjectState, OtherState);
-	float OwnerStateMultiplier = UStateComponent::CalItemCreatureStateDamageMultiplier(OwnerState,PackObjectState);
+	float OwnerStateMultiplier = UStateComponent::CalItemCreatureStateDamageMultiplier(OwnerState, PackObjectState);
 	float Damage = BaseDamage * DamageMultiplier * ElementMultiplier / Defense * OtherStateMultiplier * OwnerStateMultiplier;
 	if (IsTest)
 		UE_LOG(LogTemp, Warning, TEXT("BaseDamage:%f,DamageMultiplier:%f,ElementMultiplier:%f,Defense:%f,OtherStateMultiplier:%f,OwnerStateMultiplier:%f"), BaseDamage, DamageMultiplier, ElementMultiplier, Defense, OtherStateMultiplier, OwnerStateMultiplier);
 	return Damage;
-	
 }
 
 
@@ -104,13 +107,18 @@ EInterruptDir UCalAttackLibrary::CalculateInterruptDir(AActor* SelfActor,AActor*
 
 FAttackReturnValue UCalAttackLibrary::CalculateAttack( APackObject* SelfPackObejct, ACreature* OtherCreature,  float DamageMultiplier)
 {
+	return CalculateAttack(SelfPackObejct, OtherCreature->GetDefenseComponent(), OtherCreature->GetStateComponent()->GetState(), OtherCreature->GetAttributeComponent()->GetHealthComponent(), DamageMultiplier);
+}
+
+FAttackReturnValue UCalAttackLibrary::CalculateAttack(APackObject* SelfPackObejct, UDefenseComponent* DefenseComponent, FState OtherState, UHealthComponent* HealthComponent, float DamageMultiplier)
+{
 	FAttackReturnValue ReturnValue;
-	UDefenseComponent* DefenseComponent = OtherCreature->GetDefenseComponent();
 	UPOAttackAttributeComponent* POAttackAttributeComponent = SelfPackObejct->GetPOAttackAttributeComponent();
-	ReturnValue.Damage = CalculateDamage(SelfPackObejct, OtherCreature, DamageMultiplier);
-	ReturnValue.InterruptDir = CalculateInterruptDir(SelfPackObejct,OtherCreature);
-	ReturnValue.InterruptType = CalculateInterrupt(POAttackAttributeComponent->InterruptAblity,ReturnValue.Damage / OtherCreature->GetAttributeComponent()->GetHealthValue()->GetMaxValue(), DefenseComponent->AvoidAblity, DefenseComponent->StartToBeInterruptedPercent);
+	ReturnValue.Damage = CalculateDamage(SelfPackObejct, DefenseComponent,OtherState, DamageMultiplier);
+	ReturnValue.InterruptDir = CalculateInterruptDir(SelfPackObejct, DefenseComponent->GetOwner());
+	ReturnValue.InterruptType = CalculateInterrupt(POAttackAttributeComponent->InterruptAblity, ReturnValue.Damage / HealthComponent->GetMaxValue(), DefenseComponent->AvoidAblity, DefenseComponent->StartToBeInterruptedPercent);
 	if (IsTest)
 		UE_LOG(LogTemp, Warning, TEXT("Damage:%f,InterruptType:%d,InterruptDir:%d"), ReturnValue.Damage, ReturnValue.InterruptType, ReturnValue.InterruptDir);
 	return ReturnValue;
+
 }

@@ -8,6 +8,9 @@
 #include "Character/Component/AttributeComponent/SetValueInterface.h"
 #include "BlueComponent.generated.h"
 
+//蓝量耗尽委托
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBlueEmptyDelegate);
+
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class DAOFA_API  UBlueComponent: public UActorComponent, public IGetValueInterface, public ISetValueInterface
@@ -34,6 +37,9 @@ protected:
 
 
 public:	
+	UPROPERTY(BlueprintAssignable, Category = "Blue")
+	FOnBlueEmptyDelegate OnBlueEmpty;
+
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
@@ -53,7 +59,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Blue")
 	virtual void SetCurrentValue(float NewValue) override
 	{
-		if (NewValue >= 0)
+		if (NewValue > 0)
 		{
 			if (NewValue > MaxBlue)
 			{
@@ -67,6 +73,7 @@ public:
 		else
 		{
 			CurrentBlue = 0;
+			OnBlueEmpty.Broadcast();
 		}
 	}	
 	UFUNCTION(BlueprintCallable, Category = "Blue")
@@ -75,7 +82,7 @@ public:
 		MaxBlue = FMath::Max(NewValue, 0.0f);
 		if (CurrentBlue > MaxBlue)
 		{
-			CurrentBlue = MaxBlue;
+			SetCurrentValue(MaxBlue);
 		}
 	}
 	UFUNCTION(BlueprintCallable, Category = "Blue")
@@ -83,7 +90,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Blue")
 	virtual void SetFull() override { CurrentBlue = MaxBlue; }
 	UFUNCTION(BlueprintCallable, Category = "Blue")
-	virtual void SetEmpty() override { CurrentBlue = 0; }
+	virtual void SetEmpty() override { CurrentBlue = 0; OnBlueEmpty.Broadcast(); }
 	UFUNCTION(BlueprintCallable, Category = "Blue")
 	virtual void AddValue(float Value) override { SetCurrentValue(CurrentBlue + Value); }
 	UFUNCTION(BlueprintCallable, Category = "Blue")

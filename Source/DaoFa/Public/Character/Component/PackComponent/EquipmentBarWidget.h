@@ -49,11 +49,7 @@ public:
 	
 	virtual void TakeOffEquipment(APackObject* Equipment);
 
-	UFUNCTION(BlueprintCallable, Category = "EquipmentBar")
-	bool TriggeredBegin(int Index);
-
-	UFUNCTION(BlueprintCallable, Category = "EquipmentBar")
-	bool TriggeredEnd(int Index);
+	APackObject* GetEquipment(int Index) { return EquipmentBar[Index]; }
 
 
 	

@@ -2,7 +2,6 @@
 
 
 #include "Character/Component/PackComponent/EquipmentBarWidget.h"
-#include "Character/Component/PackComponent/PackObject.h"
 
 void UEquipmentBarWidget::WearEquipment(APackObject* Equipment, int Index)
 {
@@ -50,29 +49,7 @@ void UEquipmentBarWidget::TakeOffEquipment(APackObject* Equipment)
 
 
 
-bool UEquipmentBarWidget::TriggeredEnd(int Index)
-{
-	if (Index >= 0 && Index < Size)
-	{
-		if (EquipmentBar[Index] )
-		{
-			return EquipmentBar[Index]->TriggeredEnd();
-		}
-	}
-	return false;
-}
 
-bool UEquipmentBarWidget::TriggeredBegin(int Index)
-{
-	if (Index >= 0 && Index < Size)
-	{
-		if (EquipmentBar[Index] )
-		{
-			return EquipmentBar[Index]->TriggeredBegin();
-		}
-	}
-	return false;
-}
 
 
 

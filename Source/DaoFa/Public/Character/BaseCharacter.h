@@ -37,8 +37,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	float WalkSpeed = 250.f;
-	float RunSpeed = 500.f;
+
 
 
 
@@ -57,11 +56,7 @@ public:
 	// Called to bind functionality to input
 
 
-	UFUNCTION()
-	void SetSpeedToWalk();
 
-	UFUNCTION()
-	void SetSpeedToRun();
 
 	virtual void InitSumEquipmentBar(USumEquipmentBarWidget* SumEquipmentBarWidget) override;
 

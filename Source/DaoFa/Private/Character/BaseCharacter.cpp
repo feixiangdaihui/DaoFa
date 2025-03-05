@@ -11,6 +11,7 @@
 #include "Character/Component/PackComponent/PackComponent.h"
 #include "General/EnemyDetector.h"
 #include "Enemy/BaseEnemy.h"
+#include"General/CreatureBehavior.h"
 
 // Sets default values
 ABaseCharacter::ABaseCharacter()
@@ -91,19 +92,10 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	InputOperationComponent->SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void ABaseCharacter::SetSpeedToWalk()
-{
-	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-}
-
-void ABaseCharacter::SetSpeedToRun()
-{
-	GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
-}
 
 void ABaseCharacter::InitSumEquipmentBar(USumEquipmentBarWidget* SumEquipmentBarWidget)
 {
-	InputOperationComponent->InitSumEquipmentBar(SumEquipmentBarWidget);
+	CreatureBehavior->InitSumEquipmentBar(SumEquipmentBarWidget);
 	PackComponent->InitSumEquipmentBar(SumEquipmentBarWidget);
 }
 

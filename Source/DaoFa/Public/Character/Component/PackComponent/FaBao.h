@@ -30,7 +30,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void AttachToCharacter(ACreature* Creature) override;
+	virtual void AttachToCreature(ACreature* Creature) override;
 	
 
 };

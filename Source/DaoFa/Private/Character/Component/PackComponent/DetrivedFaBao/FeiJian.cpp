@@ -7,6 +7,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Creature.h"
+#include "General/Interface/BeAttacked.h"
 AFeiJian::AFeiJian()
 {
 	LongPressEnemyDetector = CreateDefaultSubobject<UEnemyDetector>(TEXT("LongPressEnemyDetector"));
@@ -40,15 +41,16 @@ AFeiJian::AFeiJian()
 
 	StaticMeshComponent->SetSimulatePhysics(false);
 	StaticMeshComponent->SetEnableGravity(false);
+
 	CapsuleComponent->SetSimulatePhysics(false);
 	CapsuleComponent->SetEnableGravity(false);
 
 
 }
 
-void AFeiJian::AttachToCharacter(ACreature* Creature)
+void AFeiJian::AttachToCreature(ACreature* Creature)
 {
-	Super::AttachToCharacter(Creature);
+	Super::AttachToCreature(Creature);
 	StaticMeshComponent->SetVisibility(false);
 	IsInHand = true;
 	IsGoHome = false;
@@ -175,22 +177,19 @@ void AFeiJian::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Other
 	if (IsSpell)
 	{
 		ACreature* Creature = Cast<ACreature>(OtherActor);
-		if (Creature)
+		if (Creature == Owner)
 		{
-			//如果是拥有者，收回
-			if (Creature == Owner)
-			{
-				EndSpell();
-				AttachToCharacter(Creature);
-			}
-			else
-			{
-				if (IsShortPressHurt)
-					Creature->BeAttacked(this, POAttackAttributeComponent->GetShortPressDamageMultiplier());
-				else if (IsLongPressHurt)
-					Creature->BeAttacked(this, POAttackAttributeComponent->GetLongPressDamageMultiplier());
-			}
-
+			EndSpell();
+			AttachToCreature(Creature);
+			return;
+		}
+		IBeAttacked* BeAttacked = Cast<IBeAttacked>(OtherActor);
+		if (BeAttacked)
+		{
+			if (IsShortPressHurt)
+				BeAttacked->BeAttacked(this, POAttackAttributeComponent->GetShortPressDamageMultiplier());
+			else if (IsLongPressHurt)
+				BeAttacked->BeAttacked(this, POAttackAttributeComponent->GetLongPressDamageMultiplier());
 		}
 		else
 			EndSpell();
@@ -215,11 +214,11 @@ void AFeiJian::EndSpell()
 		SetActorScale3D(FVector(1, 1, 1));
 		//透明度变回
 		IsLongPressHurt = false;
-		AttachToCharacter(Owner);
+		AttachToCreature(Owner);
 	}
 	if (IsGoHome)
 	{
-		AttachToCharacter(Owner);
+		AttachToCreature(Owner);
 	}
 }
 

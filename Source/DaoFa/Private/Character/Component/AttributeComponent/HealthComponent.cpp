@@ -32,6 +32,40 @@ void UHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	// ...
 }
 
+void UHealthComponent::SetCurrentValue(float NewValue)
+{
+	if (!CanBeHurt)
+	{
+		if (NewValue <= CurrentHealth)
+		{
+			return ;
+		}
+		else
+		{
+			CurrentHealth = NewValue;
+			return ;
+		}
+	}
+	else if (NewValue >0)
+	{
+		if (NewValue > MaxHealth)
+		{
+			CurrentHealth = MaxHealth;
+		}
+		else
+		{
+			CurrentHealth = NewValue;
+		}
+		return ;
+	}
+	else
+	{
+		CurrentHealth = 0;
+		OnDeath.Broadcast();
+		return ;
+	}
+}
+
 
 
 

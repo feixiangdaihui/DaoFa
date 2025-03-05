@@ -4,8 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Character/Interface/InputUpdateInterface.h"
-#include "Hud/Interface/InitSumEquipmentBarInterface.h"
 #include "InputOperationComponent.generated.h"
 
 class UInputAction;
@@ -13,14 +11,15 @@ class ABaseCharacter;
 class UInputComponent;
 struct FInputActionValue;
 class UInputMappingContext;
-class UBaseAnimInstance;
 class USumEquipmentBarWidget;
 class ABaseHud;
+class APackObject;
+class UCreatureBehavior;
 //负责告诉动画实例类现在的输入状态
 //动画实例类根据输入状态来判断是否播放动画
 //该类从而判断是否进行移动或者其他
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class DAOFA_API UInputOperationComponent : public UActorComponent, public IInputUpdateInterface,public IInitSumEquipmentBarInterface
+class DAOFA_API UInputOperationComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
@@ -31,32 +30,20 @@ public:
 	//设置输入映射上下文为当前组件所指定的上下文
 	void SetInputMappingContext(ULocalPlayer* LocalPlayer);
 
-	virtual void InitSumEquipmentBar(USumEquipmentBarWidget* SumEquipmentBarWidget) override;
 protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
 
 	
 
 private:
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	virtual void UpdateInput(InputAnimation Input) override;
 
-	virtual bool CheckInput(InputAnimation Input) override;
-
-	TArray<TScriptInterface<IInputUpdateInterface>> InputUpdateInterfaces;
 
 
 	ABaseCharacter* OwnerCharacter;
 
-
 	ABaseHud* OwnerHud;
 
-	UBaseAnimInstance* OwnerAnimInstance;
-
-	USumEquipmentBarWidget* OwnerSumEquipmentBarWidget;
+	UCreatureBehavior* OwnerCreatureBehavior;
 	
 	/* Jump Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -121,38 +108,13 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
 
-	void Jump();
 
-	void StopJumping();
-
-	void Walk(const FInputActionValue& Value);
-
-	void BaseWalk(const FInputActionValue& Value);
-
-	void StopWalk();
-
-	void Run();
-
-	void StopRun();
-	
 	void Look(const FInputActionValue& Value);
 
-	void Dodge();
 
-	void FirstAttack(const FInputActionValue& Value);
-
-	void SecondAttack(const FInputActionValue& Value);
-
-
-	//1表示开始释放技能，0表示结束释放技能
-	void Spell(int Num, bool Begin);
-
-
-	void ChangeChosenEquipmentBarToSmall(const FInputActionValue& Value);
-
-	void ChangeChosenEquipmentBarToBig(const FInputActionValue& Value);
 
 	void OpenPack();
+
 
 
 

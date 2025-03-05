@@ -4,7 +4,7 @@
 #include "Character/Component/PackComponent/BlueCostComponent.h"
 #include "Character/Component/AttributeComponent/AttributeComponent.h"
 #include "Creature.h"
-#include "Character/Component/AttributeComponent/SetValueInterface.h"
+#include "Character/Component/AttributeComponent/BlueComponent.h"
 
 
 // Sets default values for this component's properties
@@ -26,7 +26,7 @@ void UBlueCostComponent::BeginPlay()
 	ACreature* Creature = Cast<ACreature>(CreatureActor);
 	if (Creature)
 	{
-		BlueValue = Creature->GetAttributeComponent()->SetBlueValue();
+		BlueValue = Creature->GetAttributeComponent()->GetBlueComponent();
 	}
 
 	// ...
@@ -44,17 +44,33 @@ void UBlueCostComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 
 
 
-bool UBlueCostComponent::CheckShortPressBlueCost()
+
+bool UBlueCostComponent::ShortPressCostBlue()
 {
 	return BlueValue->SubtractValue(ShortPressBlueCost);
 }
-
-bool UBlueCostComponent::CheckLongPressBlueCost()
+bool UBlueCostComponent::LongPressCostBlue()
 {
 	return BlueValue->SubtractValue(LongPressBlueCost);
 }
 
 
+
+void UBlueCostComponent::OngoingCostBlue()
+{
+    if (OngoingMode)
+    {
+        if (BlueValue->SubtractValue(OngoingBlueCost))
+        {
+			GetWorld()->GetTimerManager().SetTimer(OngoingTimer, [this]() {BlueValue->SubtractValue(OngoingBlueCost); }, OngoingInterval, true);
+        }
+    }
+}
+
+void UBlueCostComponent::EndOngoingCostBlue()
+{
+	GetWorld()->GetTimerManager().ClearTimer(OngoingTimer);
+}
 
 
 

@@ -9,6 +9,7 @@
 //记录哪些状态可以共存
 //IdleWalkRun持续输入的状态无需单独记录
 //具有先后顺序，不一定完全对称（意味着可以从A到B，但不一定可以从B到A）
+//NONE表示中止当前蒙太奇动画
 TMap<InputAnimation, TArray<InputAnimation>> UBaseAnimInstance::InputBlendAgree =
 {
 	{InputAnimation::FirstAttack,{InputAnimation::Idle}},
@@ -19,12 +20,12 @@ TMap<InputAnimation, TArray<InputAnimation>> UBaseAnimInstance::InputBlendAgree 
 	{InputAnimation::SpellEnd ,{InputAnimation::Idle,InputAnimation::Walk}},
 
 };
-TSet<InputAnimation> UBaseAnimInstance::FlexibleState = { InputAnimation::Run, InputAnimation::Idle ,InputAnimation::Walk  };
+TSet<InputAnimation> UBaseAnimInstance::FlexibleState = { InputAnimation::Run, InputAnimation::Idle ,InputAnimation::Walk };
 
 
 
 
-
+//Input==NONE时表示中止当前蒙太奇动画
 void UBaseAnimInstance::UpdateInput(InputAnimation Input)
 {
 	if (OwnerCharacter)
@@ -38,6 +39,8 @@ void UBaseAnimInstance::UpdateInput(InputAnimation Input)
 		{
 			IsMontageForbiden = false;
 			CurrentMontageState = Input;
+			if (CurrentMontageState == InputAnimation::NONE)
+				StopAllMontages(0.25f);
 		}
 
 	}
@@ -62,6 +65,8 @@ void UBaseAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	{
 		ZVelocity = OwnerCharacter->GetCharacterMovement()->Velocity.Z;
 		IsFalling = OwnerCharacter->GetCharacterMovement()->IsFalling();
+		if(!IsFalling&& CurrentMontageState == InputAnimation::Jump)
+			CurrentMontageState = InputAnimation::NONE;
 		
 	}
 }

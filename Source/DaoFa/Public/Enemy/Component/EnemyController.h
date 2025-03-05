@@ -29,15 +29,18 @@ protected:
 	FTimerHandle RotateTimer;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy")
-	float RotateAnglePer = 10.0f;
+	float RotateAnglePer = 1.0f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Enemy")
 	float RotateInterval = 0.1f;
 
 	ACreature* CurrentTarget = nullptr;
+	
+
+
 private:
 
-	void UpdateTarget();
+	
 
 	void RotateToTarget();
 
@@ -49,4 +52,7 @@ public:
 
 	UEnemyDetector* GetEnemyDetector() const { return EnemyDetector; }
 
+	void UpdateTarget();
+
+	void UpdateTarget(ACreature* Target);
 };

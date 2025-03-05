@@ -50,7 +50,7 @@ protected:
 
 public:
 	AFeiJian();
-	virtual void AttachToCharacter(class ACreature* Creature) override;
+	virtual void AttachToCreature(class ACreature* Creature) override;
 
 	virtual void BeginPlay() override;
 

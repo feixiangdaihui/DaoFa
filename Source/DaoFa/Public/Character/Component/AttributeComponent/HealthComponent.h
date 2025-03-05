@@ -8,6 +8,9 @@
 #include "Character/Component/AttributeComponent/SetValueInterface.h"
 #include "HealthComponent.generated.h"
 
+// 死亡委托
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeath);
+
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class DAOFA_API UHealthComponent : public UActorComponent, public IGetValueInterface, public ISetValueInterface
@@ -27,7 +30,27 @@ protected:
 	float CurrentHealth = 100.0f;
 
 
+
+
+
 public:	
+
+	//死亡委托
+	UPROPERTY(BlueprintAssignable, Category = "Health")
+	FOnDeath OnDeath;
+
+	//是否可以被伤害，但不包括免疫debuff
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
+	bool CanBeHurt = true;
+
+	//是否可以被治疗
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
+	bool CanBeHealed = true;
+
+	//是否可以被影响，主要用于免疫debuff
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
+	bool CanBeInfluenced = true;
+
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
@@ -44,39 +67,32 @@ public:
 
 
 	UFUNCTION(BlueprintCallable, Category = "Health")
-	virtual void SetCurrentValue(float NewValue) override
+	virtual void SetCurrentValue(float NewValue) override;
+
+	//如果新的值小于当前值，是一种debuff，如果新的值大于当前值，是一种buff
+	UFUNCTION(BlueprintCallable, Category = "Health")
+	virtual void SetMaxValue(float NewValue) override 
 	{
-		if (NewValue >= 0 )
+		if (CanBeInfluenced)
 		{
-			if (NewValue > MaxHealth)
+			MaxHealth = FMath::Max(NewValue, 0.0f);
+
+			if (CurrentHealth > MaxHealth)
 			{
-				CurrentHealth = MaxHealth;
-			}
-			else
-			{
-				CurrentHealth = NewValue;
+				SetCurrentValue(MaxHealth);
 			}
 		}
 		else
 		{
-			CurrentHealth = 0;
-		}
-	}
-	UFUNCTION(BlueprintCallable, Category = "Health")
-	virtual void SetMaxValue(float NewValue) override 
-	{ 
-		MaxHealth = FMath::Max(NewValue, 0.0f);
-		if (CurrentHealth > MaxHealth)
-		{
-			CurrentHealth = MaxHealth;
+			MaxHealth = FMath::Max(NewValue, MaxHealth);
 		}
 	}
 	UFUNCTION(BlueprintCallable, Category = "Health")
 	virtual void SetPercentage(float NewValue) override { SetCurrentValue(MaxHealth * NewValue); }
 	UFUNCTION(BlueprintCallable, Category = "Health")
-	virtual void SetFull() override { CurrentHealth = MaxHealth; }
+	virtual void SetFull() override { SetCurrentValue(MaxHealth); }
 	UFUNCTION(BlueprintCallable, Category = "Health")
-	virtual void SetEmpty() override { CurrentHealth = 0; }
+	virtual void SetEmpty() override { SetCurrentValue(0); }
 	UFUNCTION(BlueprintCallable, Category = "Health")
 	virtual void AddValue(float Value) override { SetCurrentValue(CurrentHealth + Value); }
 	UFUNCTION(BlueprintCallable, Category = "Health")
@@ -84,31 +100,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Health")
 	virtual bool SubtractValue(float Value) override
 	{ 
-		if (CurrentHealth - Value < 0)
-		{
-			CurrentHealth = 0;
-			return false;
-		}
-		else
-		{
-			CurrentHealth -= Value;
-			return true;
-		}
+		SetCurrentValue(CurrentHealth - Value);
+		return true;
 	}
 	UFUNCTION(BlueprintCallable, Category = "Health")
 	virtual bool SubtractPercentage(float Value) override
 	{
-		if (CurrentHealth - Value * MaxHealth < 0)
-		{
-			CurrentHealth = 0;
-			return false;
-		}
-		else
-		{
-			CurrentHealth -= Value * MaxHealth;
-			return true;
-		}
-
+		SetCurrentValue(CurrentHealth - MaxHealth * Value);
+		return true;
 	}
 
 

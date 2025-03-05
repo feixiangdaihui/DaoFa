@@ -27,5 +27,7 @@ public:
 	FText GetName() const { return Name; }
 
 	ABaseEnemy();
+	
+	virtual void BeAttacked(APackObject* PackObject, float DamageMultiplier) override;
 
 };

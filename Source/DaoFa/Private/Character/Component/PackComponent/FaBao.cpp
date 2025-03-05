@@ -44,9 +44,9 @@ void AFaBao::Tick(float DeltaTime)
 
 }
 
-void AFaBao::AttachToCharacter(ACreature* Creature)
+void AFaBao::AttachToCreature(ACreature* Creature)
 {
-	Super::AttachToCharacter(Creature);
+	Super::AttachToCreature(Creature);
 	CanBeWearOrTakeOff = true;
 }
 

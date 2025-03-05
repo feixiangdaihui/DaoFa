@@ -37,11 +37,14 @@ void ADropObjectDomain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AAct
 	{
 		for (auto ObjectClass : DropObjects)
 		{
-			FActorSpawnParameters SpawnParameters;
-			SpawnParameters.Owner = Character;
-			APackObject* PackObject = GetWorld()->SpawnActor<APackObject>(ObjectClass, Character->GetActorLocation(), FRotator::ZeroRotator, SpawnParameters);
-			PackObject->AttachToCharacter(Character);
-			Character->GetPackComponent()->WearEquipment(PackObject);
+			if (ObjectClass)
+			{
+				FActorSpawnParameters SpawnParameters;
+				SpawnParameters.Owner = Character;
+				APackObject* PackObject = GetWorld()->SpawnActor<APackObject>(ObjectClass, Character->GetActorLocation(), FRotator::ZeroRotator, SpawnParameters);
+				PackObject->AttachToCreature(Character);
+				Character->GetPackComponent()->WearEquipment(PackObject);
+			}
 		}
 	}
 }

@@ -51,46 +51,23 @@ void USumEquipmentBarWidget::TakeOffEquipment(APackObject* Equipment)
 	}
 }
 
-
-
-
-bool USumEquipmentBarWidget::TriggeredEnd( int SpecificIndex)
+APackObject* USumEquipmentBarWidget::GetEquipment(int Index)
 {
 	switch (CurrentChosenIndex)
 	{
 	case 0:
-		return FaShuEquipmentBar->TriggeredEnd(SpecificIndex);
-		break;
+		return FaShuEquipmentBar->GetEquipment(Index);
 	case 1:
-		return FaBaoEquipmentBar->TriggeredEnd(SpecificIndex);
-		break;
+		return FaBaoEquipmentBar->GetEquipment(Index);
 	case 2:
-		return FuLuEquipmentBar->TriggeredEnd(SpecificIndex);
-		break;
+		return FuLuEquipmentBar->GetEquipment(Index);
 	default:
-		break;
+		return nullptr;
 	}
-	return false;
 }
 
-bool USumEquipmentBarWidget::TriggeredBegin( int SpecificIndex)
-{
-	switch (CurrentChosenIndex)
-	{
-	case 0:
-		return FaShuEquipmentBar->TriggeredBegin(SpecificIndex);
-		break;
-	case 1:
-		return FaBaoEquipmentBar->TriggeredBegin(SpecificIndex);
-		break;
-	case 2:
-		return FuLuEquipmentBar->TriggeredBegin(SpecificIndex);
-		break;
-	default:
-		break;
-	}
-	return false;
-}
+
+
 
 void USumEquipmentBarWidget::ChangeChosenEquipmentBarToSmall()
 {

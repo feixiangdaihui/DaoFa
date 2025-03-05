@@ -36,7 +36,7 @@ void APackObject::Tick(float DeltaTime)
 
 }
 
-void APackObject::AttachToCharacter(ACreature* Creature)
+void APackObject::AttachToCreature(ACreature* Creature)
 {
 	AttachToActor(Creature, FAttachmentTransformRules::SnapToTargetIncludingScale);
 	OwnerCreature = Creature;
@@ -44,7 +44,14 @@ void APackObject::AttachToCharacter(ACreature* Creature)
 
 bool APackObject::TriggeredBegin()
 {
-	if (CheckShortPress())
+	if (!IsLongPressPermit )
+	{
+		BlueCostComponent->OngoingCostBlue();
+		TriggeredByShortPress();
+		return true;
+	}
+
+	if (BlueCostComponent->ShortPressCostBlue())
 	{
 		LongPressTimeCounter = GetWorld()->GetTimeSeconds();
 		return true;
@@ -55,20 +62,31 @@ bool APackObject::TriggeredBegin()
 
 bool APackObject::TriggeredEnd()
 {
-	if (LongPressTimeCounter == 0)
-		return false;
+
 	if (!IsLongPressPermit)
 	{
 		TriggeredByShortPress();
+		BlueCostComponent->EndOngoingCostBlue();
 		return true;
 	}
+
+
+	if (LongPressTimeCounter == 0)
+		return false;
+
+
 	LongPressTimeCounter = GetWorld()->GetTimeSeconds() - LongPressTimeCounter;
-	if (LongPressTimeCounter > LongPressTime&& CheckLongPress())
+	if (LongPressTimeCounter > LongPressTime && BlueCostComponent->LongPressCostBlue())
 	{
 		TriggeredByLongPress();
 	}
-	else
+	else if (IsShortPressPermit)
 		TriggeredByShortPress();
+	else
+	{
+		LongPressTimeCounter = 0;
+		return false;
+	}
 	LongPressTimeCounter = 0;
 	return true;
 }
@@ -96,12 +114,3 @@ FPackObjectInfo APackObject::GetPackObjectInfo()
 	return PackObjectInfo;
 }
 
-bool APackObject::CheckShortPress()
-{
-	return BlueCostComponent->CheckShortPressBlueCost();
-}
-
-bool APackObject::CheckLongPress()
-{
-	return BlueCostComponent->CheckLongPressBlueCost();
-}

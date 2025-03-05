@@ -4,14 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "General/Interface/BeAttacked.h"
 #include "Creature.generated.h"
 class UAttributeComponent;
 class UPackComponent;
 class UDefenseComponent;
 class UStateComponent;
 class APackObject;
+class UCreatureBehavior;
 UCLASS()
-class DAOFA_API ACreature : public ACharacter
+class DAOFA_API ACreature : public ACharacter, public IBeAttacked
 {
 	GENERATED_BODY()
 
@@ -34,6 +36,14 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "State")
 	TObjectPtr<UStateComponent> StateComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Behavior")
+	TObjectPtr<UCreatureBehavior> CreatureBehavior;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Walk")
+	float WalkSpeed = 250.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Walk")
+	float RunSpeed = 500.f;
+
 public:
 	// Sets default values for this character's properties
 	ACreature();
@@ -47,7 +57,16 @@ public:
 	UPackComponent* GetPackComponent() { return PackComponent.Get(); }
 	UDefenseComponent* GetDefenseComponent()  const{ return DefenseComponent.Get(); }
 	UStateComponent* GetStateComponent() { return StateComponent.Get(); }
+	UCreatureBehavior* GetCreatureBehavior() { return CreatureBehavior.Get(); }
 
-	void BeAttacked(APackObject* PackObject, float DamageMultiplier);
+	virtual void BeAttacked(APackObject* PackObject, float DamageMultiplier) override;
+
+	UFUNCTION()
+	void SetSpeedToWalk();
+
+	UFUNCTION()
+	void SetSpeedToRun();
+
+	void SetUnbeatable(bool NewValue);
 
 };

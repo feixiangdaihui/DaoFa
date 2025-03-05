@@ -42,9 +42,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SumEquipmentBar")
 	virtual void TakeOffEquipment(APackObject* Equipment) override;
 
-	bool TriggeredBegin(int SpecificIndex);
-
-	bool TriggeredEnd( int SpecificIndex);
+	APackObject* GetEquipment(int Index);
 
 
 	void ChangeChosenEquipmentBarToSmall();

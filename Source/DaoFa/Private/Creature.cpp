@@ -8,6 +8,9 @@
 #include "General/StateComponent.h"
 #include"General/CalAttackLibrary.h"
 #include "Character/Component/AttributeComponent/HealthComponent.h"
+#include "General/CreatureBehavior.h"
+#include "GameFramework/CharacterMovementComponent.h"
+
 
 // Sets default values
 ACreature::ACreature()
@@ -18,6 +21,7 @@ ACreature::ACreature()
 	PackComponent = CreateDefaultSubobject<UPackComponent>(TEXT("PackComponent"));
 	DefenseComponent = CreateDefaultSubobject<UDefenseComponent>(TEXT("DefenseComponent"));
 	StateComponent = CreateDefaultSubobject<UStateComponent>(TEXT("StateComponent"));
+	CreatureBehavior = CreateDefaultSubobject<UCreatureBehavior>(TEXT("CreatureBehavior"));
 }
 
 // Called when the game starts or when spawned
@@ -46,6 +50,22 @@ void ACreature::BeAttacked(APackObject* PackObject, float DamageMultiplier)
 	FAttackReturnValue ReturnValue = UCalAttackLibrary::CalculateAttack(PackObject, this, DamageMultiplier);
 	AttributeComponent->GetHealthComponent()->SubtractValue(ReturnValue.Damage);
 
+}
+
+void ACreature::SetSpeedToWalk()
+{
+	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+
+}
+
+void ACreature::SetSpeedToRun()
+{
+	GetCharacterMovement()->MaxWalkSpeed = RunSpeed;
+}
+
+void ACreature::SetUnbeatable(bool NewValue)
+{
+	AttributeComponent->GetHealthComponent()->CanBeHurt = !NewValue;
 }
 
 

@@ -33,6 +33,16 @@ void UPackComponent::BeginPlay()
 }
 
 
+
+
+void UPackComponent::OnPackObjectExhausted(APackObject* PackObject)
+{
+	for (auto UpdateEquipmentInterface : UpdateEquipmentInterfaces)
+	{
+		UpdateEquipmentInterface->TakeOffEquipment(PackObject);
+	}
+}
+
 // Called every frame
 void UPackComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -50,6 +60,7 @@ void UPackComponent::WearEquipment( APackObject* Equipment, int SpecificIndex)
 		return;
 	}
 	CurrentSize += Size;
+	Equipment->OnPackObjectExhausted.AddDynamic(this, &UPackComponent::OnPackObjectExhausted);
 	switch (Equipment->GetEquipmentType())
 	{
 	case EEquipmentType::FASHU:

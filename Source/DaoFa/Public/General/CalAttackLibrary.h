@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Character/Component/PackComponent/PackObject.h"
+#include"General/StateComponent.h"
 #include "CalAttackLibrary.generated.h"
 USTRUCT(BlueprintType)
 struct FAttackReturnValue
@@ -22,6 +23,8 @@ public:
 };
 
 class APackObject;
+class UDefenseComponent;
+class UHealthComponent;
 /**
  * 
  */
@@ -35,8 +38,10 @@ private:
 	static EInterruptType CalculateInterrupt(EInterruptAblity InterruptAblity,float ActualDamagePercent, EAvoidInterruptAblity AvoidAblity, float StartToBeInterruptedPercent);
 
 	//计算公式：攻击力*角色与法宝不匹配度带来的伤害倍率*境界差异带来的伤害倍率/对方的防御力*元素克制倍率
+	static  float CalculateDamage(APackObject* SelfPackObejct, ACreature* OtherCreature,float DamageMultiplier);
+
 	UFUNCTION(BlueprintCallable, Category = "Attack")
-	static  float CalculateDamage(APackObject* SelfPackObejct, ACreature* OtherCreature, float DamageMultiplier);
+	static  float CalculateDamage(APackObject* SelfPackObejct, UDefenseComponent* DefenseComponent, FState OtherState,float DamageMultiplier);
 
 	UFUNCTION(BlueprintCallable, Category = "Attack")
 	static EInterruptDir CalculateInterruptDir(AActor* SelfActor,AActor* OtherActor);
@@ -45,7 +50,9 @@ private:
 
 public:
 	//DamageMultiplier是类似重击所带的倍率，也可以是虚弱状态所带的倍率，物品和角色原本自带的倍率已经算在内
-	UFUNCTION(BlueprintCallable, Category = "Attack")
 	static  FAttackReturnValue CalculateAttack( APackObject* SelfPackObejct, ACreature* OtherCreature, float DamageMultiplier);
+
+	UFUNCTION(BlueprintCallable, Category = "Attack")
+	static  FAttackReturnValue CalculateAttack(APackObject* SelfPackObejct, UDefenseComponent* DefenseComponent, FState OtherState, UHealthComponent* HealthComponent, float DamageMultiplier);
 	
 };

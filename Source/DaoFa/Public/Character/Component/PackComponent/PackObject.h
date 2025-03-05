@@ -11,6 +11,10 @@ class UAttackAttributeComponent;
 class UPOAttackAttributeComponent;
 class UStateComponent;
 
+
+//物品耗尽委托,需要一个参数，表示物品耗尽的物品
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPackObjectExhausted, APackObject*, PackObject);
+
 UENUM(BlueprintType)
 enum class EEquipmentType : uint8
 {
@@ -126,6 +130,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
 	bool IsLongPressPermit = true;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
+	bool IsShortPressPermit = true;
+
 	virtual void TriggeredByShortPress() {}
 
 	virtual void TriggeredByLongPress() {}
@@ -133,6 +140,8 @@ protected:
 
 	bool CanBeWearOrTakeOff = true;
 public:	
+	FOnPackObjectExhausted OnPackObjectExhausted;
+
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -146,11 +155,18 @@ public:
 	virtual int GetQunatity() const { return Quantity; }
 
 	UFUNCTION(BlueprintCallable, Category = "PackObject")
-	virtual void AttachToCharacter(class ACreature* Creature);
+	virtual void AttachToCreature(class ACreature* Creature);
 
 	UFUNCTION(BlueprintCallable, Category = "PackObject")
 	bool GetCanBeWearOrTakeOff() { return CanBeWearOrTakeOff; }
 
+	//允许长按且允许短按的模式：
+	//1.begin后什么都不做，直到end，判断是否长按，如果是长按，触发长按，否则触发短按
+	//不允许长按的模式：
+	//1.begin直接触发短按
+	//2.end再次触发短按，所以该模式下的物品应该在再次触发短按时处理收尾逻辑
+	//不允许短按的模式：
+	//1.begin后什么都不做，直到end，判断是否长按，如果是长按，触发长按，否则什么都不做
 	bool TriggeredBegin();
 
 	bool TriggeredEnd();
@@ -177,9 +193,7 @@ public:
 	ACreature* GetOwnerCreature() { return OwnerCreature; }
 	
 	
-	virtual bool CheckShortPress();
 
-	virtual bool CheckLongPress();
 
 
 };

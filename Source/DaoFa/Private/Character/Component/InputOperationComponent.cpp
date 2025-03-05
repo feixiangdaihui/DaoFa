@@ -6,11 +6,8 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
-#include "Character/Animation/BaseAnimInstance.h"
-#include "Character/Component/AttributeComponent/AttributeComponent.h"
-#include "Character/Component/AttributeComponent/PhysicalPowerComponent.h"
-#include "Character/Component/PackComponent/SumEquipmentBarWidget.h"
 #include "Hud/BaseHud.h"
+#include "General/CreatureBehavior.h"
 // Sets default values for this component's properties
 UInputOperationComponent::UInputOperationComponent()
 {
@@ -23,58 +20,10 @@ UInputOperationComponent::UInputOperationComponent()
 
 
 // Called when the game starts
-void UInputOperationComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
-	// ...
-	OwnerCharacter = Cast<ABaseCharacter>(GetOwner());
-	if (OwnerCharacter != nullptr)
-	{
-		OwnerAnimInstance = Cast<UBaseAnimInstance>(OwnerCharacter->GetMesh()->GetAnimInstance());
-		UAttributeComponent* OwnerAttributeComponent = OwnerCharacter->GetAttributeComponent();
-		UPhysicalPowerComponent* OwnerPhysicalPowerComponent = OwnerAttributeComponent->GetPhysicalPowerComponent();
-		OwnerHud = Cast<ABaseHud>(OwnerCharacter->GetWorld()->GetFirstPlayerController()->GetHUD());
-
-		if (OwnerAnimInstance != nullptr)
-			InputUpdateInterfaces.Add(OwnerAnimInstance);
-		if (OwnerPhysicalPowerComponent != nullptr)
-			InputUpdateInterfaces.Add(OwnerPhysicalPowerComponent);
-	
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("OwnerCharacter is nullptr"));
-	}
-
-}
 
 
 // Called every frame
-void UInputOperationComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
-}
-
-void UInputOperationComponent::UpdateInput(InputAnimation Input)
-{
-	for (auto InputUpdateInterface : InputUpdateInterfaces)
-	{
-		InputUpdateInterface->UpdateInput(Input);
-	}
-}
-
-bool UInputOperationComponent::CheckInput(InputAnimation Input)
-{
-	for (auto InputUpdateInterface : InputUpdateInterfaces)
-	{
-		if (!InputUpdateInterface->CheckInput(Input))
-			return false;
-	}
-	return true;
-}
 
 
 
@@ -82,39 +31,54 @@ bool UInputOperationComponent::CheckInput(InputAnimation Input)
 
 void UInputOperationComponent::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
+	// ...
+	OwnerCharacter = Cast<ABaseCharacter>(GetOwner());
+	if (OwnerCharacter != nullptr)
+	{
+
+		OwnerHud = Cast<ABaseHud>(OwnerCharacter->GetWorld()->GetFirstPlayerController()->GetHUD());
+		OwnerCreatureBehavior = OwnerCharacter->GetCreatureBehavior();
+		if (!IsValid(OwnerCreatureBehavior))
+		{
+			UE_LOG(LogTemp, Error, TEXT("OwnerCreatureBehavior is nullptr"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("OwnerCharacter is nullptr"));
+	}
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
 
 		// Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &UInputOperationComponent::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &UInputOperationComponent::StopJumping);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, OwnerCreatureBehavior, &UCreatureBehavior::Jump);
 		// Moving
-		EnhancedInputComponent->BindAction(WalkAction, ETriggerEvent::Triggered, this, &UInputOperationComponent::Walk);
-		EnhancedInputComponent->BindAction(WalkAction, ETriggerEvent::Completed, this, &UInputOperationComponent::StopWalk);
-		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Started, this, &UInputOperationComponent::Run);
-		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Completed, this, &UInputOperationComponent::StopRun);
+		EnhancedInputComponent->BindAction(WalkAction, ETriggerEvent::Triggered, OwnerCreatureBehavior, &UCreatureBehavior::Walk);
+		EnhancedInputComponent->BindAction(WalkAction, ETriggerEvent::Completed, OwnerCreatureBehavior, &UCreatureBehavior::StopWalk);
+		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Started, OwnerCreatureBehavior, &UCreatureBehavior::Run);
+		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Completed, OwnerCreatureBehavior, &UCreatureBehavior::StopRun);
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &UInputOperationComponent::Look);
 		//Dodge
-		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Started, this, &UInputOperationComponent::Dodge);
+		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Started, OwnerCreatureBehavior, &UCreatureBehavior::Dodge);
 
 		//ChangeChosenEquipmentBar
-		EnhancedInputComponent->BindAction(ChangeChosenEquipmentBarToSmallAction, ETriggerEvent::Started, this, &UInputOperationComponent::ChangeChosenEquipmentBarToSmall);
-		EnhancedInputComponent->BindAction(ChangeChosenEquipmentBarToBigAction, ETriggerEvent::Started, this, &UInputOperationComponent::ChangeChosenEquipmentBarToBig);
+		EnhancedInputComponent->BindAction(ChangeChosenEquipmentBarToSmallAction, ETriggerEvent::Started, OwnerCreatureBehavior, &UCreatureBehavior::ChangeChosenEquipmentBarToSmall);
+		EnhancedInputComponent->BindAction(ChangeChosenEquipmentBarToBigAction, ETriggerEvent::Started, OwnerCreatureBehavior, &UCreatureBehavior::ChangeChosenEquipmentBarToBig);
 
 		//Pack
 		EnhancedInputComponent->BindAction(OpenPackAction, ETriggerEvent::Started, this, &UInputOperationComponent::OpenPack);
 		OpenPackAction->bTriggerWhenPaused = true;
 
 		//Spell
-		EnhancedInputComponent->BindAction(SpellAction0, ETriggerEvent::Started, this, &UInputOperationComponent::Spell, 0, true);
-		EnhancedInputComponent->BindAction(SpellAction0, ETriggerEvent::Completed, this, &UInputOperationComponent::Spell, 0, false);
-		EnhancedInputComponent->BindAction(SpellAction1, ETriggerEvent::Started, this, &UInputOperationComponent::Spell, 1, true);
-		EnhancedInputComponent->BindAction(SpellAction1, ETriggerEvent::Completed, this, &UInputOperationComponent::Spell, 1, false);
-		EnhancedInputComponent->BindAction(SpellAction2, ETriggerEvent::Started, this, &UInputOperationComponent::Spell, 2, true);
-		EnhancedInputComponent->BindAction(SpellAction2, ETriggerEvent::Completed, this, &UInputOperationComponent::Spell, 2, false);
-		EnhancedInputComponent->BindAction(SpellAction3, ETriggerEvent::Started, this, &UInputOperationComponent::Spell, 3, true);
-		EnhancedInputComponent->BindAction(SpellAction3, ETriggerEvent::Completed, this, &UInputOperationComponent::Spell, 3, false);
+		EnhancedInputComponent->BindAction(SpellAction0, ETriggerEvent::Started, OwnerCreatureBehavior, &UCreatureBehavior::Spell, 0, true);
+		EnhancedInputComponent->BindAction(SpellAction0, ETriggerEvent::Completed, OwnerCreatureBehavior, &UCreatureBehavior::Spell, 0, false);
+		EnhancedInputComponent->BindAction(SpellAction1, ETriggerEvent::Started, OwnerCreatureBehavior, &UCreatureBehavior::Spell, 1, true);
+		EnhancedInputComponent->BindAction(SpellAction1, ETriggerEvent::Completed, OwnerCreatureBehavior, &UCreatureBehavior::Spell, 1, false);
+		EnhancedInputComponent->BindAction(SpellAction2, ETriggerEvent::Started, OwnerCreatureBehavior, &UCreatureBehavior::Spell, 2, true);
+		EnhancedInputComponent->BindAction(SpellAction2, ETriggerEvent::Completed, OwnerCreatureBehavior, &UCreatureBehavior::Spell, 2, false);
+		EnhancedInputComponent->BindAction(SpellAction3, ETriggerEvent::Started, OwnerCreatureBehavior, &UCreatureBehavior::Spell, 3, true);
+		EnhancedInputComponent->BindAction(SpellAction3, ETriggerEvent::Completed, OwnerCreatureBehavior, &UCreatureBehavior::Spell, 3, false);
 
 	}
 }
@@ -125,79 +89,6 @@ void UInputOperationComponent::SetInputMappingContext(ULocalPlayer* LocalPlayer)
 	{
 		Subsystem->AddMappingContext(DefaultMappingContext, 1);
 	}
-}
-
-
-
-void UInputOperationComponent::Jump()
-{
-	if (CheckInput(InputAnimation::Jump))
-	{
-		OwnerCharacter->Jump();
-		UpdateInput(InputAnimation::Jump);
-	}
-}
-
-void UInputOperationComponent::StopJumping()
-{
-	if (OwnerCharacter != nullptr )
-	{
-		OwnerCharacter->StopJumping();
-		UpdateInput(InputAnimation::NONE);
-	}
-}
-
-void UInputOperationComponent::Walk(const FInputActionValue& Value)
-{
-
-	if (OwnerCharacter != nullptr )
-	{
-		if(IsRunning&& CheckInput(InputAnimation::Run))
-		{
-			OwnerCharacter->SetSpeedToRun();
-			UpdateInput(InputAnimation::Run);
-			BaseWalk(Value);
-		}
-		else if (CheckInput(InputAnimation::Walk))
-		{
-			OwnerCharacter->SetSpeedToWalk();
-			UpdateInput(InputAnimation::Walk);
-			BaseWalk(Value);
-
-		}
-
-	}
-
-}
-
-void UInputOperationComponent::BaseWalk(const FInputActionValue& Value)
-{
-	FVector2D MovementVector = Value.Get<FVector2D>();
-	// find out which way is forward
-	const FRotator Rotation = OwnerCharacter->Controller->GetControlRotation();
-	const FRotator YawRotation(0, Rotation.Yaw, 0);
-	// get forward vector
-	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	// get right vector 
-	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-	// add movement 
-	OwnerCharacter->AddMovementInput(ForwardDirection, MovementVector.Y);
-	OwnerCharacter->AddMovementInput(RightDirection, MovementVector.X);
-}
-
-void UInputOperationComponent::StopWalk()
-{
-	UpdateInput(InputAnimation::Idle);
-}
-
-void UInputOperationComponent::Run()
-{
-	IsRunning = true;
-}
-
-void UInputOperationComponent::StopRun()
-{
-	IsRunning=false;
 }
 
 void UInputOperationComponent::Look(const FInputActionValue& Value)
@@ -212,67 +103,6 @@ void UInputOperationComponent::Look(const FInputActionValue& Value)
 	}
 }
 
-void UInputOperationComponent::Dodge()
-{
-	if (CheckInput(InputAnimation::Dodge))
-	{
-		UpdateInput(InputAnimation::Dodge);
-	}
-
-}
-
-void UInputOperationComponent::FirstAttack(const FInputActionValue& Value)
-{
-	
-}
-
-void UInputOperationComponent::SecondAttack(const FInputActionValue& Value)
-{
-	
-}
-
-
-
-
-void UInputOperationComponent::Spell(int Num, bool Begin)
-{
-	if (Begin)
-	{
-		if (CheckInput(InputAnimation::SpellLoop))
-		{
-			if( OwnerSumEquipmentBarWidget->TriggeredBegin(Num))
-			{
-				UpdateInput(InputAnimation::SpellLoop);
-			}
-		}
-	}
-	else
-	{
-		if (CheckInput(InputAnimation::SpellEnd))
-		{
-			if (OwnerSumEquipmentBarWidget->TriggeredEnd(Num))
-			{
-				UpdateInput(InputAnimation::SpellEnd);
-			}
-		}
-	}
-}
-
-void UInputOperationComponent::ChangeChosenEquipmentBarToSmall(const FInputActionValue& Value)
-{
-	if (OwnerSumEquipmentBarWidget)
-	{
-		OwnerSumEquipmentBarWidget->ChangeChosenEquipmentBarToSmall();
-	}
-}
-
-void UInputOperationComponent::ChangeChosenEquipmentBarToBig(const FInputActionValue& Value)
-{
-	if (OwnerSumEquipmentBarWidget)
-	{
-		OwnerSumEquipmentBarWidget->ChangeChosenEquipmentBarToBig();
-	}
-}
 
 
 void UInputOperationComponent::OpenPack()
@@ -289,11 +119,5 @@ void UInputOperationComponent::OpenPack()
 		IsPackOpen = true;
 	}
 }
-
-void UInputOperationComponent::InitSumEquipmentBar(USumEquipmentBarWidget* SumEquipmentBarWidget)
-{
-	OwnerSumEquipmentBarWidget = SumEquipmentBarWidget;
-}
-
 
 
