@@ -10,10 +10,13 @@ class UBlueCostComponent;
 class UAttackAttributeComponent;
 class UPOAttackAttributeComponent;
 class UStateComponent;
+class USpellCoolComponent;
+class UPODefenseComponent;
 
-
-//物品耗尽委托,需要一个参数，表示物品耗尽的物品
+//物品耗尽委托，需要一个参数，表示耗尽的物品
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPackObjectExhausted, APackObject*, PackObject);
+
+
 
 UENUM(BlueprintType)
 enum class EEquipmentType : uint8
@@ -21,6 +24,14 @@ enum class EEquipmentType : uint8
 	FASHU,
 	FABAO,
 	FULU
+};
+
+UENUM(BlueprintType)
+enum class EEquipmentModeType : uint8
+{
+	Attack,
+	Defense,
+	Blend
 };
 
 //背包中要显示的信息的结构体
@@ -49,6 +60,9 @@ public:
 	EEquipmentType EquipmentType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
+	EEquipmentModeType EquipmentModeType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
 	float BaseDamage;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
@@ -71,6 +85,21 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
 	float LongPressDamageMultiplier;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
+	float Defense;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
+	GElement DefenseElement;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
+	EAvoidInterruptAblity AvoidInterruptAblity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
+	float MaxHealth = 100.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PackObjectInfo")
+	float CurrentHealth = 100.0f;
 
 };
 
@@ -103,6 +132,9 @@ protected:
 	int Quantity = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
+	EEquipmentModeType EquipmentModeType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
 	float LongPressTime = 1.0f;
 	float LongPressTimeCounter = 0.0f;
 
@@ -112,6 +144,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
 	TObjectPtr<UPOAttackAttributeComponent> POAttackAttributeComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
+	TObjectPtr<UPODefenseComponent> PODefenseComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
+	TObjectPtr<USpellCoolComponent> SpellCoolComponent;
 
 
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PackObject")
@@ -140,6 +178,10 @@ protected:
 
 	bool CanBeWearOrTakeOff = true;
 public:	
+
+	EEquipmentModeType GetEquipmentModeType() { return EquipmentModeType; }
+
+	UPROPERTY(BlueprintAssignable, Category = "PackObject")
 	FOnPackObjectExhausted OnPackObjectExhausted;
 
 	// Called every frame
@@ -156,6 +198,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "PackObject")
 	virtual void AttachToCreature(class ACreature* Creature);
+
 
 	UFUNCTION(BlueprintCallable, Category = "PackObject")
 	bool GetCanBeWearOrTakeOff() { return CanBeWearOrTakeOff; }
@@ -181,7 +224,7 @@ public:
 	int GetSizeInPack() { return SizeInPack; }
 
 	UFUNCTION(BlueprintCallable, Category = "PackObject")
-	FPackObjectInfo GetPackObjectInfo();
+	FPackObjectInfo GetPackObjectInfo() const;
 
 	UFUNCTION(BlueprintCallable, Category = "PackObject")
 	UPOAttackAttributeComponent* GetPOAttackAttributeComponent() { return POAttackAttributeComponent; } 

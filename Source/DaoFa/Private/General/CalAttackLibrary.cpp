@@ -8,9 +8,10 @@
 #include"Character/Component/AttributeComponent/AttributeComponent.h"
 #include "Character/Component/AttributeComponent/HealthComponent.h"
 #include "General/ElementSetting.h"
+#include "Character/Component/PackComponent/PODefenseComponent.h"
 
 
-bool UCalAttackLibrary::IsTest = true;
+bool UCalAttackLibrary::IsTest = false;
 
 EInterruptType UCalAttackLibrary::CalculateInterrupt(EInterruptAblity InterruptAblity,float ActualDamagePercent, EAvoidInterruptAblity AvoidAblity, float StartToBeInterruptedPercent)
 {
@@ -112,6 +113,15 @@ FAttackReturnValue UCalAttackLibrary::CalculateAttack( APackObject* SelfPackObej
 
 FAttackReturnValue UCalAttackLibrary::CalculateAttack(APackObject* SelfPackObejct, UDefenseComponent* DefenseComponent, FState OtherState, UHealthComponent* HealthComponent, float DamageMultiplier)
 {
+	if (!SelfPackObejct || !DefenseComponent || !HealthComponent)
+	{
+		return FAttackReturnValue();
+	}
+	if (SelfPackObejct->GetEquipmentModeType() == EEquipmentModeType::Defense)
+	{
+		return FAttackReturnValue();
+	}
+
 	FAttackReturnValue ReturnValue;
 	UPOAttackAttributeComponent* POAttackAttributeComponent = SelfPackObejct->GetPOAttackAttributeComponent();
 	ReturnValue.Damage = CalculateDamage(SelfPackObejct, DefenseComponent,OtherState, DamageMultiplier);
@@ -121,4 +131,9 @@ FAttackReturnValue UCalAttackLibrary::CalculateAttack(APackObject* SelfPackObejc
 		UE_LOG(LogTemp, Warning, TEXT("Damage:%f,InterruptType:%d,InterruptDir:%d"), ReturnValue.Damage, ReturnValue.InterruptType, ReturnValue.InterruptDir);
 	return ReturnValue;
 
+}
+
+FAttackReturnValue UCalAttackLibrary::CalculateAttack(APackObject* SelfPackObejct, UPODefenseComponent* DefenseComponent, FState OtherState, float DamageMultiplier)
+{
+	return CalculateAttack(SelfPackObejct, DefenseComponent->GetDefenseComponent(), OtherState, DefenseComponent->GetHealthComponent(), DamageMultiplier);
 }

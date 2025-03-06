@@ -5,15 +5,19 @@
 #include "Character/Component/PackComponent/BlueCostComponent.h"
 #include "Character/BaseCharacter.h"
 #include "Character/Component/PackComponent/POAttackAttributeComponent.h"
+#include "Character/Component/PackComponent/SpellCoolComponent.h"
 #include"General/StateComponent.h"
+#include "Character/Component/PackComponent/PODefenseComponent.h"
+#include "General/DefenseComponent.h"
+#include "Character/Component/AttributeComponent/HealthComponent.h"
 // Sets default values
 APackObject::APackObject()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	BlueCostComponent = CreateDefaultSubobject<UBlueCostComponent>(TEXT("BlueCostComponent"));
-	POAttackAttributeComponent = CreateDefaultSubobject<UPOAttackAttributeComponent>(TEXT("AttackAttributeComponent"));
 	StateComponent = CreateDefaultSubobject<UStateComponent>(TEXT("StateComponent"));
+	SpellCoolComponent = CreateDefaultSubobject<USpellCoolComponent>(TEXT("SpellCoolComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -44,10 +48,17 @@ void APackObject::AttachToCreature(ACreature* Creature)
 
 bool APackObject::TriggeredBegin()
 {
+	if (SpellCoolComponent->IsCoolingNow())
+	{
+		return false;
+	}
+
+
 	if (!IsLongPressPermit )
 	{
 		BlueCostComponent->OngoingCostBlue();
 		TriggeredByShortPress();
+		LongPressTimeCounter = GetWorld()->GetTimeSeconds();
 		return true;
 	}
 
@@ -63,29 +74,30 @@ bool APackObject::TriggeredBegin()
 bool APackObject::TriggeredEnd()
 {
 
-	if (!IsLongPressPermit)
-	{
-		TriggeredByShortPress();
-		BlueCostComponent->EndOngoingCostBlue();
-		return true;
-	}
-
 
 	if (LongPressTimeCounter == 0)
 		return false;
 
 
-	LongPressTimeCounter = GetWorld()->GetTimeSeconds() - LongPressTimeCounter;
-	if (LongPressTimeCounter > LongPressTime && BlueCostComponent->LongPressCostBlue())
+	if (!IsLongPressPermit)
 	{
-		TriggeredByLongPress();
-	}
-	else if (IsShortPressPermit)
 		TriggeredByShortPress();
+		BlueCostComponent->EndOngoingCostBlue();
+	}
 	else
 	{
-		LongPressTimeCounter = 0;
-		return false;
+		LongPressTimeCounter = GetWorld()->GetTimeSeconds() - LongPressTimeCounter;
+		if (LongPressTimeCounter > LongPressTime && BlueCostComponent->LongPressCostBlue())
+		{
+			TriggeredByLongPress();
+		}
+		else if (IsShortPressPermit)
+			TriggeredByShortPress();
+		else
+		{
+			LongPressTimeCounter = 0;
+			return false;
+		}
 	}
 	LongPressTimeCounter = 0;
 	return true;
@@ -94,7 +106,7 @@ bool APackObject::TriggeredEnd()
 
 
 
-FPackObjectInfo APackObject::GetPackObjectInfo()
+FPackObjectInfo APackObject::GetPackObjectInfo() const 
 {
 	FPackObjectInfo PackObjectInfo;
 	PackObjectInfo.Icon = Icon;
@@ -103,14 +115,27 @@ FPackObjectInfo APackObject::GetPackObjectInfo()
 	PackObjectInfo.Quantity = Quantity;
 	PackObjectInfo.SizeInPack = SizeInPack;
 	PackObjectInfo.EquipmentType = EquipmentType;
-	PackObjectInfo.BaseDamage = POAttackAttributeComponent->BaseDamage;
-	PackObjectInfo.AttackMutiplier = POAttackAttributeComponent->AttackMutiplier;
-	PackObjectInfo.CriticalHitChance = POAttackAttributeComponent->CriticalHitChance;
-	PackObjectInfo.CriticalHitMultiplier = POAttackAttributeComponent->CriticalHitMultiplier;
-	PackObjectInfo.Element = POAttackAttributeComponent->Element;
-	PackObjectInfo.InterruptAblity = POAttackAttributeComponent->InterruptAblity;
-	PackObjectInfo.ShortPressDamageMultiplier = POAttackAttributeComponent->ShortPressDamageMultiplier;
-	PackObjectInfo.LongPressDamageMultiplier = POAttackAttributeComponent->LongPressDamageMultiplier;
+	PackObjectInfo.EquipmentModeType = EquipmentModeType;
+	if (IsValid(POAttackAttributeComponent))
+	{
+		PackObjectInfo.BaseDamage = POAttackAttributeComponent->BaseDamage;
+		PackObjectInfo.AttackMutiplier = POAttackAttributeComponent->AttackMutiplier;
+		PackObjectInfo.CriticalHitChance = POAttackAttributeComponent->CriticalHitChance;
+		PackObjectInfo.CriticalHitMultiplier = POAttackAttributeComponent->CriticalHitMultiplier;
+		PackObjectInfo.Element = POAttackAttributeComponent->Element;
+		PackObjectInfo.InterruptAblity = POAttackAttributeComponent->InterruptAblity;
+		PackObjectInfo.ShortPressDamageMultiplier = POAttackAttributeComponent->ShortPressDamageMultiplier;
+		PackObjectInfo.LongPressDamageMultiplier = POAttackAttributeComponent->LongPressDamageMultiplier;
+	}
+	if (IsValid(PODefenseComponent))
+	{
+		PackObjectInfo.Defense = PODefenseComponent->GetDefenseComponent()->GetDefense();
+		PackObjectInfo.DefenseElement = PODefenseComponent->GetDefenseComponent()->GetDefenseElement();
+		PackObjectInfo.AvoidInterruptAblity = PODefenseComponent->GetDefenseComponent()->GetAvoidInterruptAblity();
+		PackObjectInfo.MaxHealth = PODefenseComponent->GetHealthComponent()->GetMaxValue();
+		PackObjectInfo.CurrentHealth = PODefenseComponent->GetHealthComponent()->GetCurrentValue();
+
+	}
 	return PackObjectInfo;
 }
 

@@ -25,6 +25,7 @@ public:
 class APackObject;
 class UDefenseComponent;
 class UHealthComponent;
+class UPODefenseComponent;
 /**
  * 
  */
@@ -54,5 +55,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Attack")
 	static  FAttackReturnValue CalculateAttack(APackObject* SelfPackObejct, UDefenseComponent* DefenseComponent, FState OtherState, UHealthComponent* HealthComponent, float DamageMultiplier);
+
+	static  FAttackReturnValue CalculateAttack(APackObject* SelfPackObejct, UPODefenseComponent* DefenseComponent, FState OtherState, float DamageMultiplier);
 	
 };

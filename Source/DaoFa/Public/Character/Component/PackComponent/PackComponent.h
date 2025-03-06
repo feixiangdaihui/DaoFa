@@ -49,6 +49,7 @@ protected:
 
 	USumEquipmentBarWidget* OwningSumEquipmentBarWidget;
 
+	UFUNCTION()
 	void OnPackObjectExhausted(APackObject* PackObject);
 
 public:	

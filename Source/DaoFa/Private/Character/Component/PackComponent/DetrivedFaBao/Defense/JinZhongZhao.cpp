@@ -2,17 +2,22 @@
 
 
 #include "Character/Component/PackComponent/DetrivedFaBao/Defense/JinZhongZhao.h"
-#include "Character/Component/AttributeComponent/HealthComponent.h"
 #include "General/CalAttackLibrary.h"
-#include "General/DefenseComponent.h"
 #include "General/CreatureBehavior.h"
 #include "Creature.h"
 #include "Character/Component/PackComponent/BlueCostComponent.h"
 #include "Components/CapsuleComponent.h"
-
+#include "Character/Component/PackComponent/SpellCoolComponent.h"
+#include "Character/Component/PackComponent/PODefenseComponent.h"
+#include "Character/Component/AttributeComponent/HealthComponent.h"
 
 AJinZhongZhao::AJinZhongZhao()
 {
+	PODefenseComponent = CreateDefaultSubobject<UPODefenseComponent>(TEXT("PODefenseComponent"));
+	EquipmentModeType = EEquipmentModeType::Defense;
+	PODefenseComponent->GetHealthComponent()->OnDeath.AddDynamic(this, &AJinZhongZhao::OnDeath);
+
+
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent"));
 	//设置碰撞
 	CapsuleComponent->SetCollisionProfileName(TEXT("OverlapAll"));
@@ -23,14 +28,11 @@ AJinZhongZhao::AJinZhongZhao()
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	StaticMeshComponent->SetupAttachment(RootComponent);
 	//overlap
-	StaticMeshComponent->SetCollisionProfileName(TEXT("OverlapAll"));
+	StaticMeshComponent->SetCollisionProfileName(TEXT("NOCollision"));
 	StaticMeshComponent->SetGenerateOverlapEvents(true);
 
-	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
-	//绑定死亡事件
-	HealthComponent->OnDeath.AddDynamic(this, &AJinZhongZhao::OnDeath);
 
-	DefenseComponent = CreateDefaultSubobject<UDefenseComponent>(TEXT("DefenseComponent"));
+
 
 	IsLongPressPermit = false;
 
@@ -52,6 +54,7 @@ void AJinZhongZhao::TriggeredByShortPress()
 		CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		OwnerCreature->GetCreatureBehavior()->SetMoveForbid(true);
 		IsSpell = true;
+		SpellCoolComponent->StartCool();
 	}
 }
 
@@ -72,8 +75,8 @@ void AJinZhongZhao::AttachToCreature(ACreature* Creature)
 
 void AJinZhongZhao::BeAttacked(APackObject* PackObject, float DamageMultiplier)
 {
-	FAttackReturnValue ReturnValue = UCalAttackLibrary::CalculateAttack(PackObject, DefenseComponent, StateComponent->GetState(), HealthComponent, DamageMultiplier);
-	HealthComponent->SubtractValue(ReturnValue.Damage);
+	FAttackReturnValue ReturnValue = UCalAttackLibrary::CalculateAttack(PackObject, PODefenseComponent, StateComponent->GetState(), DamageMultiplier);
+	PODefenseComponent->GetHealthComponent()->SubtractValue(ReturnValue.Damage);
 	
 }
 

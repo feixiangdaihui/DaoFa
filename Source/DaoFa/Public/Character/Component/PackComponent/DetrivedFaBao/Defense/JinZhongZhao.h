@@ -6,9 +6,7 @@
 #include "Character/Component/PackComponent/FaBao.h"
 #include "General/Interface/BeAttacked.h"
 #include "JinZhongZhao.generated.h"
-class UHealthComponent;
 class ACreature;
-class UDefenseComponent;
 class UCapsuleComponent;
 /**
  * 
@@ -25,11 +23,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "JinZhongZhao")
 	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "JinZhongZhao")
-	TObjectPtr<UHealthComponent> HealthComponent;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "JinZhongZhao")
-	TObjectPtr<UDefenseComponent> DefenseComponent;
 
 	UFUNCTION()
 	void OnDeath();

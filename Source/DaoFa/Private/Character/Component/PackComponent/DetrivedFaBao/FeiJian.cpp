@@ -8,8 +8,13 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Creature.h"
 #include "General/Interface/BeAttacked.h"
+#include "Character/Component/PackComponent/SpellCoolComponent.h"
 AFeiJian::AFeiJian()
 {
+	POAttackAttributeComponent = CreateDefaultSubobject<UPOAttackAttributeComponent>(TEXT("POAttackAttributeComponent"));
+	EquipmentModeType = EEquipmentModeType::Attack;
+
+
 	LongPressEnemyDetector = CreateDefaultSubobject<UEnemyDetector>(TEXT("LongPressEnemyDetector"));
 	LongPressEnemyDetector->DetectionRadius = 3000;
 	LongPressEnemyDetector->HorizontalAngle = 360;
@@ -146,6 +151,9 @@ void AFeiJian::TriggeredByLongPress()
 					StaticMeshComponent->SetVisibility(true);
 					//调整方向
 					AddActorLocalRotation(FRotator(180, 0, 0));
+					//冷却
+					SpellCoolComponent->StartCool();
+
 					//飞剑从天而降
 					BeginSpell(EndLocation,LongSpellSpeed);
 					break;

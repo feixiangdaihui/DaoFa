@@ -5,9 +5,13 @@
 #include "Character/Component/PackComponent/DetrivedFaShu/CastFaShuProjectile.h"
 #include "General/EnemyDetector.h"
 #include "Creature.h"
+#include "Character/Component/PackComponent/SpellCoolComponent.h"
 ACastFaShu::ACastFaShu()
 {
-	
+	POAttackAttributeComponent = CreateDefaultSubobject<UPOAttackAttributeComponent>(TEXT("POAttackAttributeComponent"));
+	EquipmentModeType = EEquipmentModeType::Attack;
+
+
 	EnemyDetector = CreateDefaultSubobject<UEnemyDetector>(TEXT("EnemyDetector"));
 	EnemyDetector->DetectionRadius = 3000;
 	EnemyDetector->HorizontalAngle = 360;
@@ -69,6 +73,7 @@ void ACastFaShu::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor)
 
 void ACastFaShu::TriggeredByLongPress()
 {
+	SpellCoolComponent->StartCool();
 	IsSpell = true;
 	GetWorldTimerManager().SetTimer(SpellTimerHandle, [this]() {
 		if (SpellNumberCounter++ == SpellNumber)

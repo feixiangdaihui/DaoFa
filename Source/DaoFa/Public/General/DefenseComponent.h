@@ -40,6 +40,14 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	UFUNCTION(BlueprintCallable, Category = "Defense")
+	float GetDefense() { return Defense; }
+
+	UFUNCTION(BlueprintCallable, Category = "Defense")
+	GElement GetDefenseElement() { return DefenseElement; }
+
+	UFUNCTION(BlueprintCallable, Category = "Defense")
+	EAvoidInterruptAblity GetAvoidInterruptAblity() { return AvoidAblity; }
 
 	virtual void SetCurrentValue(float NewValue) override
 	{

@@ -37,10 +37,7 @@ void UPackComponent::BeginPlay()
 
 void UPackComponent::OnPackObjectExhausted(APackObject* PackObject)
 {
-	for (auto UpdateEquipmentInterface : UpdateEquipmentInterfaces)
-	{
-		UpdateEquipmentInterface->TakeOffEquipment(PackObject);
-	}
+	TakeOffEquipment(PackObject);
 }
 
 // Called every frame
