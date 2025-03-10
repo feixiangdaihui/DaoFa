@@ -6,21 +6,23 @@
 #include "Character/BaseCharacter.h"
 #include "Character/Component/PackComponent/PackObject.h"
 #include"Character/Component/PackComponent/PackComponent.h"
+#include "General/StateComponent.h"
 // Sets default values
 ADropObjectDomain::ADropObjectDomain()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	SphereComponent = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComponent"));
-	SphereComponent->SetSphereRadius(Radius);
 	SphereComponent->SetCollisionProfileName(TEXT("Trigger"));
+	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &ADropObjectDomain::OnOverlapBegin);
 }
 
 // Called when the game starts or when spawned
 void ADropObjectDomain::BeginPlay()
 {
 	Super::BeginPlay();
-	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &ADropObjectDomain::OnOverlapBegin);
+
+	SphereComponent->SetSphereRadius(Radius);
 }
 
 // Called every frame
@@ -35,17 +37,29 @@ void ADropObjectDomain::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AAct
 	ABaseCharacter* Character = Cast<ABaseCharacter>(OtherActor);
 	if (Character)
 	{
-		for (auto ObjectClass : DropObjects)
+		Character->GetStateComponent()->AddValue(DropExp);
+		for (auto DropObject: DropObjects)
 		{
-			if (ObjectClass)
+			if (DropObject)
 			{
 				FActorSpawnParameters SpawnParameters;
 				SpawnParameters.Owner = Character;
-				APackObject* PackObject = GetWorld()->SpawnActor<APackObject>(ObjectClass, Character->GetActorLocation(), FRotator::ZeroRotator, SpawnParameters);
-				PackObject->AttachToCreature(Character);
-				Character->GetPackComponent()->WearEquipment(PackObject);
+				DropObject->AttachToCreature(Character);
+				Character->GetPackComponent()->WearEquipment(DropObject);
 			}
 		}
+		for (auto DropObjectClass : DropObjectClasses)
+		{
+			if (DropObjectClass)
+			{
+				FActorSpawnParameters SpawnParameters;
+				SpawnParameters.Owner = Character;
+				APackObject* DropObject = GetWorld()->SpawnActor<APackObject>(DropObjectClass, Character->GetActorLocation(), FRotator::ZeroRotator, SpawnParameters);
+				DropObject->AttachToCreature(Character);
+				Character->GetPackComponent()->WearEquipment(DropObject);
+			}
+		}
+		
 	}
 }
 

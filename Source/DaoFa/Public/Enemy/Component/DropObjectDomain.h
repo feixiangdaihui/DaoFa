@@ -32,8 +32,21 @@ protected:
 
 	//掉落物品
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Drop")
-	TArray<TSubclassOf<APackObject>> DropObjects;
+	TArray<APackObject*> DropObjects;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Drop")
+	TArray<TSubclassOf<APackObject>> DropObjectClasses;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Drop")
+	float DropExp = 10.0f;
+
 public:	
+
+	void SetDropObjects(TArray<APackObject*> InDropObjects) { DropObjects = InDropObjects; }
+
+	void AddDropObject(APackObject* InDropObject) { DropObjects.Add(InDropObject); }
+
+	void ClearDropObjects() { DropObjects.Empty(); }
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

@@ -48,6 +48,7 @@ void APackObject::AttachToCreature(ACreature* Creature)
 
 bool APackObject::TriggeredBegin()
 {
+	CanBeWearOrTakeOff = false;
 	if (SpellCoolComponent->IsCoolingNow())
 	{
 		return false;
@@ -73,7 +74,7 @@ bool APackObject::TriggeredBegin()
 
 bool APackObject::TriggeredEnd()
 {
-
+	CanBeWearOrTakeOff = true;
 
 	if (LongPressTimeCounter == 0)
 		return false;

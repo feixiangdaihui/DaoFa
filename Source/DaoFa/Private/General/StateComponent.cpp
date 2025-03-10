@@ -1,5 +1,6 @@
 #include "General/StateComponent.h"
 
+#include "Character/Component/AttributeComponent/BlueComponent.h"
 // Sets default values for this component's properties
 UStateComponent::UStateComponent()
 {
@@ -31,6 +32,63 @@ float UStateComponent::CreatureStateDamageMultiplier[LARGE_STATE_NUM][SMALL_STAT
 	{50.0f, 5.0f, 5.0f, 5.0f}
 };
 
+//境界经验表
+//[i][j]表示大境界为i，小境界为j
+//[i][j]的值表示突破到下一个境界所需的经验，即这个境界的经验值
+float UStateComponent::StateExpTable[LARGE_STATE_NUM][SMALL_STATE_NUM] =
+{
+	{100.0f, 200.0f, 300.0f, 400.0f},
+	{500.0f, 600.0f, 700.0f, 800.0f},
+	{900.0f, 1000.0f, 1100.0f, 1200.0f},
+	{1300.0f, 1400.0f, 1500.0f, 1600.0f},
+	{1700.0f, 1800.0f, 1900.0f, 2000.0f}
+};
+
+
+//每个境界的经验值作用在增加灵力密度上的比例
+float UStateComponent::ExpToDensityRate = 0.1f;
+
+//境界升级成功率
+//[i][j]表示大境界为i，小境界为j
+//[i][j]的值表示突破到下一个境界的成功率
+float UStateComponent::UpgradeSuccessRate[LARGE_STATE_NUM][SMALL_STATE_NUM] =
+{
+	{0.9f, 0.8f, 0.7f, 0.6f},
+	{0.8f, 0.7f, 0.6f, 0.5f},
+	{0.7f, 0.6f, 0.5f, 0.4f},
+	{0.6f, 0.5f, 0.4f, 0.3f},
+	{0.5f, 0.4f, 0.3f, 0.2f}
+};
+
+FText UStateComponent::LargeStateText[LARGE_STATE_NUM] =
+{
+	NSLOCTEXT("State", "LIANQI", "LianQi"),
+	NSLOCTEXT("State", "ZHUJI", "ZhuJi"),
+	NSLOCTEXT("State", "JINDAN", "JinDan"),
+	NSLOCTEXT("State", "YUANYING", "YuanYing"),
+	NSLOCTEXT("State", "HUASHEN", "HuaShen")
+
+};
+FText UStateComponent::SmallStateText[SMALL_STATE_NUM] =
+{
+	NSLOCTEXT("State", "EARLY", "Early"),
+	NSLOCTEXT("State", "MIDDLE", "Middle"),
+	NSLOCTEXT("State", "LATE", "Late"),
+	NSLOCTEXT("State", "COMPLETE", "Complete")
+};
+
+
+FState UStateComponent::GetNextState()
+{
+	if (CurrentState.SmallState != ESmallState::Complete)
+	{
+		return { CurrentState.LargeState, static_cast<ESmallState>(static_cast<int>(CurrentState.SmallState) + 1) };
+	}
+	else
+	{
+		return { static_cast<ELargeState>(static_cast<int>(CurrentState.LargeState) + 1), ESmallState::Early };
+	}
+}
 
 float UStateComponent::CalCreatureStateDamageMultiplier(FState SelfState, FState OtherState)
 {
@@ -110,4 +168,64 @@ void UStateComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	// ...
+}
+
+void UStateComponent::SetCurrentValue(float NewValue)
+{
+	float OldStateExp = StateExp;
+	StateExp = FMath::Max(0.0f, NewValue);
+	if (OldStateExp < StateExp)
+	{
+		//增加灵力密度
+		BlueComponent->AddBlueDensity((StateExp - OldStateExp) * ExpToDensityRate);
+	}
+}
+
+bool UStateComponent::UpgradeState()
+{
+	float SuccessRate = GetUpgradeSuccessRate();
+	if (SuccessRate == -1)
+	{
+		return false;
+	}
+	else
+	{
+		if (FMath::FRand() <= SuccessRate)
+		{
+			LastUpgradeExp = 0;
+			CurrentState = GetNextState();
+			OnStateUpgrade.Broadcast(CurrentState);
+			return true;
+		}
+		else
+		{
+			LastUpgradeExp = StateExp;
+			StateExp = 0;
+			return false;
+		}
+	}
+}
+//-1表示无法突破
+//其他返回值表示突破到下一个境界的概率
+float UStateComponent::GetUpgradeSuccessRate()
+{
+	if (StateExp <= LastUpgradeExp)
+	{
+		return -1;
+	}
+	else
+	{
+		return (StateExp / StateExpTable[static_cast<int>(CurrentState.LargeState)][static_cast<int>(CurrentState.SmallState)] - 1) + UpgradeSuccessRate[static_cast<int>(CurrentState.LargeState)][static_cast<int>(CurrentState.SmallState)];
+	}
+		
+}
+
+FText UStateComponent::GetNextStateText()
+{
+	return ChangeStateToText(GetNextState());
+}
+
+FText UStateComponent::ChangeStateToText(FState InState)
+{
+	return FText::Format(NSLOCTEXT("State", "STATE", "{0} {1}"), LargeStateText[static_cast<int>(InState.LargeState)], SmallStateText[static_cast<int>(InState.SmallState)]);
 }

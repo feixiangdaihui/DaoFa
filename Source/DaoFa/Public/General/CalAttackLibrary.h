@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "Character/Component/PackComponent/PackObject.h"
+
 #include"General/StateComponent.h"
 #include "CalAttackLibrary.generated.h"
 USTRUCT(BlueprintType)
@@ -38,7 +39,7 @@ private:
 	UFUNCTION(BlueprintCallable, Category = "Attack")
 	static EInterruptType CalculateInterrupt(EInterruptAblity InterruptAblity,float ActualDamagePercent, EAvoidInterruptAblity AvoidAblity, float StartToBeInterruptedPercent);
 
-	//计算公式：攻击力*角色与法宝不匹配度带来的伤害倍率*境界差异带来的伤害倍率/对方的防御力*元素克制倍率
+	//计算公式：攻击力*角色与法宝不匹配度带来的伤害倍率*境界差异带来的伤害倍率/对方的防御力*元素克制倍率*灵力密度
 	static  float CalculateDamage(APackObject* SelfPackObejct, ACreature* OtherCreature,float DamageMultiplier);
 
 	UFUNCTION(BlueprintCallable, Category = "Attack")

@@ -22,6 +22,7 @@ ACreature::ACreature()
 	DefenseComponent = CreateDefaultSubobject<UDefenseComponent>(TEXT("DefenseComponent"));
 	StateComponent = CreateDefaultSubobject<UStateComponent>(TEXT("StateComponent"));
 	CreatureBehavior = CreateDefaultSubobject<UCreatureBehavior>(TEXT("CreatureBehavior"));
+	StateComponent->InitStateComponent(AttributeComponent->GetBlueComponent());
 }
 
 // Called when the game starts or when spawned

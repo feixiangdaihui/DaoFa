@@ -9,6 +9,7 @@
 #include "Character/Component/AttributeComponent/HealthComponent.h"
 #include "General/ElementSetting.h"
 #include "Character/Component/PackComponent/PODefenseComponent.h"
+#include "Character/Component/AttributeComponent/BlueComponent.h"
 
 
 bool UCalAttackLibrary::IsTest = false;
@@ -46,7 +47,7 @@ EInterruptType UCalAttackLibrary::CalculateInterrupt(EInterruptAblity InterruptA
 	else
 		return EInterruptType::NONE;
 }
-//计算公式：攻击力*角色与法宝不匹配度带来的伤害倍率*境界差异带来的伤害倍率/对方的防御力*元素克制倍率
+
 float UCalAttackLibrary::CalculateDamage(APackObject* SelfPackObejct, ACreature* OtherCreature, float DamageMultiplier)
 {
 	return CalculateDamage(SelfPackObejct, OtherCreature->GetDefenseComponent(), OtherCreature->GetStateComponent()->GetState(), DamageMultiplier);
@@ -65,9 +66,14 @@ float UCalAttackLibrary::CalculateDamage(APackObject* SelfPackObejct, UDefenseCo
 	float ElementMultiplier = UElementSetting::GetElementRestrainMultiplier(POAttackAttributeComponent->Element, DefenseElement);
 	float OtherStateMultiplier = UStateComponent::CalCreatureStateDamageMultiplier(PackObjectState, OtherState);
 	float OwnerStateMultiplier = UStateComponent::CalItemCreatureStateDamageMultiplier(OwnerState, PackObjectState);
-	float Damage = BaseDamage * DamageMultiplier * ElementMultiplier / Defense * OtherStateMultiplier * OwnerStateMultiplier;
+	float BlueDensity = 0.0f;
+	ACreature* OwnerCreature = SelfPackObejct->GetOwnerCreature();
+	if (OwnerCreature)
+		BlueDensity = OwnerCreature->GetAttributeComponent()->GetBlueComponent()->GetBlueDensity();
+	float Damage = BaseDamage * DamageMultiplier * ElementMultiplier / Defense * OtherStateMultiplier * OwnerStateMultiplier*BlueDensity;
+
 	if (IsTest)
-		UE_LOG(LogTemp, Warning, TEXT("BaseDamage:%f,DamageMultiplier:%f,ElementMultiplier:%f,Defense:%f,OtherStateMultiplier:%f,OwnerStateMultiplier:%f"), BaseDamage, DamageMultiplier, ElementMultiplier, Defense, OtherStateMultiplier, OwnerStateMultiplier);
+		UE_LOG(LogTemp, Warning, TEXT("BaseDamage:%f,DamageMultiplier:%f,ElementMultiplier:%f,Defense:%f,OtherStateMultiplier:%f,OwnerStateMultiplier:%f,BlueDensity:%f,Damage:%f"), BaseDamage, DamageMultiplier, ElementMultiplier, Defense, OtherStateMultiplier, OwnerStateMultiplier, BlueDensity, Damage);
 	return Damage;
 }
 

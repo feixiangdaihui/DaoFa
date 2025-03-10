@@ -34,9 +34,20 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Blue")
 	float RecoverBlueAmountBySecond = 1.0f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Blue")
+	float BlueDensity = 100.0f;
 
 
 public:	
+	
+	void AddBlueDensity(float Value) { BlueDensity += Value; }
+
+	float GetBlueDensity() { return BlueDensity; }
+
+	void SubtractBlueDensity(float Value) { BlueDensity = FMath::Max(BlueDensity - Value, 0.0f); }
+
+
 	UPROPERTY(BlueprintAssignable, Category = "Blue")
 	FOnBlueEmptyDelegate OnBlueEmpty;
 
