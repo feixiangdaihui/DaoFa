@@ -13,8 +13,9 @@ UCLASS()
 class DAOFA_API ABasePlayerController : public APlayerController
 {
 	GENERATED_BODY()
+private:
+	int PauseCount = 0;
 public:
-	UFUNCTION(BlueprintCallable, Category = "Input")
-	void GatherToPauseGame();
-	void GatherToUnPauseGame();
+	UFUNCTION(BlueprintCallable, Category = "BasePlayerController")
+	void QueryForGamePause(bool WantPause);
 };

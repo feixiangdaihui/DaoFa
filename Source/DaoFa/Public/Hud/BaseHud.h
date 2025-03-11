@@ -66,7 +66,6 @@ public:
 
 	USumEquipmentBarWidget* GetSumEquipmentBarWidget() { return SumEquipmentBarWidget; }
 
-	void OpenPack();
+	void OpenClosePack();
 
-	void ClosePack();
 };

@@ -60,23 +60,6 @@ float UStateComponent::UpgradeSuccessRate[LARGE_STATE_NUM][SMALL_STATE_NUM] =
 	{0.5f, 0.4f, 0.3f, 0.2f}
 };
 
-FText UStateComponent::LargeStateText[LARGE_STATE_NUM] =
-{
-	NSLOCTEXT("State", "LIANQI", "LianQi"),
-	NSLOCTEXT("State", "ZHUJI", "ZhuJi"),
-	NSLOCTEXT("State", "JINDAN", "JinDan"),
-	NSLOCTEXT("State", "YUANYING", "YuanYing"),
-	NSLOCTEXT("State", "HUASHEN", "HuaShen")
-
-};
-FText UStateComponent::SmallStateText[SMALL_STATE_NUM] =
-{
-	NSLOCTEXT("State", "EARLY", "Early"),
-	NSLOCTEXT("State", "MIDDLE", "Middle"),
-	NSLOCTEXT("State", "LATE", "Late"),
-	NSLOCTEXT("State", "COMPLETE", "Complete")
-};
-
 
 FState UStateComponent::GetNextState()
 {
@@ -211,21 +194,11 @@ float UStateComponent::GetUpgradeSuccessRate()
 {
 	if (StateExp <= LastUpgradeExp)
 	{
-		return -1;
+		return 0;
 	}
 	else
 	{
 		return (StateExp / StateExpTable[static_cast<int>(CurrentState.LargeState)][static_cast<int>(CurrentState.SmallState)] - 1) + UpgradeSuccessRate[static_cast<int>(CurrentState.LargeState)][static_cast<int>(CurrentState.SmallState)];
 	}
 		
-}
-
-FText UStateComponent::GetNextStateText()
-{
-	return ChangeStateToText(GetNextState());
-}
-
-FText UStateComponent::ChangeStateToText(FState InState)
-{
-	return FText::Format(NSLOCTEXT("State", "STATE", "{0} {1}"), LargeStateText[static_cast<int>(InState.LargeState)], SmallStateText[static_cast<int>(InState.SmallState)]);
 }

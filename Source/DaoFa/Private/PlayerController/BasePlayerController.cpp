@@ -6,18 +6,28 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Kismet/GameplayStatics.h"
-
-void ABasePlayerController::GatherToPauseGame()
+#include "GameFramework/PlayerController.h"
+void ABasePlayerController::QueryForGamePause(bool WantPause)
 {
-	SetShowMouseCursor(true);
-
-	UGameplayStatics::SetGamePaused(GetWorld(), true);
-	SetInputMode(FInputModeGameAndUI());
-}
-
-void ABasePlayerController::GatherToUnPauseGame()
-{
-	SetShowMouseCursor(false);
-	SetInputMode(FInputModeGameOnly());
-	UGameplayStatics::SetGamePaused(GetWorld(), false);
+	if (WantPause)
+	{
+		PauseCount++;
+	}
+	else
+	{
+		PauseCount--;
+	}
+	if (PauseCount > 0)
+	{
+		SetShowMouseCursor(true);
+		UGameplayStatics::SetGamePaused(GetWorld(), true);
+		SetInputMode(FInputModeGameAndUI());
+	}
+	else
+	{
+		SetShowMouseCursor(false);
+		UGameplayStatics::SetGamePaused(GetWorld(), false);
+		SetInputMode(FInputModeGameOnly());
+		PauseCount = 0;
+	}
 }

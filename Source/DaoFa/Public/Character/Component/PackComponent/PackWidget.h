@@ -21,13 +21,14 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Pack")
 	USumEquipmentBarWidget* SumEquipmentBarWidget;
-
-public:
-	//蓝图实现
 	UFUNCTION(BlueprintImplementableEvent, Category = "Pack")
 	void OpenPack();
 	UFUNCTION(BlueprintImplementableEvent, Category = "Pack")
 	void ClosePack();
+public:
+	
+	void OpenClosePack();
+
 	void InitPackWidget(UPackComponent* InPackComponent);
 
 };

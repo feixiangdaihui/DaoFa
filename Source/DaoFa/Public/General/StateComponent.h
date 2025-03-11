@@ -112,12 +112,7 @@ private:
 	//境界升级成功率
 	static float UpgradeSuccessRate[LARGE_STATE_NUM][SMALL_STATE_NUM];
 
-	static FText LargeStateText[LARGE_STATE_NUM];
 
-	static FText SmallStateText[SMALL_STATE_NUM];
-
-	
-	FState GetNextState();
 
 
 public:
@@ -194,25 +189,17 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "State")
 	bool UpgradeState();
 
-
+	UFUNCTION(BlueprintCallable, Category = "State")
+	FState GetNextState();
 
 	UFUNCTION(BlueprintCallable, Category = "State")
 	FState GetState() { return CurrentState; }
-
-	UFUNCTION(BlueprintCallable, Category = "State")
-	FText GetStateText() { return ChangeStateToText(CurrentState); }
 
 	UFUNCTION(BlueprintCallable, Category = "State")
 	float GetUpgradeSuccessRate();
 
 	void InitStateComponent(UBlueComponent* InBlueComponent) { BlueComponent = InBlueComponent; }
 
-	UFUNCTION(BlueprintCallable, Category = "State")
-	FText GetNextStateText();
-
-
-	UFUNCTION(BlueprintCallable, Category = "State")
-	FText ChangeStateToText(FState InState);
 
 
 

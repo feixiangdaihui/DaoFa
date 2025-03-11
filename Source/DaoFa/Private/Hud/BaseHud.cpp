@@ -33,9 +33,8 @@ void ABaseHud::BeginPlay()
 			SumEquipmentBarWidget->AddToViewport();
 			OwnerCharacter->InitSumEquipmentBar(SumEquipmentBarWidget);
 		}
-		PackWidget = CreateWidget<UPackWidget>(GetWorld(), PackWidgetClass);
-		if (PackWidget)
-			PackWidget->InitPackWidget(OwnerCharacter->GetPackComponent());
+
+
 
 		RealTimeWidget = CreateWidget<URealTimeWidget>(GetWorld(), RealTimeWidgetClass);
 		if (RealTimeWidget)
@@ -44,12 +43,22 @@ void ABaseHud::BeginPlay()
 			RealTimeWidget->InitRealTimeWidget(OwnerCharacter->GetAttributeComponent()->GetHealthValue(), OwnerCharacter->GetAttributeComponent()->GetBlueValue(), OwnerCharacter->GetAttributeComponent()->GetPhysicalPowerValue());
 		}
 
+
 		EnemyInfoWidget = CreateWidget<UEnemyInfoWidget>(GetWorld(), EnemyInfoWidgetClass);
 		if (EnemyInfoWidget)
 		{
 			EnemyInfoWidget->AddToViewport();
 			EnemyInfoWidget->InitEnemyInfoWidget(OwnerCharacter->GetEnemyDetector());
 		}
+
+		PackWidget = CreateWidget<UPackWidget>(GetWorld(), PackWidgetClass);
+		if (PackWidget)
+		{
+			PackWidget->InitPackWidget(OwnerCharacter->GetPackComponent());
+			PackWidget->AddToViewport();
+			PackWidget->SetVisibility(ESlateVisibility::Hidden);
+		}
+
 
 		OwnerController = Cast<ABasePlayerController>(GetOwningPlayerController());
 	}
@@ -65,22 +74,10 @@ void ABaseHud::DrawHUD()
 	Super::DrawHUD();
 
 }
-void ABaseHud::OpenPack()
+void ABaseHud::OpenClosePack()
 {
-	if (OwnerController)
-	{
-		OwnerController->GatherToPauseGame();
-	}
 	if (PackWidget)
-		PackWidget->OpenPack();
-}
-
-void ABaseHud::ClosePack()
-{
-	if (OwnerController)
 	{
-		OwnerController->GatherToUnPauseGame();
+		PackWidget->OpenClosePack();
 	}
-	if (PackWidget)
-		PackWidget->ClosePack();
 }

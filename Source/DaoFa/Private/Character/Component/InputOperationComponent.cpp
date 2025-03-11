@@ -107,17 +107,7 @@ void UInputOperationComponent::Look(const FInputActionValue& Value)
 
 void UInputOperationComponent::OpenPack()
 {
-	if (IsPackOpen)
-	{
-
-		OwnerHud->ClosePack();
-		IsPackOpen = false;
-	}
-	else
-	{
-		OwnerHud->OpenPack();
-		IsPackOpen = true;
-	}
+	OwnerHud->OpenClosePack();
 }
 
 
