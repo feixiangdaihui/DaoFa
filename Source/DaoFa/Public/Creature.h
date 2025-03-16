@@ -6,7 +6,9 @@
 #include "GameFramework/Character.h"
 #include "General/Interface/BeAttacked.h"
 #include "Creature.generated.h"
-class UAttributeComponent;
+class UHealthComponent;
+class UBlueComponent;
+class UPhysicalPowerComponent;
 class UPackComponent;
 class UDefenseComponent;
 class UStateComponent;
@@ -25,7 +27,13 @@ protected:
 
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Attribute")
-	TObjectPtr<UAttributeComponent> AttributeComponent;
+	TObjectPtr<UHealthComponent> HealthComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Attribute")
+	TObjectPtr<UBlueComponent> BlueComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Attribute")
+	TObjectPtr<UPhysicalPowerComponent> PhysicalPowerComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Pack")
 	TObjectPtr<UPackComponent> PackComponent;
@@ -53,7 +61,12 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UAttributeComponent* GetAttributeComponent() { return AttributeComponent.Get(); }
+	UHealthComponent* GetHealthComponent() { return HealthComponent.Get(); }
+	UBlueComponent* GetBlueComponent() { return BlueComponent.Get(); }
+	UPhysicalPowerComponent* GetPhysicalPowerComponent() { return PhysicalPowerComponent.Get(); }
+
+
+
 	UPackComponent* GetPackComponent() { return PackComponent.Get(); }
 	UDefenseComponent* GetDefenseComponent()  const{ return DefenseComponent.Get(); }
 	UStateComponent* GetStateComponent() { return StateComponent.Get(); }

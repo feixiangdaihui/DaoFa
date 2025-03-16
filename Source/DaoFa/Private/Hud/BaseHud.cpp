@@ -8,8 +8,10 @@
 #include "Character/Component/PackComponent/PackWidget.h"
 #include "PlayerController/BasePlayerController.h"
 #include "Hud/Widget/RealTimeWidget.h"
-#include "Character/Component/AttributeComponent/AttributeComponent.h"
 #include "Hud/Widget/EnemyInfoWidget.h"
+#include "Character/Component/AttributeComponent/HealthComponent.h"
+#include "Character/Component/AttributeComponent/PhysicalPowerComponent.h"
+#include "Character/Component/AttributeComponent/BlueComponent.h"
 
 ABaseHud::ABaseHud()
 {
@@ -40,7 +42,7 @@ void ABaseHud::BeginPlay()
 		if (RealTimeWidget)
 		{
 			RealTimeWidget->AddToViewport();
-			RealTimeWidget->InitRealTimeWidget(OwnerCharacter->GetAttributeComponent()->GetHealthValue(), OwnerCharacter->GetAttributeComponent()->GetBlueValue(), OwnerCharacter->GetAttributeComponent()->GetPhysicalPowerValue());
+			RealTimeWidget->InitRealTimeWidget(OwnerCharacter->GetHealthComponent(), OwnerCharacter->GetHealthComponent(), OwnerCharacter->GetHealthComponent());
 		}
 
 

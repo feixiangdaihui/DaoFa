@@ -2,7 +2,6 @@
 
 
 #include "Creature.h"
-#include "Character/Component/AttributeComponent/AttributeComponent.h"
 #include "Character/Component/PackComponent/PackComponent.h"
 #include "General/DefenseComponent.h"
 #include "General/StateComponent.h"
@@ -10,6 +9,8 @@
 #include "Character/Component/AttributeComponent/HealthComponent.h"
 #include "General/CreatureBehavior.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Character/Component/AttributeComponent/BlueComponent.h"
+#include "Character/Component/AttributeComponent/PhysicalPowerComponent.h"
 
 
 // Sets default values
@@ -17,12 +18,15 @@ ACreature::ACreature()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	AttributeComponent = CreateDefaultSubobject<UAttributeComponent>(TEXT("AttributeComponent"));
+	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
+	BlueComponent = CreateDefaultSubobject<UBlueComponent>(TEXT("BlueComponent"));
+	PhysicalPowerComponent = CreateDefaultSubobject<UPhysicalPowerComponent>(TEXT("PhysicalPowerComponent"));
+
 	PackComponent = CreateDefaultSubobject<UPackComponent>(TEXT("PackComponent"));
 	DefenseComponent = CreateDefaultSubobject<UDefenseComponent>(TEXT("DefenseComponent"));
 	StateComponent = CreateDefaultSubobject<UStateComponent>(TEXT("StateComponent"));
 	CreatureBehavior = CreateDefaultSubobject<UCreatureBehavior>(TEXT("CreatureBehavior"));
-	StateComponent->InitStateComponent(AttributeComponent->GetBlueComponent());
+	StateComponent->InitStateComponent(BlueComponent);
 }
 
 // Called when the game starts or when spawned
@@ -49,7 +53,7 @@ void ACreature::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 void ACreature::BeAttacked(APackObject* PackObject, float DamageMultiplier)
 {
 	FAttackReturnValue ReturnValue = UCalAttackLibrary::CalculateAttack(PackObject, this, DamageMultiplier);
-	AttributeComponent->GetHealthComponent()->SubtractValue(ReturnValue.Damage);
+	HealthComponent->SubtractValue(ReturnValue.Damage);
 
 }
 
@@ -66,7 +70,7 @@ void ACreature::SetSpeedToRun()
 
 void ACreature::SetUnbeatable(bool NewValue)
 {
-	AttributeComponent->GetHealthComponent()->CanBeHurt = !NewValue;
+	HealthComponent->CanBeHurt = !NewValue;
 }
 
 

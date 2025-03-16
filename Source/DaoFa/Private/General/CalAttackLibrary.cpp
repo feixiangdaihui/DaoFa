@@ -5,7 +5,6 @@
 #include"Creature.h"
 #include "General/DefenseComponent.h"
 #include"General/AttackAttributeComponent.h"
-#include"Character/Component/AttributeComponent/AttributeComponent.h"
 #include "Character/Component/AttributeComponent/HealthComponent.h"
 #include "General/ElementSetting.h"
 #include "Character/Component/PackComponent/PODefenseComponent.h"
@@ -69,7 +68,7 @@ float UCalAttackLibrary::CalculateDamage(APackObject* SelfPackObejct, UDefenseCo
 	float BlueDensity = 0.0f;
 	ACreature* OwnerCreature = SelfPackObejct->GetOwnerCreature();
 	if (OwnerCreature)
-		BlueDensity = OwnerCreature->GetAttributeComponent()->GetBlueComponent()->GetBlueDensity();
+		BlueDensity = OwnerCreature->GetBlueComponent()->GetBlueDensity();
 	float Damage = BaseDamage * DamageMultiplier * ElementMultiplier / Defense * OtherStateMultiplier * OwnerStateMultiplier*BlueDensity;
 
 	if (IsTest)
@@ -114,7 +113,7 @@ EInterruptDir UCalAttackLibrary::CalculateInterruptDir(AActor* SelfActor,AActor*
 
 FAttackReturnValue UCalAttackLibrary::CalculateAttack( APackObject* SelfPackObejct, ACreature* OtherCreature,  float DamageMultiplier)
 {
-	return CalculateAttack(SelfPackObejct, OtherCreature->GetDefenseComponent(), OtherCreature->GetStateComponent()->GetState(), OtherCreature->GetAttributeComponent()->GetHealthComponent(), DamageMultiplier);
+	return CalculateAttack(SelfPackObejct, OtherCreature->GetDefenseComponent(), OtherCreature->GetStateComponent()->GetState(), OtherCreature->GetHealthComponent(), DamageMultiplier);
 }
 
 FAttackReturnValue UCalAttackLibrary::CalculateAttack(APackObject* SelfPackObejct, UDefenseComponent* DefenseComponent, FState OtherState, UHealthComponent* HealthComponent, float DamageMultiplier)

@@ -1,7 +1,6 @@
 #include "General/CreatureBehavior.h"
 #include "InputActionValue.h"
 #include "Character/Animation/BaseAnimInstance.h"
-#include "Character/Component/AttributeComponent/AttributeComponent.h"
 #include "Character/Component/AttributeComponent/PhysicalPowerComponent.h"
 #include "Character/Component/PackComponent/SumEquipmentBarWidget.h"
 #include "Character/Component/PackComponent/PackObject.h"
@@ -28,9 +27,8 @@ void UCreatureBehavior::BeginPlay()
 	if (OwnerCreature != nullptr)
 	{
 		OwnerAnimInstance = Cast<UBaseAnimInstance>(OwnerCreature->GetMesh()->GetAnimInstance());
-		UAttributeComponent* OwnerAttributeComponent = OwnerCreature->GetAttributeComponent();
-		UPhysicalPowerComponent* OwnerPhysicalPowerComponent = OwnerAttributeComponent->GetPhysicalPowerComponent();
-		UBlueComponent* OwnerBlueComponent = OwnerAttributeComponent->GetBlueComponent();
+		UPhysicalPowerComponent* OwnerPhysicalPowerComponent = OwnerCreature->GetPhysicalPowerComponent();
+		UBlueComponent* OwnerBlueComponent = OwnerCreature->GetBlueComponent();
 		if (OwnerBlueComponent)
 			OwnerBlueComponent->OnBlueEmpty.AddDynamic(this, &UCreatureBehavior::OnBlueEmpty);
 		else

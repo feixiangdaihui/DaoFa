@@ -5,7 +5,7 @@
 #include "Hud/Widget/MyProgressBar.h"
 #include "General/EnemyDetector.h"
 #include "Enemy/BaseEnemy.h"
-#include "Character/Component/AttributeComponent/AttributeComponent.h"
+#include "Character/Component/AttributeComponent/HealthComponent.h"
 
 void UEnemyInfoWidget::UpdateEnemy()
 {
@@ -20,7 +20,7 @@ void UEnemyInfoWidget::UpdateEnemy()
 				Enemy = Cast<ABaseEnemy>(Actor);
 				if (Enemy)
 				{
-					EnemyHealthValue->InitProgressBar(Enemy->GetAttributeComponent()->GetHealthValue());
+					EnemyHealthValue->InitProgressBar(Enemy->GetHealthComponent());
 					EnemyName = Enemy->GetName();
 					IsEnemyPresent = true;
 				}

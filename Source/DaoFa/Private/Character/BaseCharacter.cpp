@@ -7,7 +7,6 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Character/Component/InputOperationComponent.h"
-#include "Character/Component/AttributeComponent/AttributeComponent.h"
 #include "Character/Component/PackComponent/PackComponent.h"
 #include "General/StateComponent.h"
 #include "General/EnemyDetector.h"
@@ -62,8 +61,6 @@ ABaseCharacter::ABaseCharacter()
 
 
 
-	//存档
-	UBlueComponent* BlueComponent = AttributeComponent->GetBlueComponent();
 	if (IsValid(BlueComponent))
 	{
 		SaveLoadDataArray.Add(TScriptInterface<ISaveLoadData>(BlueComponent));

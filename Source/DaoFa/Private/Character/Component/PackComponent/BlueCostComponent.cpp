@@ -2,7 +2,6 @@
 
 
 #include "Character/Component/PackComponent/BlueCostComponent.h"
-#include "Character/Component/AttributeComponent/AttributeComponent.h"
 #include "Creature.h"
 #include "Character/Component/AttributeComponent/BlueComponent.h"
 
@@ -26,7 +25,7 @@ void UBlueCostComponent::BeginPlay()
 	ACreature* Creature = Cast<ACreature>(CreatureActor);
 	if (Creature)
 	{
-		BlueValue = Creature->GetAttributeComponent()->GetBlueComponent();
+		BlueValue = Creature->GetBlueComponent();
 	}
 
 	// ...
