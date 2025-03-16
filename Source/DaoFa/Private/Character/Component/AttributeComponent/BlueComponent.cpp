@@ -42,3 +42,21 @@ void UBlueComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	// ...
 }
 
+FJsonObject UBlueComponent::SaveDataMethod() const
+{
+	TSharedPtr<FJsonObject> SaveData = MakeShared<FJsonObject>();
+	SaveData->SetNumberField(TEXT("MaxBlue"), MaxBlue);
+	SaveData->SetNumberField(TEXT("CurrentBlue"), CurrentBlue);
+	SaveData->SetNumberField(TEXT("BlueDensity"), BlueDensity);
+	SaveData->SetNumberField(TEXT("RecoverBlueAmountBySecond"), RecoverBlueAmountBySecond);
+	return *SaveData;
+}
+
+void UBlueComponent::LoadDataMethod(const TSharedPtr<FJsonObject> JsonObject)
+{
+	MaxBlue = JsonObject->GetNumberField(TEXT("MaxBlue"));
+	CurrentBlue = JsonObject->GetNumberField(TEXT("CurrentBlue"));
+	BlueDensity = JsonObject->GetNumberField(TEXT("BlueDensity"));
+	RecoverBlueAmountBySecond = JsonObject->GetNumberField(TEXT("RecoverBlueAmountBySecond"));
+}
+

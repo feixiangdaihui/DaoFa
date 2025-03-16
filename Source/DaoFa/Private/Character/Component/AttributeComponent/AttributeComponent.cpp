@@ -68,4 +68,3 @@ TScriptInterface<ISetValueInterface> UAttributeComponent::SetBlueValue()
 	return BlueComponent;
 }
 
-

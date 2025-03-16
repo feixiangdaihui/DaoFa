@@ -14,4 +14,14 @@ class DAOFA_API UMyGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
 
+
+public:
+	virtual void Init() override;
+
+	void LoadGame();
+
+	//定时保存游戏
+	void AutoSaveGame();
+
+
 };

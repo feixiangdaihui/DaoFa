@@ -202,3 +202,21 @@ float UStateComponent::GetUpgradeSuccessRate()
 	}
 		
 }
+
+FJsonObject UStateComponent::SaveDataMethod() const
+{
+	TSharedPtr<FJsonObject> SaveData = MakeShared<FJsonObject>();
+	SaveData->SetNumberField(TEXT("StateExp"), StateExp);
+	SaveData->SetNumberField(TEXT("LastUpgradeExp"), LastUpgradeExp);
+	SaveData->SetNumberField(TEXT("CurrentStateLarge"), static_cast<int>(CurrentState.LargeState));
+	SaveData->SetNumberField(TEXT("CurrentStateSmall"), static_cast<int>(CurrentState.SmallState));
+	return *SaveData;
+}
+
+void UStateComponent::LoadDataMethod(const TSharedPtr<FJsonObject> JsonObject)
+{
+	StateExp = JsonObject->GetNumberField(TEXT("StateExp"));
+	LastUpgradeExp = JsonObject->GetNumberField(TEXT("LastUpgradeExp"));
+	CurrentState.LargeState = static_cast<ELargeState>(JsonObject->GetIntegerField(TEXT("CurrentStateLarge")));
+	CurrentState.SmallState = static_cast<ESmallState>(JsonObject->GetIntegerField(TEXT("CurrentStateSmall")));
+}

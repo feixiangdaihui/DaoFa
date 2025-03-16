@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "Character/Component/AttributeComponent/GetValueInterface.h"
 #include "Character/Component/AttributeComponent/SetValueInterface.h"
+#include "General/Interface/SaveLoadData.h"
 #include "BlueComponent.generated.h"
 
 //蓝量耗尽委托
@@ -13,7 +14,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBlueEmptyDelegate);
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class DAOFA_API  UBlueComponent: public UActorComponent, public IGetValueInterface, public ISetValueInterface
+class DAOFA_API  UBlueComponent : public UActorComponent, public IGetValueInterface, public ISetValueInterface, public ISaveLoadData
 {
 	GENERATED_BODY()
 
@@ -128,6 +129,11 @@ public:
 	}
 
 
+	virtual FJsonObject SaveDataMethod() const override;
+
+	virtual void LoadDataMethod(const TSharedPtr<FJsonObject> JsonObject) override;
+
+	virtual FString GetKey() const override { return TEXT("BlueComponent"); }
 	
 
 		

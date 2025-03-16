@@ -4,6 +4,7 @@
 #include "Components/ActorComponent.h"
 #include "Character/Component/AttributeComponent/GetValueInterface.h"
 #include "Character/Component/AttributeComponent/SetValueInterface.h"
+#include "General/Interface/SaveLoadData.h"
 #include "StateComponent.generated.h"
 
 #define LARGE_STATE_NUM 5
@@ -76,7 +77,7 @@ public:
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnStateUpgrade, FState, CurrentState);
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class DAOFA_API UStateComponent : public UActorComponent, public IGetValueInterface, public ISetValueInterface
+class DAOFA_API UStateComponent : public UActorComponent, public IGetValueInterface, public ISetValueInterface, public ISaveLoadData
 {
 	GENERATED_BODY()
 
@@ -199,6 +200,14 @@ public:
 	float GetUpgradeSuccessRate();
 
 	void InitStateComponent(UBlueComponent* InBlueComponent) { BlueComponent = InBlueComponent; }
+
+	
+	//存档
+	virtual FJsonObject SaveDataMethod() const override;
+
+	virtual void LoadDataMethod(const TSharedPtr<FJsonObject> JsonObject) override;
+
+	virtual FString GetKey() const override { return TEXT("StateComponent"); }
 
 
 

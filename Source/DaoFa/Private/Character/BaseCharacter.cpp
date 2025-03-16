@@ -9,9 +9,12 @@
 #include "Character/Component/InputOperationComponent.h"
 #include "Character/Component/AttributeComponent/AttributeComponent.h"
 #include "Character/Component/PackComponent/PackComponent.h"
+#include "General/StateComponent.h"
 #include "General/EnemyDetector.h"
 #include "Enemy/BaseEnemy.h"
 #include"General/CreatureBehavior.h"
+#include"Character/Component/AttributeComponent/BlueComponent.h"
+
 
 // Sets default values
 ABaseCharacter::ABaseCharacter()
@@ -58,6 +61,17 @@ ABaseCharacter::ABaseCharacter()
 	EnemyDetector->EnemyClasses.Add(ABaseEnemy::StaticClass());
 
 
+
+	//存档
+	UBlueComponent* BlueComponent = AttributeComponent->GetBlueComponent();
+	if (IsValid(BlueComponent))
+	{
+		SaveLoadDataArray.Add(TScriptInterface<ISaveLoadData>(BlueComponent));
+	}
+	if (IsValid(StateComponent))
+	{
+		SaveLoadDataArray.Add(TScriptInterface<ISaveLoadData>(StateComponent.Get()));
+	}
 }
 
 // Called when the game starts or when spawned
@@ -65,6 +79,7 @@ void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	SetSpeedToWalk();
+
 }
 
 // Called every frame
@@ -98,5 +113,36 @@ void ABaseCharacter::InitSumEquipmentBar(USumEquipmentBarWidget* SumEquipmentBar
 	CreatureBehavior->InitSumEquipmentBar(SumEquipmentBarWidget);
 	PackComponent->InitSumEquipmentBar(SumEquipmentBarWidget);
 }
+
+FJsonObject ABaseCharacter::SaveDataMethod() const
+{
+	TSharedPtr<FJsonObject> SaveData = MakeShared<FJsonObject>();
+	TArray<TSharedPtr<FJsonObject>> TempArray;
+	TempArray.SetNum(SaveLoadDataArray.Num());
+	for (int i = 0; i < SaveLoadDataArray.Num(); i++)
+	{
+		if (SaveLoadDataArray[i].GetObject() != nullptr)
+		{
+			TempArray[i] = MakeShared<FJsonObject>(SaveLoadDataArray[i]->SaveDataMethod());
+			SaveData->SetObjectField(SaveLoadDataArray[i]->GetKey(), TempArray[i]);
+		}
+	}
+	return *SaveData;
+
+}
+
+void ABaseCharacter::LoadDataMethod(const TSharedPtr<FJsonObject> JsonObject)
+{
+	UE_LOG(LogTemp, Warning, TEXT("ABaseCharacter::LoadDataMethod"));
+	for (auto ISaveLoadData : SaveLoadDataArray)
+	{
+		if (ISaveLoadData.GetObject() != nullptr)
+			ISaveLoadData->LoadDataMethod(JsonObject->GetObjectField(ISaveLoadData->GetKey()));
+	}
+}
+
+
+
+
 
 

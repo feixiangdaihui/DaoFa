@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Creature.h"
 #include "Hud/Interface/InitSumEquipmentBarInterface.h"
+#include "General/Interface/SaveLoadData.h"
 #include "BaseCharacter.generated.h"
 
 class USpringArmComponent;
@@ -14,7 +15,7 @@ class UAttributeComponent;
 class UPackComponent;
 class UEnemyDetector;
 UCLASS()
-class DAOFA_API ABaseCharacter : public ACreature, public IInitSumEquipmentBarInterface
+class DAOFA_API ABaseCharacter : public ACreature, public IInitSumEquipmentBarInterface, public ISaveLoadData
 {
 	GENERATED_BODY()
 
@@ -38,14 +39,13 @@ protected:
 	virtual void BeginPlay() override;
 
 
-
-
-
-
-
 	virtual void NotifyControllerChanged() override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Save")
+	TArray<TScriptInterface<ISaveLoadData>> SaveLoadDataArray;
+
 
 public:	
 	// Called every frame
@@ -55,11 +55,17 @@ public:
 	TObjectPtr<UInputOperationComponent> InputOperationComponent;
 	// Called to bind functionality to input
 
-
-
-
 	virtual void InitSumEquipmentBar(USumEquipmentBarWidget* SumEquipmentBarWidget) override;
 
 	UEnemyDetector* GetEnemyDetector() const { return EnemyDetector; }
+
+
+	//存档
+	virtual FJsonObject SaveDataMethod() const override;
+
+	virtual void LoadDataMethod(const TSharedPtr<FJsonObject> JsonObject) override;
+
+	virtual FString GetKey() const override { return TEXT("BaseCharacter"); }
+
 
 };
