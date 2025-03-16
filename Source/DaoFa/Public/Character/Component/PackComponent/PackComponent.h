@@ -4,8 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Character/Interface/UpdateEquipmentInterface.h"
-#include "Hud/Interface/InitSumEquipmentBarInterface.h"
 #include "PackComponent.generated.h"
 
 class AFuLu;
@@ -13,9 +11,10 @@ class AFaBao;
 class AFaShu;
 class UPackWidget;
 class ABasePlayerController;
+class UEquipmentBarComponent;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class DAOFA_API UPackComponent : public UActorComponent, public IUpdateEquipmentInterface,public IInitSumEquipmentBarInterface
+class DAOFA_API UPackComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
@@ -45,9 +44,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pack")
 	TArray<TObjectPtr<APackObject>> FaShuArray;
 
-	TArray<TScriptInterface< IUpdateEquipmentInterface>> UpdateEquipmentInterfaces;
 
-	USumEquipmentBarWidget* OwningSumEquipmentBarWidget;
+	UEquipmentBarComponent* EquipmentBarComponent;
+
 
 	UFUNCTION()
 	void OnPackObjectExhausted(APackObject* PackObject);
@@ -57,10 +56,10 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Pack")
-	virtual void WearEquipment( APackObject* Equipment, int SpecificIndex = -1) override;
+	virtual void WearEquipment( APackObject* Equipment, int SpecificIndex = -1) ;
 
 	UFUNCTION(BlueprintCallable, Category = "Pack")
-	virtual void TakeOffEquipment(APackObject* Equipment) override;
+	virtual void TakeOffEquipment(APackObject* Equipment);
 
 
 
@@ -68,13 +67,11 @@ public:
 
 
 
-	virtual void InitSumEquipmentBar(USumEquipmentBarWidget* SumEquipmentBarWidget) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Pack")
 	TArray<APackObject*> GetArrayByType(EEquipmentType TypeIndex);
 
 
 
-	USumEquipmentBarWidget* GetSumEquipmentBarWidget() { return OwningSumEquipmentBarWidget; }
 	
 };

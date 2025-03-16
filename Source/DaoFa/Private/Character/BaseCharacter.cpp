@@ -13,6 +13,7 @@
 #include "Enemy/BaseEnemy.h"
 #include"General/CreatureBehavior.h"
 #include"Character/Component/AttributeComponent/BlueComponent.h"
+#include"Character/Component/PackComponent/EquipmentBarComponent.h"
 
 
 // Sets default values
@@ -51,6 +52,9 @@ ABaseCharacter::ABaseCharacter()
 
 
 	InputOperationComponent = CreateDefaultSubobject<UInputOperationComponent>(TEXT("InputOperationComponent"));
+	EquipmentBarComponent = CreateDefaultSubobject<UEquipmentBarComponent>(TEXT("EquipmentBarComponent"));
+
+
 
 	EnemyDetector = CreateDefaultSubobject<UEnemyDetector>(TEXT("EnemyDetector"));
 	EnemyDetector->DetectionRadius = 3000.0f;
@@ -58,6 +62,8 @@ ABaseCharacter::ABaseCharacter()
 	EnemyDetector->VerticalAngle = 180.0f;
 	EnemyDetector->EnemyClasses.Empty();
 	EnemyDetector->EnemyClasses.Add(ABaseEnemy::StaticClass());
+
+
 
 
 
@@ -105,11 +111,6 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 }
 
 
-void ABaseCharacter::InitSumEquipmentBar(USumEquipmentBarWidget* SumEquipmentBarWidget)
-{
-	CreatureBehavior->InitSumEquipmentBar(SumEquipmentBarWidget);
-	PackComponent->InitSumEquipmentBar(SumEquipmentBarWidget);
-}
 
 FJsonObject ABaseCharacter::SaveDataMethod() const
 {

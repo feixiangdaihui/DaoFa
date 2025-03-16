@@ -3,7 +3,6 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Character/Interface/InputUpdateInterface.h"
-#include "Hud/Interface/InitSumEquipmentBarInterface.h"
 #include "CreatureBehavior.generated.h"
 
 
@@ -17,7 +16,7 @@ class USumEquipmentBarWidget;
 class ABaseHud;
 class APackObject;
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class DAOFA_API UCreatureBehavior : public UActorComponent, public IInputUpdateInterface, public IInitSumEquipmentBarInterface
+class DAOFA_API UCreatureBehavior : public UActorComponent, public IInputUpdateInterface
 {
 	GENERATED_BODY()
 
@@ -34,8 +33,6 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-
-	virtual void InitSumEquipmentBar(USumEquipmentBarWidget* SumEquipmentBarWidget) override;
 
 
 	
@@ -54,7 +51,6 @@ private:
 
 	UBaseAnimInstance* OwnerAnimInstance;
 
-	USumEquipmentBarWidget* OwnerSumEquipmentBarWidget;
 
 
 
@@ -70,9 +66,6 @@ private:
 	void Run();
 
 	void StopRun();
-	void ChangeChosenEquipmentBarToSmall();
-
-	void ChangeChosenEquipmentBarToBig();
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -81,12 +74,12 @@ private:
 
 
 	//1表示开始释放技能，0表示结束释放技能
-	void Spell(int Num, bool Begin);
+	void Spell(APackObject* Equipment, bool Begin);
 
 	UFUNCTION()
 	void OnBlueEmpty();
 
-	APackObject* CurrentPackObject = nullptr;
+	APackObject* CurrentEquipment = nullptr;
 
 
 	bool IsRunning = false;

@@ -8,6 +8,7 @@
 #include "InputActionValue.h"
 #include "Hud/BaseHud.h"
 #include "General/CreatureBehavior.h"
+#include "Character/Component/PackComponent/EquipmentBarComponent.h"
 // Sets default values for this component's properties
 UInputOperationComponent::UInputOperationComponent()
 {
@@ -38,6 +39,7 @@ void UInputOperationComponent::SetupPlayerInputComponent(UInputComponent* Player
 
 		OwnerHud = Cast<ABaseHud>(OwnerCharacter->GetWorld()->GetFirstPlayerController()->GetHUD());
 		OwnerCreatureBehavior = OwnerCharacter->GetCreatureBehavior();
+		OwnerEquipmentBarComponent = OwnerCharacter->GetEquipmentBarComponent();
 		if (!IsValid(OwnerCreatureBehavior))
 		{
 			UE_LOG(LogTemp, Error, TEXT("OwnerCreatureBehavior is nullptr"));
@@ -63,22 +65,22 @@ void UInputOperationComponent::SetupPlayerInputComponent(UInputComponent* Player
 		EnhancedInputComponent->BindAction(DodgeAction, ETriggerEvent::Started, OwnerCreatureBehavior, &UCreatureBehavior::Dodge);
 
 		//ChangeChosenEquipmentBar
-		EnhancedInputComponent->BindAction(ChangeChosenEquipmentBarToSmallAction, ETriggerEvent::Started, OwnerCreatureBehavior, &UCreatureBehavior::ChangeChosenEquipmentBarToSmall);
-		EnhancedInputComponent->BindAction(ChangeChosenEquipmentBarToBigAction, ETriggerEvent::Started, OwnerCreatureBehavior, &UCreatureBehavior::ChangeChosenEquipmentBarToBig);
+		EnhancedInputComponent->BindAction(ChangeChosenEquipmentBarToSmallAction, ETriggerEvent::Started,this, &UInputOperationComponent::ChangeChosenEquipmentBarToSmall);
+		EnhancedInputComponent->BindAction(ChangeChosenEquipmentBarToBigAction, ETriggerEvent::Started,this, &UInputOperationComponent::ChangeChosenEquipmentBarToBig);
 
 		//Pack
 		EnhancedInputComponent->BindAction(OpenPackAction, ETriggerEvent::Started, this, &UInputOperationComponent::OpenPack);
 		OpenPackAction->bTriggerWhenPaused = true;
 
 		//Spell
-		EnhancedInputComponent->BindAction(SpellAction0, ETriggerEvent::Started, OwnerCreatureBehavior, &UCreatureBehavior::Spell, 0, true);
-		EnhancedInputComponent->BindAction(SpellAction0, ETriggerEvent::Completed, OwnerCreatureBehavior, &UCreatureBehavior::Spell, 0, false);
-		EnhancedInputComponent->BindAction(SpellAction1, ETriggerEvent::Started, OwnerCreatureBehavior, &UCreatureBehavior::Spell, 1, true);
-		EnhancedInputComponent->BindAction(SpellAction1, ETriggerEvent::Completed, OwnerCreatureBehavior, &UCreatureBehavior::Spell, 1, false);
-		EnhancedInputComponent->BindAction(SpellAction2, ETriggerEvent::Started, OwnerCreatureBehavior, &UCreatureBehavior::Spell, 2, true);
-		EnhancedInputComponent->BindAction(SpellAction2, ETriggerEvent::Completed, OwnerCreatureBehavior, &UCreatureBehavior::Spell, 2, false);
-		EnhancedInputComponent->BindAction(SpellAction3, ETriggerEvent::Started, OwnerCreatureBehavior, &UCreatureBehavior::Spell, 3, true);
-		EnhancedInputComponent->BindAction(SpellAction3, ETriggerEvent::Completed, OwnerCreatureBehavior, &UCreatureBehavior::Spell, 3, false);
+		EnhancedInputComponent->BindAction(SpellAction0, ETriggerEvent::Started,this, &UInputOperationComponent::Spell, 0, true);
+		EnhancedInputComponent->BindAction(SpellAction0, ETriggerEvent::Completed,this, &UInputOperationComponent::Spell, 0, false);
+		EnhancedInputComponent->BindAction(SpellAction1, ETriggerEvent::Started,this, &UInputOperationComponent::Spell, 1, true);
+		EnhancedInputComponent->BindAction(SpellAction1, ETriggerEvent::Completed,this, &UInputOperationComponent::Spell, 1, false);
+		EnhancedInputComponent->BindAction(SpellAction2, ETriggerEvent::Started,this, &UInputOperationComponent::Spell, 2, true);
+		EnhancedInputComponent->BindAction(SpellAction2, ETriggerEvent::Completed,this, &UInputOperationComponent::Spell, 2, false);
+		EnhancedInputComponent->BindAction(SpellAction3, ETriggerEvent::Started,this, &UInputOperationComponent::Spell, 3, true);
+		EnhancedInputComponent->BindAction(SpellAction3, ETriggerEvent::Completed,this, &UInputOperationComponent::Spell, 3, false);
 
 	}
 }
@@ -108,6 +110,34 @@ void UInputOperationComponent::Look(const FInputActionValue& Value)
 void UInputOperationComponent::OpenPack()
 {
 	OwnerHud->OpenClosePack();
+}
+
+void UInputOperationComponent::ChangeChosenEquipmentBarToSmall()
+{
+	if (OwnerEquipmentBarComponent)
+	{
+		OwnerEquipmentBarComponent->ChangeChosenEquipmentBarToSmall();
+	}
+}
+
+void UInputOperationComponent::ChangeChosenEquipmentBarToBig()
+{
+	if (OwnerEquipmentBarComponent)
+	{
+		OwnerEquipmentBarComponent->ChangeChosenEquipmentBarToBig();
+	}
+}
+
+void UInputOperationComponent::Spell(int32 Index, bool Begin)
+{
+	if (OwnerEquipmentBarComponent)
+	{
+		if(OwnerCreatureBehavior)
+		{
+			if (APackObject* Temp=OwnerEquipmentBarComponent->GetEquipment(Index))
+				OwnerCreatureBehavior->Spell(Temp, Begin);
+		}
+	}
 }
 
 

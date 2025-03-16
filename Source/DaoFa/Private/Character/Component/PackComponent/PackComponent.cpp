@@ -5,6 +5,7 @@
 #include "Character/Component/PackComponent/SumEquipmentBarWidget.h"
 #include "Character/Component/PackComponent/PackWidget.h"
 #include"PlayerController/BasePlayerController.h"
+#include "Character/Component/PackComponent/EquipmentBarComponent.h"
 #include "Character/Component/PackComponent/PackObject.h"
 // Sets default values for this component's properties
 UPackComponent::UPackComponent()
@@ -26,7 +27,7 @@ void UPackComponent::BeginPlay()
 
 
 	OwnerController = GetOwner()->GetInstigatorController<ABasePlayerController>();
-
+	EquipmentBarComponent = GetOwner()->FindComponentByClass<UEquipmentBarComponent>();
 
 	// ...
 	
@@ -75,9 +76,9 @@ void UPackComponent::WearEquipment( APackObject* Equipment, int SpecificIndex)
 	default:
 		break;
 	}
-	for (auto UpdateEquipmentInterface : UpdateEquipmentInterfaces)
+	if (EquipmentBarComponent)
 	{
-		UpdateEquipmentInterface->WearEquipment(Equipment, SpecificIndex);
+		EquipmentBarComponent->WearEquipment(Equipment, SpecificIndex);
 	}
 	
 }
@@ -85,9 +86,9 @@ void UPackComponent::WearEquipment( APackObject* Equipment, int SpecificIndex)
 void UPackComponent::TakeOffEquipment(APackObject* Equipment)
 {
 	CurrentSize -= Equipment->GetSizeInPack();
-	for (auto UpdateEquipmentInterface : UpdateEquipmentInterfaces)
+	if (EquipmentBarComponent)
 	{
-		UpdateEquipmentInterface->TakeOffEquipment(Equipment);
+		EquipmentBarComponent->TakeOffEquipment(Equipment);
 	}
 	switch (Equipment->GetEquipmentType())
 	{
@@ -120,16 +121,6 @@ void UPackComponent::TakeOffEquipment(APackObject* Equipment)
 
 
 
-
-
-void UPackComponent::InitSumEquipmentBar(USumEquipmentBarWidget* SumEquipmentBarWidget)
-{
-	if(SumEquipmentBarWidget)
-	{
-		UpdateEquipmentInterfaces.Add(SumEquipmentBarWidget);
-		this->OwningSumEquipmentBarWidget = SumEquipmentBarWidget;
-	}
-}
 
 TArray<APackObject*> UPackComponent::GetArrayByType(EEquipmentType TypeIndex)
 {

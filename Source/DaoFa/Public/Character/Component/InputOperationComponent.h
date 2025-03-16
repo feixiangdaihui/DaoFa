@@ -11,7 +11,7 @@ class ABaseCharacter;
 class UInputComponent;
 struct FInputActionValue;
 class UInputMappingContext;
-class USumEquipmentBarWidget;
+class UEquipmentBarComponent;
 class ABaseHud;
 class APackObject;
 class UCreatureBehavior;
@@ -44,7 +44,9 @@ private:
 	ABaseHud* OwnerHud;
 
 	UCreatureBehavior* OwnerCreatureBehavior;
-	
+
+	UEquipmentBarComponent* OwnerEquipmentBarComponent;
+
 	/* Jump Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* JumpAction;
@@ -114,10 +116,12 @@ private:
 
 	void OpenPack();
 
+	void ChangeChosenEquipmentBarToSmall();
 
+	void ChangeChosenEquipmentBarToBig();
 
+	void Spell(int32 Index, bool Begin);
 
-	bool IsRunning = false;
 
 
 		

@@ -12,6 +12,7 @@
 #include "Character/Component/AttributeComponent/HealthComponent.h"
 #include "Character/Component/AttributeComponent/PhysicalPowerComponent.h"
 #include "Character/Component/AttributeComponent/BlueComponent.h"
+#include "Character/Component/PackComponent/EquipmentBarComponent.h"
 
 ABaseHud::ABaseHud()
 {
@@ -33,7 +34,7 @@ void ABaseHud::BeginPlay()
 		if(SumEquipmentBarWidget)
 		{
 			SumEquipmentBarWidget->AddToViewport();
-			OwnerCharacter->InitSumEquipmentBar(SumEquipmentBarWidget);
+			OwnerCharacter->GetEquipmentBarComponent()->InitSumEquipmentBarWidget(SumEquipmentBarWidget);
 		}
 
 

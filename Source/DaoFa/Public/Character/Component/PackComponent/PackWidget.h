@@ -19,8 +19,6 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Pack")
 	UPackComponent* PackComponent;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Pack")
-	USumEquipmentBarWidget* SumEquipmentBarWidget;
 	UFUNCTION(BlueprintImplementableEvent, Category = "Pack")
 	void OpenPack();
 	UFUNCTION(BlueprintImplementableEvent, Category = "Pack")

@@ -151,21 +151,6 @@ void UCreatureBehavior::StopRun()
 	IsRunning = false;
 }
 
-void UCreatureBehavior::ChangeChosenEquipmentBarToSmall()
-{
-	if (OwnerSumEquipmentBarWidget)
-	{
-		OwnerSumEquipmentBarWidget->ChangeChosenEquipmentBarToSmall();
-	}
-}
-
-void UCreatureBehavior::ChangeChosenEquipmentBarToBig()
-{
-	if (OwnerSumEquipmentBarWidget)
-	{
-		OwnerSumEquipmentBarWidget->ChangeChosenEquipmentBarToBig();
-	}
-}
 
 
 void UCreatureBehavior::Dodge()
@@ -183,18 +168,20 @@ void UCreatureBehavior::Dodge()
 
 
 
-void UCreatureBehavior::Spell(int Num, bool Begin)
+
+
+void UCreatureBehavior::Spell(APackObject* Equipment, bool Begin)
 {
 	if (Begin)
 	{
 		if (CheckInput(InputAnimation::SpellLoop))
-		{
-			CurrentPackObject = OwnerSumEquipmentBarWidget->GetEquipment(Num);
-			if (CurrentPackObject)
+		{;
+			if (Equipment)
 			{
-				if (CurrentPackObject->TriggeredBegin())
+				if (Equipment->TriggeredBegin())
 				{
 					UpdateInput(InputAnimation::SpellLoop);
+					CurrentEquipment = Equipment;
 				}
 			}
 		}
@@ -203,9 +190,9 @@ void UCreatureBehavior::Spell(int Num, bool Begin)
 	{
 		if (CheckInput(InputAnimation::SpellEnd))
 		{
-			if (CurrentPackObject)
+			if (Equipment)
 			{
-				if (CurrentPackObject->TriggeredEnd())
+				if (Equipment->TriggeredEnd())
 				{
 					UpdateInput(InputAnimation::SpellEnd);
 				}
@@ -213,6 +200,7 @@ void UCreatureBehavior::Spell(int Num, bool Begin)
 				{
 					UpdateInput(InputAnimation::NONE);
 				}
+				CurrentEquipment = nullptr;
 			}
 		}
 	}
@@ -220,21 +208,16 @@ void UCreatureBehavior::Spell(int Num, bool Begin)
 
 void UCreatureBehavior::OnBlueEmpty()
 {
-	if (CurrentPackObject)
+	if (CurrentEquipment)
 	{
-		CurrentPackObject->TriggeredEnd();
+		CurrentEquipment->TriggeredEnd();
 		UpdateInput(InputAnimation::SpellEnd);
-		CurrentPackObject = nullptr;
+		CurrentEquipment = nullptr;
 	}
 
 }
 
 
-
-void UCreatureBehavior::InitSumEquipmentBar(USumEquipmentBarWidget* SumEquipmentBarWidget)
-{
-	OwnerSumEquipmentBarWidget = SumEquipmentBarWidget;
-}
 
 
 

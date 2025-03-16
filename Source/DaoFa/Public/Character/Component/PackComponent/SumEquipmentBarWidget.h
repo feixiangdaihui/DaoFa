@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Character/Component/PackComponent/EquipmentBarWidget.h"
-#include "Character/Interface/UpdateEquipmentInterface.h"
 #include "Character/Component/PackComponent/PackObject.h"
 #include "SumEquipmentBarWidget.generated.h"
 
@@ -16,7 +15,7 @@
  * 
  */
 UCLASS()
-class DAOFA_API USumEquipmentBarWidget : public UUserWidget, public IUpdateEquipmentInterface
+class DAOFA_API USumEquipmentBarWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
@@ -30,24 +29,13 @@ protected:
 	UPROPERTY( meta = (BindWidget))
 	TObjectPtr<UEquipmentBarWidget> FuLuEquipmentBar;
 
-	int CurrentChosenIndex = 0;
+
 
 public:
 
     virtual void NativeConstruct() override;
 
-	UFUNCTION(BlueprintCallable, Category = "SumEquipmentBar")
-	virtual void WearEquipment( APackObject* Equipment, int SpecificIndex = -1) override;
-
-	UFUNCTION(BlueprintCallable, Category = "SumEquipmentBar")
-	virtual void TakeOffEquipment(APackObject* Equipment) override;
-
-	APackObject* GetEquipment(int Index);
-
-
-	void ChangeChosenEquipmentBarToSmall();
-
-	void ChangeChosenEquipmentBarToBig();
+	void SetEquipmentBar(int Index, TArray<APackObject*> EquipmentBar);
 
 	//蓝图中实现
 	

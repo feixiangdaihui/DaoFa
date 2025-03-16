@@ -11,81 +11,27 @@
 void USumEquipmentBarWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	SetChosenEquipmentBar(CurrentChosenIndex);
 }
 
-void USumEquipmentBarWidget::WearEquipment( APackObject* Equipment, int SpecificIndex)
+void USumEquipmentBarWidget::SetEquipmentBar(int Index, TArray<APackObject*> EquipmentBar)
 {
-
-	switch (Equipment->GetEquipmentType())
-	{
-	case EEquipmentType::FASHU:
-		FaShuEquipmentBar->WearEquipment(Equipment, SpecificIndex);
-		break;
-	case EEquipmentType::FABAO:
-		FaBaoEquipmentBar->WearEquipment(Equipment, SpecificIndex);
-		break;
-	case EEquipmentType::FULU:
-		FuLuEquipmentBar->WearEquipment(Equipment, SpecificIndex);
-		break;
-	default:
-		break;
-	}
-}
-
-void USumEquipmentBarWidget::TakeOffEquipment(APackObject* Equipment)
-{	
-	switch (Equipment->GetEquipmentType())
-	{
-	case EEquipmentType::FASHU:
-		FaShuEquipmentBar->TakeOffEquipment(Equipment);
-		break;
-	case EEquipmentType::FABAO:
-		FaBaoEquipmentBar->TakeOffEquipment(Equipment);
-		break;
-	case EEquipmentType::FULU:
-		FuLuEquipmentBar->TakeOffEquipment(Equipment);
-		break;
-	default:
-		break;
-	}
-}
-
-APackObject* USumEquipmentBarWidget::GetEquipment(int Index)
-{
-	switch (CurrentChosenIndex)
+	switch (Index)
 	{
 	case 0:
-		return FaShuEquipmentBar->GetEquipment(Index);
+		FaShuEquipmentBar->SetEquipmentBar(EquipmentBar);
+		break;
 	case 1:
-		return FaBaoEquipmentBar->GetEquipment(Index);
+		FaBaoEquipmentBar->SetEquipmentBar(EquipmentBar);
+		break;
 	case 2:
-		return FuLuEquipmentBar->GetEquipment(Index);
+		FuLuEquipmentBar->SetEquipmentBar(EquipmentBar);
+		break;
 	default:
-		return nullptr;
+		break;
 	}
 }
 
 
-
-
-void USumEquipmentBarWidget::ChangeChosenEquipmentBarToSmall()
-{
-	if (CurrentChosenIndex == 0)
-		CurrentChosenIndex = EQUIPMENTBAR_NUM - 1;
-	else
-		CurrentChosenIndex--;
-	SetChosenEquipmentBar(CurrentChosenIndex);
-}
-
-void USumEquipmentBarWidget::ChangeChosenEquipmentBarToBig()
-{
-	if (CurrentChosenIndex == EQUIPMENTBAR_NUM - 1)
-		CurrentChosenIndex = 0;
-	else
-		CurrentChosenIndex++;
-	SetChosenEquipmentBar(CurrentChosenIndex);
-}
 
 void USumEquipmentBarWidget::SetChosenEquipmentBar(int Index)
 {

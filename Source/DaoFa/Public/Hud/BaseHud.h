@@ -64,7 +64,6 @@ public:
 	virtual void BeginPlay() override;
 	virtual void DrawHUD() override;
 
-	USumEquipmentBarWidget* GetSumEquipmentBarWidget() { return SumEquipmentBarWidget; }
 
 	void OpenClosePack();
 
