@@ -11,6 +11,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Character/Component/AttributeComponent/BlueComponent.h"
 #include "Character/Component/AttributeComponent/PhysicalPowerComponent.h"
+#include "Character/Component/GongFa/GongFaComponent.h"
 
 
 // Sets default values
@@ -27,6 +28,8 @@ ACreature::ACreature()
 	StateComponent = CreateDefaultSubobject<UStateComponent>(TEXT("StateComponent"));
 	CreatureBehavior = CreateDefaultSubobject<UCreatureBehavior>(TEXT("CreatureBehavior"));
 	StateComponent->InitStateComponent(BlueComponent);
+
+	GongFaComponent = CreateDefaultSubobject<UGongFaComponent>(TEXT("GongFaComponent"));
 }
 
 // Called when the game starts or when spawned

@@ -15,14 +15,16 @@ void UBaseSaveGame::SaveGameMethod(FString SlotName)
 	{
 		if (ISaveLoadDataArray[i].GetObject() != nullptr)
 		{
-			TempSaveData[i] = MakeShared<FJsonObject>(ISaveLoadDataArray[i]->SaveDataMethod());
-			//输出jsonobject
-			FString TestString;
-			TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&TestString);
-			FJsonSerializer::Serialize(TempSaveData[i].ToSharedRef(), Writer);
-
-			// 输出日志  
-			UE_LOG(LogTemp, Display, TEXT("JSON内容：\n%s"), *TestString);
+			if(IsTest)
+			{
+				TempSaveData[i] = MakeShared<FJsonObject>(ISaveLoadDataArray[i]->SaveDataMethod());
+				//输出jsonobject
+				FString TestString;
+				TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&TestString);
+				FJsonSerializer::Serialize(TempSaveData[i].ToSharedRef(), Writer);
+				// 输出日志  
+				UE_LOG(LogTemp, Display, TEXT("JSON内容：\n%s"), *TestString);
+			}
 			SaveData->SetObjectField(ISaveLoadDataArray[i]->GetKey(), TempSaveData[i]);
 		}
 	}

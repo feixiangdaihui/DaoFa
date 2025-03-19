@@ -14,6 +14,7 @@ class UDefenseComponent;
 class UStateComponent;
 class APackObject;
 class UCreatureBehavior;
+class UGongFaComponent;
 UCLASS()
 class DAOFA_API ACreature : public ACharacter, public IBeAttacked
 {
@@ -47,6 +48,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Behavior")
 	TObjectPtr<UCreatureBehavior> CreatureBehavior;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "GongFa")
+	TObjectPtr<UGongFaComponent> GongFaComponent;
+
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Walk")
 	float WalkSpeed = 250.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Walk")
@@ -61,16 +66,17 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UHealthComponent* GetHealthComponent() { return HealthComponent.Get(); }
-	UBlueComponent* GetBlueComponent() { return BlueComponent.Get(); }
-	UPhysicalPowerComponent* GetPhysicalPowerComponent() { return PhysicalPowerComponent.Get(); }
+	UHealthComponent* GetHealthComponent() const { return HealthComponent.Get(); }
+	UBlueComponent* GetBlueComponent()const { return BlueComponent.Get(); }
+	UPhysicalPowerComponent* GetPhysicalPowerComponent()const { return PhysicalPowerComponent.Get(); }
 
 
 
-	UPackComponent* GetPackComponent() { return PackComponent.Get(); }
+	UPackComponent* GetPackComponent() const{ return PackComponent.Get(); }
 	UDefenseComponent* GetDefenseComponent()  const{ return DefenseComponent.Get(); }
-	UStateComponent* GetStateComponent() { return StateComponent.Get(); }
-	UCreatureBehavior* GetCreatureBehavior() { return CreatureBehavior.Get(); }
+	UStateComponent* GetStateComponent()const { return StateComponent.Get(); }
+	UCreatureBehavior* GetCreatureBehavior()const { return CreatureBehavior.Get(); }
+	UGongFaComponent* GetGongFaComponent()const { return GongFaComponent.Get(); }
 
 	virtual void BeAttacked(APackObject* PackObject, float DamageMultiplier) override;
 
@@ -81,5 +87,6 @@ public:
 	void SetSpeedToRun();
 
 	void SetUnbeatable(bool NewValue);
+
 
 };

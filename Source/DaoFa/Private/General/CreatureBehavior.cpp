@@ -6,6 +6,10 @@
 #include "Character/Component/PackComponent/PackObject.h"
 #include "Character/Component/AttributeComponent/BlueComponent.h"
 #include "Creature.h"
+#include "Character/Component/GongFa/BaseMainGongFa.h"
+#include "Character/Component/GongFa/GongFaComponent.h"
+
+#include"Character/BaseCharacter.h"
 // Sets default values for this component's properties
 UCreatureBehavior::UCreatureBehavior()
 {
@@ -175,7 +179,7 @@ void UCreatureBehavior::Spell(APackObject* Equipment, bool Begin)
 	if (Begin)
 	{
 		if (CheckInput(InputAnimation::SpellLoop))
-		{;
+		{
 			if (Equipment)
 			{
 				if (Equipment->TriggeredBegin())
@@ -195,6 +199,7 @@ void UCreatureBehavior::Spell(APackObject* Equipment, bool Begin)
 				if (Equipment->TriggeredEnd())
 				{
 					UpdateInput(InputAnimation::SpellEnd);
+					OnSpell.Broadcast(Equipment);
 				}
 				else
 				{
@@ -215,6 +220,47 @@ void UCreatureBehavior::OnBlueEmpty()
 		CurrentEquipment = nullptr;
 	}
 
+}
+
+void UCreatureBehavior::FirstAttack()
+{
+	if (CheckInput(InputAnimation::FirstAttack))
+	{
+		UGongFaComponent* GongFaComponent = OwnerCreature->GetGongFaComponent();
+		if (GongFaComponent)
+		{
+			UBaseMainGongFa* MainGongFa = GongFaComponent->GetMainGongFa();
+			if (MainGongFa)
+			{
+				if (MainGongFa->CheckFirstAttack())
+				{
+					MainGongFa->FirstAttack();
+					UpdateInput(InputAnimation::FirstAttack);
+				}
+			}
+		}
+
+	}
+}
+
+void UCreatureBehavior::SecondAttack()
+{
+	if (CheckInput(InputAnimation::SecondAttack))
+	{
+		UGongFaComponent* GongFaComponent = OwnerCreature->GetGongFaComponent();
+		if (GongFaComponent)
+		{
+			UBaseMainGongFa* MainGongFa = GongFaComponent->GetMainGongFa();
+			if (MainGongFa)
+			{
+				if (MainGongFa->CheckSecondAttack())
+				{
+					MainGongFa->SecondAttack();
+					UpdateInput(InputAnimation::SecondAttack);
+				}
+			}
+		}
+	}
 }
 
 

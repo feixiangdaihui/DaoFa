@@ -11,13 +11,13 @@ void UMyGameInstance::Init()
 {
 	Super::Init();
 
-	//1s后加载游戏
-	FTimerHandle TimerHandle1;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle1, this, &UMyGameInstance::LoadGame, 1.0f, false);
+	////1s后加载游戏
+	//FTimerHandle TimerHandle1;
+	//GetWorld()->GetTimerManager().SetTimer(TimerHandle1, this, &UMyGameInstance::LoadGame, 1.0f, false);
 
-	//定时保存游戏
-	FTimerHandle TimerHandle2;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle2, this, &UMyGameInstance::AutoSaveGame, 10.0f, true);
+	////定时保存游戏
+	//FTimerHandle TimerHandle2;
+	//GetWorld()->GetTimerManager().SetTimer(TimerHandle2, this, &UMyGameInstance::AutoSaveGame, 10.0f, true);
 
 }
 

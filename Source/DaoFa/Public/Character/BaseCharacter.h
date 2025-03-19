@@ -52,6 +52,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Save")
 	TArray<TScriptInterface<ISaveLoadData>> SaveLoadDataArray;
 
+	
+
 
 public:	
 	// Called every frame

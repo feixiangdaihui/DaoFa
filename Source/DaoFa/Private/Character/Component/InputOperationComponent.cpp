@@ -82,6 +82,10 @@ void UInputOperationComponent::SetupPlayerInputComponent(UInputComponent* Player
 		EnhancedInputComponent->BindAction(SpellAction3, ETriggerEvent::Started,this, &UInputOperationComponent::Spell, 3, true);
 		EnhancedInputComponent->BindAction(SpellAction3, ETriggerEvent::Completed,this, &UInputOperationComponent::Spell, 3, false);
 
+		//Attack
+		EnhancedInputComponent->BindAction(FirstAttackAction, ETriggerEvent::Started, OwnerCreatureBehavior, &UCreatureBehavior::FirstAttack);
+		EnhancedInputComponent->BindAction(SecondAttackAction, ETriggerEvent::Started, OwnerCreatureBehavior, &UCreatureBehavior::SecondAttack);
+
 	}
 }
 

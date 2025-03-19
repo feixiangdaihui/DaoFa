@@ -6,6 +6,8 @@
 #include "CreatureBehavior.generated.h"
 
 
+
+
 class UInputAction;
 class ACreature;
 class UInputComponent;
@@ -15,6 +17,10 @@ class UBaseAnimInstance;
 class USumEquipmentBarWidget;
 class ABaseHud;
 class APackObject;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSpell, APackObject*, Equipment);
+
+
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class DAOFA_API UCreatureBehavior : public UActorComponent, public IInputUpdateInterface
 {
@@ -34,6 +40,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 
+	FOnSpell OnSpell;
 
 	
 
@@ -83,6 +90,10 @@ private:
 
 
 	bool IsRunning = false;
+
+	void FirstAttack();
+
+	void SecondAttack();
 
 
 

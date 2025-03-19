@@ -15,7 +15,6 @@ public:
 	// Sets default values for this component's properties
 	USpellCoolComponent();
 
-private:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
@@ -42,6 +41,10 @@ public:
 	float GetCoolTime() { return CoolTime; }
 
 	UFUNCTION(BlueprintCallable, Category = "SpellCool")
+	void SetCoolTime(float Value) { CoolTime = FMath::Max(0.0f, Value); }
+
+
+	UFUNCTION(BlueprintCallable, Category = "SpellCool")
 	float GetRemainingPercentage() { return CoolTimeCounter / CoolTime; }
 
 	UFUNCTION(BlueprintCallable, Category = "SpellCool")
@@ -66,13 +69,13 @@ public:
 	virtual void AddValue(float Value) override { SetCurrentValue(CoolTimeCounter + Value); }
 
 	UFUNCTION(BlueprintCallable, Category = "SpellCool")
-	virtual void AddPercentage(float Value) override { SetPercentage(Value * CoolTime+ CoolTimeCounter); }
+	virtual void AddPercentage(float Value) override { SetCurrentValue(Value * CoolTime+ CoolTimeCounter); }
 
 	UFUNCTION(BlueprintCallable, Category = "SpellCool")
 	virtual bool SubtractValue(float Value) override { SetCurrentValue(CoolTimeCounter - Value); return true; }
 
 	UFUNCTION(BlueprintCallable, Category = "SpellCool")
-	virtual bool SubtractPercentage(float Value) override { SetPercentage(CoolTimeCounter - Value); return true; }
+	virtual bool SubtractPercentage(float Value) override { SetCurrentValue(CoolTimeCounter - CoolTime*Value); return true; }
 
 
 

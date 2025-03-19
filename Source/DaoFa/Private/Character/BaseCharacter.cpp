@@ -14,7 +14,9 @@
 #include"General/CreatureBehavior.h"
 #include"Character/Component/AttributeComponent/BlueComponent.h"
 #include"Character/Component/PackComponent/EquipmentBarComponent.h"
-
+#include "Character/Component/GongFa/BaseMainGongFa.h"
+#include "Character/Component/GongFa/DetriveMainGongFa/WuXingZaoHuaGong.h"
+#include "Character/Component/GongFa/GongFaComponent.h"
 
 // Sets default values
 ABaseCharacter::ABaseCharacter()
@@ -75,6 +77,7 @@ ABaseCharacter::ABaseCharacter()
 	{
 		SaveLoadDataArray.Add(TScriptInterface<ISaveLoadData>(StateComponent.Get()));
 	}
+
 }
 
 // Called when the game starts or when spawned
@@ -82,6 +85,8 @@ void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	SetSpeedToWalk();
+
+	GongFaComponent->SetMainGongFa(UWuXingZaoHuaGong::StaticClass());
 
 }
 

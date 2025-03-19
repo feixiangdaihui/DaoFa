@@ -21,7 +21,11 @@ private:
 
 	TArray<TScriptInterface<ISaveLoadData>> ISaveLoadDataArray;
 
+	bool IsTest = false;
+
 public:
+
+	void SetIsTest(bool Value) { IsTest = Value; }
 
 	void InitISaveLoadData(TArray<TScriptInterface<ISaveLoadData>> InISaveLoadDataArray) {
 		ISaveLoadDataArray.Empty();

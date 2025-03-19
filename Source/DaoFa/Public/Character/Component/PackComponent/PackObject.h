@@ -234,6 +234,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "PackObject")
 	ACreature* GetOwnerCreature() { return OwnerCreature; }
+
+	UFUNCTION(BlueprintCallable, Category = "PackObject")
+	USpellCoolComponent* GetSpellCoolComponent() { return SpellCoolComponent; }
 	
 	
 

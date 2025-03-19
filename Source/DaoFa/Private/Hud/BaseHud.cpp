@@ -43,7 +43,7 @@ void ABaseHud::BeginPlay()
 		if (RealTimeWidget)
 		{
 			RealTimeWidget->AddToViewport();
-			RealTimeWidget->InitRealTimeWidget(OwnerCharacter->GetHealthComponent(), OwnerCharacter->GetHealthComponent(), OwnerCharacter->GetHealthComponent());
+			RealTimeWidget->InitRealTimeWidget(OwnerCharacter->GetHealthComponent(), OwnerCharacter->GetBlueComponent(), OwnerCharacter->GetPhysicalPowerComponent());
 		}
 
 
