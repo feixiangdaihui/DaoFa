@@ -2,42 +2,39 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "EnemyController.generated.h"
+#include "EnemyRotator.generated.h"
 
 class UEnemyTrace;
-class UEnemyRotator;
-class UEnemyBehavior;
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class DAOFA_API UEnemyController : public UActorComponent
+class DAOFA_API UEnemyRotator : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this component's properties
-	UEnemyController();
+	UEnemyRotator();
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
-	TObjectPtr<UEnemyTrace> EnemyTrace;
+
+
+	FTimerHandle RotateTimer;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
-	TObjectPtr<UEnemyRotator> EnemyRotator;
+	float RotateAnglePerSecond = 1.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
-	TObjectPtr<UEnemyBehavior> EnemyBehavior;
+	float RotateInterval = 0.1f;
 
+	UEnemyTrace* EnemyTrace = nullptr;
 
-private:
+	void RotateToTarget();
 
-
-	
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void InitEnemyController(TSubclassOf<UEnemyBehavior> InEnemyBehavior);
-
+	void InitEnemyRotator(UEnemyTrace* InEnemyTrace) { EnemyTrace = InEnemyTrace; }
 };

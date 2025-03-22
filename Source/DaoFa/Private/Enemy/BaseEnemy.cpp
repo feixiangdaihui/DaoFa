@@ -12,5 +12,5 @@ ABaseEnemy::ABaseEnemy()
 void ABaseEnemy::BeAttacked(APackObject* PackObject, float DamageMultiplier)
 {
 	Super::BeAttacked(PackObject, DamageMultiplier);
-	EnemyController->UpdateTarget();
+	OnAttacked.Broadcast(PackObject);
 }
