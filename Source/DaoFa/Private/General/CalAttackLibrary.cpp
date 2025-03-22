@@ -13,67 +13,39 @@
 
 bool UCalAttackLibrary::IsTest = false;
 
-EInterruptType UCalAttackLibrary::CalculateInterrupt(EInterruptAblity InterruptAblity,float ActualDamagePercent, EAvoidInterruptAblity AvoidAblity, float StartToBeInterruptedPercent)
+EInterruptType UCalAttackLibrary::CalculateInterrupt(EInterruptAblity InterruptAblity, EAvoidInterruptAblity AvoidAblity)
 {
-	if (ActualDamagePercent >= StartToBeInterruptedPercent)
+	switch (AvoidAblity)
 	{
-		switch (AvoidAblity)
-		{
-		case EAvoidInterruptAblity::ABSOLUTE:
-			if (InterruptAblity == EInterruptAblity::HEAVY)
-				return EInterruptType::PARTIAL;
-			else
-				return EInterruptType::NONE;
-			break;
-		case EAvoidInterruptAblity::RELATIVE:
-			if (InterruptAblity == EInterruptAblity::HEAVY)
-				return EInterruptType::FULL;
-			else if (InterruptAblity == EInterruptAblity::LIGHT)
-				return EInterruptType::PARTIAL;
-			else
-				return EInterruptType::NONE;
-		case EAvoidInterruptAblity::NONE:
-			if (InterruptAblity == EInterruptAblity::NONE)
-				return EInterruptType::NONE;
-			else
-				return EInterruptType::FULL;
-			break;
-		default:
+	case EAvoidInterruptAblity::ABSOLUTE:
+		if (InterruptAblity == EInterruptAblity::HEAVY)
+			return EInterruptType::PARTIAL;
+		else
 			return EInterruptType::NONE;
-			break;
-		}
-	}
-	else
+		break;
+	case EAvoidInterruptAblity::RELATIVE:
+		if (InterruptAblity == EInterruptAblity::HEAVY)
+			return EInterruptType::FULL;
+		else if (InterruptAblity == EInterruptAblity::LIGHT)
+			return EInterruptType::PARTIAL;
+		else
+			return EInterruptType::NONE;
+	case EAvoidInterruptAblity::NONE:
+		if (InterruptAblity == EInterruptAblity::NONE)
+			return EInterruptType::NONE;
+		else
+			return EInterruptType::FULL;
+		break;
+	default:
 		return EInterruptType::NONE;
+		break;
+	}
 }
 
-float UCalAttackLibrary::CalculateDamage(APackObject* SelfPackObejct, ACreature* OtherCreature, float DamageMultiplier)
+float UCalAttackLibrary::CalculateDamage(FAttackerInfo AttackerInfo, FDefenderInfo DefenderInfo)
 {
-	return CalculateDamage(SelfPackObejct, OtherCreature->GetDefenseComponent(), OtherCreature->GetStateComponent()->GetState(), DamageMultiplier);
-	
-}
-
-float UCalAttackLibrary::CalculateDamage(APackObject* SelfPackObejct, UDefenseComponent* DefenseComponent, FState OtherState, float DamageMultiplier)
-{
-	
-	UPOAttackAttributeComponent* POAttackAttributeComponent = SelfPackObejct->GetPOAttackAttributeComponent();
-	float BaseDamage = POAttackAttributeComponent->BaseDamage;
-	GElement DefenseElement = DefenseComponent->DefenseElement;
-	FState PackObjectState = SelfPackObejct->GetStateComponent()->GetState();
-	FState OwnerState = SelfPackObejct->GetOwnerCreature()->GetStateComponent()->GetState();
-	float Defense = DefenseComponent->Defense;
-	float ElementMultiplier = UElementSetting::GetElementRestrainMultiplier(POAttackAttributeComponent->Element, DefenseElement);
-	float OtherStateMultiplier = UStateComponent::CalCreatureStateDamageMultiplier(PackObjectState, OtherState);
-	float OwnerStateMultiplier = UStateComponent::CalItemCreatureStateDamageMultiplier(OwnerState, PackObjectState);
-	float BlueDensity = 0.0f;
-	ACreature* OwnerCreature = SelfPackObejct->GetOwnerCreature();
-	if (OwnerCreature)
-		BlueDensity = OwnerCreature->GetBlueComponent()->GetBlueDensity();
-	float Damage = BaseDamage * DamageMultiplier * ElementMultiplier / Defense * OtherStateMultiplier * OwnerStateMultiplier*BlueDensity;
-
-	if (IsTest)
-		UE_LOG(LogTemp, Warning, TEXT("BaseDamage:%f,DamageMultiplier:%f,ElementMultiplier:%f,Defense:%f,OtherStateMultiplier:%f,OwnerStateMultiplier:%f,BlueDensity:%f,Damage:%f"), BaseDamage, DamageMultiplier, ElementMultiplier, Defense, OtherStateMultiplier, OwnerStateMultiplier, BlueDensity, Damage);
-	return Damage;
+	float Result = AttackerInfo.BaseDamage * AttackerInfo.DamageMultiplier * UElementSetting::GetElementRestrainMultiplier(AttackerInfo.Element, DefenderInfo.Element) / DefenderInfo.Defense * UStateComponent::CalCreatureStateDamageMultiplier(AttackerInfo.State, DefenderInfo.State) * UStateComponent::CalItemCreatureStateDamageMultiplier(AttackerInfo.OwnerState, AttackerInfo.State) * AttackerInfo.BlueDensity;
+	return Result;
 }
 
 
@@ -110,35 +82,71 @@ EInterruptDir UCalAttackLibrary::CalculateInterruptDir(AActor* SelfActor,AActor*
 }
 
 
-
-FAttackReturnValue UCalAttackLibrary::CalculateAttack( APackObject* SelfPackObejct, ACreature* OtherCreature,  float DamageMultiplier)
+FAttackReturnValue UCalAttackLibrary::CalculateAttack(FAttackerInfo AttackerInfo, FDefenderInfo DefenderInfo, AActor* SelfActor, AActor* OtherActor)
 {
-	return CalculateAttack(SelfPackObejct, OtherCreature->GetDefenseComponent(), OtherCreature->GetStateComponent()->GetState(), OtherCreature->GetHealthComponent(), DamageMultiplier);
-}
-
-FAttackReturnValue UCalAttackLibrary::CalculateAttack(APackObject* SelfPackObejct, UDefenseComponent* DefenseComponent, FState OtherState, UHealthComponent* HealthComponent, float DamageMultiplier)
-{
-	if (!SelfPackObejct || !DefenseComponent || !HealthComponent)
-	{
-		return FAttackReturnValue();
-	}
-	if (SelfPackObejct->GetEquipmentModeType() == EEquipmentModeType::Defense)
-	{
-		return FAttackReturnValue();
-	}
-
 	FAttackReturnValue ReturnValue;
-	UPOAttackAttributeComponent* POAttackAttributeComponent = SelfPackObejct->GetPOAttackAttributeComponent();
-	ReturnValue.Damage = CalculateDamage(SelfPackObejct, DefenseComponent,OtherState, DamageMultiplier);
-	ReturnValue.InterruptDir = CalculateInterruptDir(SelfPackObejct, DefenseComponent->GetOwner());
-	ReturnValue.InterruptType = CalculateInterrupt(POAttackAttributeComponent->InterruptAblity, ReturnValue.Damage / HealthComponent->GetMaxValue(), DefenseComponent->AvoidAblity, DefenseComponent->StartToBeInterruptedPercent);
+	ReturnValue.Damage = CalculateDamage(AttackerInfo, DefenderInfo);
+	ReturnValue.InterruptDir = CalculateInterruptDir(SelfActor, OtherActor);
+	ReturnValue.InterruptType = CalculateInterrupt(AttackerInfo.InterruptAblity, DefenderInfo.AvoidAblity);
 	if (IsTest)
 		UE_LOG(LogTemp, Warning, TEXT("Damage:%f,InterruptType:%d,InterruptDir:%d"), ReturnValue.Damage, ReturnValue.InterruptType, ReturnValue.InterruptDir);
 	return ReturnValue;
 
 }
 
-FAttackReturnValue UCalAttackLibrary::CalculateAttack(APackObject* SelfPackObejct, UPODefenseComponent* DefenseComponent, FState OtherState, float DamageMultiplier)
+FAttackerInfo UCalAttackLibrary::CreateAttackerInfo(UAttackAttributeComponent* AttackAttributeComponent, float DamageMultiplier)
 {
-	return CalculateAttack(SelfPackObejct, DefenseComponent->GetDefenseComponent(), OtherState, DefenseComponent->GetHealthComponent(), DamageMultiplier);
+	FAttackerInfo AttackerInfo;
+	AttackerInfo.BaseDamage = AttackAttributeComponent->BaseDamage;
+	AttackerInfo.DamageMultiplier = DamageMultiplier;
+	AttackerInfo.Element = AttackAttributeComponent->Element;
+	AttackerInfo.InterruptAblity = AttackAttributeComponent->InterruptAblity;
+	AActor* Owner = AttackAttributeComponent->GetOwner();
+	if (Owner)
+	{
+		ACreature* Creature = Cast<ACreature>(Owner);
+		if (Creature)
+		{
+			AttackerInfo.State = Creature->GetStateComponent()->GetState();
+			AttackerInfo.OwnerState = Creature->GetStateComponent()->GetState();
+			AttackerInfo.BlueDensity = Creature->GetBlueComponent()->GetBlueDensity();
+		}
+		else 
+		{
+			APackObject* PackObject = Cast<APackObject>(Owner);
+			if (PackObject)
+			{
+				AttackerInfo.State = PackObject->GetStateComponent()->GetState();
+				AttackerInfo.OwnerState = PackObject->GetOwnerCreature()->GetStateComponent()->GetState();
+				AttackerInfo.BlueDensity = PackObject->GetOwnerCreature()->GetBlueComponent()->GetBlueDensity();
+			}
+		}
+	}
+	return AttackerInfo;
 }
+
+FDefenderInfo UCalAttackLibrary::CreateDefenderInfo(UDefenseComponent* DefenseComponent)
+{
+	FDefenderInfo DefenderInfo;
+	DefenderInfo.Defense = DefenseComponent->Defense;
+	DefenderInfo.Element = DefenseComponent->DefenseElement;
+	DefenderInfo.AvoidAblity = DefenseComponent->AvoidAblity;
+	AActor* Owner = DefenseComponent->GetOwner();
+	if (Owner)
+	{
+		ACreature* Creature = Cast<ACreature>(Owner);
+		if (Creature)
+		{
+			DefenderInfo.State = Creature->GetStateComponent()->GetState();
+		}
+		else
+		{
+			APackObject* PackObject = Cast<APackObject>(Owner);
+			if (PackObject)
+			{
+				DefenderInfo.State = PackObject->GetStateComponent()->GetState();
+			}
+		}
+	}
+}
+

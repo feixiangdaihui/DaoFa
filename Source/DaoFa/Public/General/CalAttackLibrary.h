@@ -8,6 +8,12 @@
 
 #include"General/StateComponent.h"
 #include "CalAttackLibrary.generated.h"
+
+
+class APackObject;
+class UDefenseComponent;
+class UHealthComponent;
+class UPODefenseComponent;
 USTRUCT(BlueprintType)
 struct FAttackReturnValue
 {
@@ -23,10 +29,44 @@ public:
 	EInterruptDir InterruptDir;
 };
 
-class APackObject;
-class UDefenseComponent;
-class UHealthComponent;
-class UPODefenseComponent;
+USTRUCT(BlueprintType)
+struct FAttackerInfo
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(BlueprintReadWrite, Category = "Attack")
+	FState State;
+	UPROPERTY(BlueprintReadWrite, Category = "Attack")
+	FState OwnerState;
+	UPROPERTY(BlueprintReadWrite, Category = "Attack")
+	float BlueDensity;
+	UPROPERTY(BlueprintReadWrite, Category = "Attack")
+	float DamageMultiplier;	//DamageMultiplier是类似重击所带的倍率，也可以是虚弱状态所带的倍率，物品和角色原本自带的倍率已经算在内
+	UPROPERTY(BlueprintReadWrite, Category = "Attack")
+	float BaseDamage;
+	UPROPERTY(BlueprintReadWrite, Category = "Attack")
+	GElement Element;
+	UPROPERTY(BlueprintReadWrite, Category = "Attack")
+	EInterruptAblity InterruptAblity;
+};
+
+USTRUCT(BlueprintType)
+struct FDefenderInfo
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(BlueprintReadWrite, Category = "Attack")
+	FState State;
+	UPROPERTY(BlueprintReadWrite, Category = "Attack")
+	float Defense;
+	UPROPERTY(BlueprintReadWrite, Category = "Attack")
+	GElement Element;
+	UPROPERTY(BlueprintReadWrite, Category = "Attack")	
+	EAvoidInterruptAblity AvoidAblity;
+};
+
+
+
 /**
  * 
  */
@@ -37,13 +77,11 @@ class DAOFA_API UCalAttackLibrary : public UBlueprintFunctionLibrary
 
 private:
 	UFUNCTION(BlueprintCallable, Category = "Attack")
-	static EInterruptType CalculateInterrupt(EInterruptAblity InterruptAblity,float ActualDamagePercent, EAvoidInterruptAblity AvoidAblity, float StartToBeInterruptedPercent);
+	static EInterruptType CalculateInterrupt(EInterruptAblity InterruptAblity, EAvoidInterruptAblity AvoidAblity);
+
 
 	//计算公式：攻击力*角色与法宝不匹配度带来的伤害倍率*境界差异带来的伤害倍率/对方的防御力*元素克制倍率*灵力密度
-	static  float CalculateDamage(APackObject* SelfPackObejct, ACreature* OtherCreature,float DamageMultiplier);
-
-	UFUNCTION(BlueprintCallable, Category = "Attack")
-	static  float CalculateDamage(APackObject* SelfPackObejct, UDefenseComponent* DefenseComponent, FState OtherState,float DamageMultiplier);
+	static  float CalculateDamage(FAttackerInfo AttackerInfo, FDefenderInfo DefenderInfo);
 
 	UFUNCTION(BlueprintCallable, Category = "Attack")
 	static EInterruptDir CalculateInterruptDir(AActor* SelfActor,AActor* OtherActor);
@@ -51,12 +89,15 @@ private:
 	static bool IsTest;
 
 public:
-	//DamageMultiplier是类似重击所带的倍率，也可以是虚弱状态所带的倍率，物品和角色原本自带的倍率已经算在内
-	static  FAttackReturnValue CalculateAttack( APackObject* SelfPackObejct, ACreature* OtherCreature, float DamageMultiplier);
+
+	
+	UFUNCTION(BlueprintCallable, Category = "Attack")
+	static  FAttackReturnValue CalculateAttack(FAttackerInfo AttackerInfo, FDefenderInfo DefenderInfo, AActor* SelfActor, AActor* OtherActor);
 
 	UFUNCTION(BlueprintCallable, Category = "Attack")
-	static  FAttackReturnValue CalculateAttack(APackObject* SelfPackObejct, UDefenseComponent* DefenseComponent, FState OtherState, UHealthComponent* HealthComponent, float DamageMultiplier);
+	static FAttackerInfo CreateAttackerInfo(UAttackAttributeComponent* AttackAttributeComponent, float DamageMultiplier);
 
-	static  FAttackReturnValue CalculateAttack(APackObject* SelfPackObejct, UPODefenseComponent* DefenseComponent, FState OtherState, float DamageMultiplier);
+	UFUNCTION(BlueprintCallable, Category = "Attack")
+	static FDefenderInfo CreateDefenderInfo(UDefenseComponent* DefenseComponent);
 	
 };
