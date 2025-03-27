@@ -4,7 +4,7 @@
 #include "Character/Component/PackComponent/PackObject.h"
 #include "Character/Component/PackComponent/BlueCostComponent.h"
 #include "Character/BaseCharacter.h"
-#include "Character/Component/PackComponent/POAttackAttributeComponent.h"
+#include "General/AttackAttributeComponent.h"
 #include "Character/Component/PackComponent/SpellCoolComponent.h"
 #include"General/StateComponent.h"
 #include "Character/Component/PackComponent/PODefenseComponent.h"
@@ -117,22 +117,13 @@ FPackObjectInfo APackObject::GetPackObjectInfo() const
 	PackObjectInfo.SizeInPack = SizeInPack;
 	PackObjectInfo.EquipmentType = EquipmentType;
 	PackObjectInfo.EquipmentModeType = EquipmentModeType;
-	if (IsValid(POAttackAttributeComponent))
+	if (IsValid(AttackAttributeComponent))
 	{
-		PackObjectInfo.BaseDamage = POAttackAttributeComponent->BaseDamage;
-		PackObjectInfo.AttackMutiplier = POAttackAttributeComponent->AttackMutiplier;
-		PackObjectInfo.CriticalHitChance = POAttackAttributeComponent->CriticalHitChance;
-		PackObjectInfo.CriticalHitMultiplier = POAttackAttributeComponent->CriticalHitMultiplier;
-		PackObjectInfo.Element = POAttackAttributeComponent->Element;
-		PackObjectInfo.InterruptAblity = POAttackAttributeComponent->InterruptAblity;
-		PackObjectInfo.ShortPressDamageMultiplier = POAttackAttributeComponent->ShortPressDamageMultiplier;
-		PackObjectInfo.LongPressDamageMultiplier = POAttackAttributeComponent->LongPressDamageMultiplier;
+		PackObjectInfo.AttackAttributeInfo = AttackAttributeComponent->GetAttackAttributeInfo();
 	}
 	if (IsValid(PODefenseComponent))
 	{
-		PackObjectInfo.Defense = PODefenseComponent->GetDefenseComponent()->GetDefense();
-		PackObjectInfo.DefenseElement = PODefenseComponent->GetDefenseComponent()->GetDefenseElement();
-		PackObjectInfo.AvoidInterruptAblity = PODefenseComponent->GetDefenseComponent()->GetAvoidInterruptAblity();
+		PackObjectInfo.DefenseAttributeInfo = PODefenseComponent->GetDefenseComponent()->GetDefenseAttributeInfo();
 		PackObjectInfo.MaxHealth = PODefenseComponent->GetHealthComponent()->GetMaxValue();
 		PackObjectInfo.CurrentHealth = PODefenseComponent->GetHealthComponent()->GetCurrentValue();
 

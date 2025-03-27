@@ -9,6 +9,8 @@
 #include "General/ElementSetting.h"
 #include "Character/Component/PackComponent/PODefenseComponent.h"
 #include "Character/Component/AttributeComponent/BlueComponent.h"
+#include "Character/Component/PackComponent/PackObject.h"
+
 
 
 bool UCalAttackLibrary::IsTest = false;
@@ -44,8 +46,28 @@ EInterruptType UCalAttackLibrary::CalculateInterrupt(EInterruptAblity InterruptA
 
 float UCalAttackLibrary::CalculateDamage(FAttackerInfo AttackerInfo, FDefenderInfo DefenderInfo)
 {
-	float Result = AttackerInfo.BaseDamage * AttackerInfo.DamageMultiplier * UElementSetting::GetElementRestrainMultiplier(AttackerInfo.Element, DefenderInfo.Element) / DefenderInfo.Defense * UStateComponent::CalCreatureStateDamageMultiplier(AttackerInfo.State, DefenderInfo.State) * UStateComponent::CalItemCreatureStateDamageMultiplier(AttackerInfo.OwnerState, AttackerInfo.State) * AttackerInfo.BlueDensity;
+
+	float ElementRestrainMultiplier = UElementSetting::GetElementRestrainMultiplier(AttackerInfo.Element, DefenderInfo.Element);
+	float StateDamageMultiplier = UStateComponent::CalCreatureStateDamageMultiplier(AttackerInfo.State, DefenderInfo.State);
+	float AttackNum = CalculateAttackNum(AttackerInfo);
+	float DefenseNum = CalculateDefenseNum(DefenderInfo);
+	float Result = AttackNum * ElementRestrainMultiplier * StateDamageMultiplier / DefenseNum;
 	return Result;
+}
+
+float UCalAttackLibrary::CalculateAttackNum(FAttackerInfo AttackerInfo)
+{
+	float BaseDamage = AttackerInfo.BaseDamage;
+	float DamageMultiplier = AttackerInfo.DamageMultiplier;
+	float BlueDensity = AttackerInfo.BlueDensity;
+	float StateDamageMultiplier = UStateComponent::CalCreatureStateDamageMultiplier(AttackerInfo.State, AttackerInfo.OwnerState);
+	return BaseDamage * DamageMultiplier * StateDamageMultiplier * BlueDensity;
+}
+
+float UCalAttackLibrary::CalculateDefenseNum(FDefenderInfo DefenderInfo)
+{
+	float Defense = DefenderInfo.Defense;
+	return Defense;
 }
 
 
@@ -94,11 +116,11 @@ FAttackReturnValue UCalAttackLibrary::CalculateAttack(FAttackerInfo AttackerInfo
 
 }
 
-FAttackerInfo UCalAttackLibrary::CreateAttackerInfo(UAttackAttributeComponent* AttackAttributeComponent, float DamageMultiplier)
+FAttackerInfo UCalAttackLibrary::CreateAttackerInfo(UAttackAttributeComponent* AttackAttributeComponent)
 {
 	FAttackerInfo AttackerInfo;
 	AttackerInfo.BaseDamage = AttackAttributeComponent->BaseDamage;
-	AttackerInfo.DamageMultiplier = DamageMultiplier;
+	AttackerInfo.DamageMultiplier = AttackAttributeComponent->DamageMultiplier;
 	AttackerInfo.Element = AttackAttributeComponent->Element;
 	AttackerInfo.InterruptAblity = AttackAttributeComponent->InterruptAblity;
 	AActor* Owner = AttackAttributeComponent->GetOwner();
@@ -148,5 +170,8 @@ FDefenderInfo UCalAttackLibrary::CreateDefenderInfo(UDefenseComponent* DefenseCo
 			}
 		}
 	}
+	return DefenderInfo;
 }
+
+
 

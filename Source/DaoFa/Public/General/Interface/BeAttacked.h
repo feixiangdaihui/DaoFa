@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
+#include "General/CalAttackLibrary.h"
 #include "BeAttacked.generated.h"
 class APackObject;
 // This class does not need to be modified.
@@ -23,5 +24,8 @@ class DAOFA_API IBeAttacked
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 
-	virtual void BeAttacked(APackObject* PackObject, float DamageMultiplier) = 0;
+	virtual void BeAttacked(FAttackReturnValue AttackReturnValue) = 0;
+
+	virtual FDefenderInfo GetDefenderInfo() = 0;
+	
 };

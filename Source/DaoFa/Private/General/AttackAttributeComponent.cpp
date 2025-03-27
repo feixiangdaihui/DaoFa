@@ -2,7 +2,8 @@
 
 
 #include "General/AttackAttributeComponent.h"
-
+#include "General/CalAttackLibrary.h"
+#include "General/Interface/BeAttacked.h"
 
 // Sets default values for this component's properties
 UAttackAttributeComponent::UAttackAttributeComponent()
@@ -32,6 +33,67 @@ void UAttackAttributeComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 
 	// ...
 }
+
+
+void UAttackAttributeComponent::SetDamageMultiplier(float Multiplier, bool bIsPermanent, float Duration)
+{
+	if (bIsPermanent)
+	{
+		DamageMultiplier = Multiplier;
+	}
+	else
+	{
+		float Temp = DamageMultiplier;
+		DamageMultiplier = Multiplier;
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, Temp]() { DamageMultiplier = Temp; }, Duration, false);
+	}
+}
+
+void UAttackAttributeComponent::MultiplyDamageMultiplier(float Multiplier, bool bIsPermanent, float Duration)
+{
+	if (bIsPermanent)
+	{
+		DamageMultiplier *= Multiplier;
+	}
+	else
+	{
+		float Temp = DamageMultiplier;
+		DamageMultiplier *= Multiplier;
+		FTimerHandle TimerHandle;
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, Temp]() { DamageMultiplier = Temp; }, Duration, false);
+	}
+}
+
+void UAttackAttributeComponent::Attack(IBeAttacked* BeAttacked)
+{
+	if(AActor* Other=Cast<AActor>(BeAttacked))
+	{
+		FAttackReturnValue ReturnValue = UCalAttackLibrary::CalculateAttack(UCalAttackLibrary::CreateAttackerInfo(this), BeAttacked->GetDefenderInfo(), GetOwner(), Other);
+		BeAttacked->BeAttacked(ReturnValue);
+	}
+}
+
+void UAttackAttributeComponent::AttackByAttackerInfo(FAttackerInfo AttackerInfo, IBeAttacked* BeAttacked)
+{
+	if (AActor* Other = Cast<AActor>(BeAttacked))
+	{
+		FAttackReturnValue ReturnValue = UCalAttackLibrary::CalculateAttack(AttackerInfo, BeAttacked->GetDefenderInfo(), nullptr, Other);
+		BeAttacked->BeAttacked(ReturnValue);
+	}
+}
+
+FAttackAttributeInfo UAttackAttributeComponent::GetAttackAttributeInfo()
+{
+	FAttackAttributeInfo Info;
+	Info.BaseDamage = BaseDamage;
+	Info.CriticalHitChance = CriticalHitChance;
+	Info.CriticalHitMultiplier = CriticalHitMultiplier;
+	Info.Element = Element;
+	Info.InterruptAblity = InterruptAblity;
+	return Info;
+}
+
 
 
 

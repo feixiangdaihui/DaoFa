@@ -8,6 +8,21 @@
 #include "DefenseComponent.generated.h"
 
 
+
+USTRUCT(BlueprintType)
+struct FDefenseAttributeInfo
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(BlueprintReadWrite, Category = "Attack")
+	float Defense;
+	UPROPERTY(BlueprintReadWrite, Category = "Attack")
+	GElement Element;
+	UPROPERTY(BlueprintReadWrite, Category = "Attack")
+	EAvoidInterruptAblity AvoidAblity;
+};
+
+
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class DAOFA_API UDefenseComponent : public UActorComponent, public ISetValueInterface
 {
@@ -96,6 +111,13 @@ public:
 	};
 
 
-
+	FDefenseAttributeInfo GetDefenseAttributeInfo()
+	{
+		FDefenseAttributeInfo DefenseAttributeInfo;
+		DefenseAttributeInfo.Defense = Defense;
+		DefenseAttributeInfo.Element = DefenseElement;
+		DefenseAttributeInfo.AvoidAblity = AvoidAblity;
+		return DefenseAttributeInfo;
+	}
 
 };

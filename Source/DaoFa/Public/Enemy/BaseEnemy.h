@@ -6,8 +6,6 @@
 #include "Creature.h"
 #include "BaseEnemy.generated.h"
 
-class APackObject;
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttacked,APackObject*,Attacker);
 class UEnemyController;
 /**
  * 
@@ -25,14 +23,11 @@ protected:
 
 
 public:
-	UPROPERTY(BlueprintAssignable, Category = "Enemy")
-	FOnAttacked OnAttacked;
 
 	UFUNCTION(BlueprintCallable, Category = "Enemy")
 	FText GetName() const { return Name; }
 
 	ABaseEnemy();
 	
-	virtual void BeAttacked(APackObject* PackObject, float DamageMultiplier) override;
 
 };

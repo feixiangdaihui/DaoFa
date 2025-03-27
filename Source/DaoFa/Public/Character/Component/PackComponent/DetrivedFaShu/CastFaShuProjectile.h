@@ -2,11 +2,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "General/Interface/Attacker.h"
 #include "CastFaShuProjectile.generated.h"
 
 
 //overlap委托
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnProjectileHit, AActor*, OverlappedActorr, AActor*, OtherActor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnProjectileHit, ACastFaShuProjectile*, FaShuProjectile, AActor*, OtherActor, UPrimitiveComponent*, OtherComp, const FHitResult&, SweepResult);
 
 
 class UProjectileMovementComponent;
@@ -14,7 +15,7 @@ class UCapsuleComponent;
 class UNiagaraComponent;
 class UNiagaraSystem;
 UCLASS()
-class DAOFA_API ACastFaShuProjectile : public AActor
+class DAOFA_API ACastFaShuProjectile : public AActor, public IAttacker
 {
 	GENERATED_BODY()
 
@@ -51,6 +52,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CastFaShu")
 	float EndNiagaraTime = 1.0f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CastFaShu")
+	EAttackerType AttackerType = EAttackerType::BLOCK;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CastFaShu")
+	FAttackerInfo AttackerInfo;
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -58,7 +65,14 @@ public:
 	UProjectileMovementComponent* GetProjectileMovementComponent() const { return ProjectileMovementComponent; }
 	UCapsuleComponent* GetCapsuleComponent() const { return CapsuleComponent; }
 
-	void BeginSpell(FVector EndLocation, float Speed,float MaxDistance);
+	void BeginSpell(FVector EndLocation, float Speed, float MaxDistance, FAttackerInfo InAttackerInfo);
+
+	void Explode(const FVector& HitLocation);
+
+	virtual FAttackerInfo GetAttackerInfo() override { return AttackerInfo; }
+
+	virtual EAttackerType GetAttackerType() override { return AttackerType; }
+
 
 	
 };

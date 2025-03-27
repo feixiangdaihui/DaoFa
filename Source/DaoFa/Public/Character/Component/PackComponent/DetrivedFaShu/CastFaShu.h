@@ -57,7 +57,8 @@ protected:
 	virtual AActor* FindTarget();
 
 	UFUNCTION()
-	void OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor);
+	void OnOverlapBegin(ACastFaShuProjectile* FaShuProjectile, AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult& SweepResult);
+
 
 
 

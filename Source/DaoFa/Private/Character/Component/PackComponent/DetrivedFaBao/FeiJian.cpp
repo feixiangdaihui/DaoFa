@@ -11,7 +11,7 @@
 #include "Character/Component/PackComponent/SpellCoolComponent.h"
 AFeiJian::AFeiJian()
 {
-	POAttackAttributeComponent = CreateDefaultSubobject<UPOAttackAttributeComponent>(TEXT("POAttackAttributeComponent"));
+	AttackAttributeComponent = CreateDefaultSubobject<UAttackAttributeComponent>(TEXT("AttackAttributeComponent"));
 	EquipmentModeType = EEquipmentModeType::Attack;
 
 
@@ -85,6 +85,13 @@ void AFeiJian::Tick(float DeltaTime)
 		}
 	}
 }
+
+FAttackerInfo AFeiJian::GetAttackerInfo()
+{
+	return UCalAttackLibrary::CreateAttackerInfo(AttackAttributeComponent);
+}
+
+
 
 
 void AFeiJian::TriggeredByShortPress()
@@ -184,6 +191,12 @@ void AFeiJian::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Other
 	
 	if (IsSpell)
 	{
+		//如果碰到的物体碰撞预设是WorldStatic，那么endSpell
+		if (OtherComp->GetCollisionObjectType() == ECollisionChannel::ECC_WorldStatic)
+		{
+			EndSpell();
+			return;
+		}
 		ACreature* Creature = Cast<ACreature>(OtherActor);
 		if (Creature == Owner)
 		{
@@ -194,10 +207,7 @@ void AFeiJian::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Other
 		IBeAttacked* BeAttacked = Cast<IBeAttacked>(OtherActor);
 		if (BeAttacked)
 		{
-			if (IsShortPressHurt)
-				BeAttacked->BeAttacked(this, POAttackAttributeComponent->GetShortPressDamageMultiplier());
-			else if (IsLongPressHurt)
-				BeAttacked->BeAttacked(this, POAttackAttributeComponent->GetLongPressDamageMultiplier());
+			AttackAttributeComponent->Attack(BeAttacked);
 		}
 		else
 			EndSpell();

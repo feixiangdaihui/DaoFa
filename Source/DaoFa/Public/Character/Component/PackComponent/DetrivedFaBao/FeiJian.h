@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Character/Component/PackComponent/FaBao.h"
+#include "General/Interface/Attacker.h"
 #include "FeiJian.generated.h"
 class UEnemyDetector;
 class UCapsuleComponent;
@@ -13,7 +14,7 @@ class ACreature;
  * 
  */
 UCLASS()
-class DAOFA_API AFeiJian : public AFaBao
+class DAOFA_API AFeiJian : public AFaBao, public IAttacker
 {
 	GENERATED_BODY()
 protected:
@@ -47,6 +48,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FeiJian")
 	float MaxSpellDistance = 2000;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FeiJian")
+	EAttackerType AttackerType = EAttackerType::NOBLOCK;
 
 public:
 	AFeiJian();
@@ -55,6 +58,10 @@ public:
 	virtual void BeginPlay() override;
 
 	virtual void Tick(float DeltaTime) override;
+
+	virtual FAttackerInfo GetAttackerInfo() override;
+
+	virtual EAttackerType GetAttackerType() override { return AttackerType; }
 private:
 	bool IsInHand = true;
 	bool IsLongPressHurt = false;

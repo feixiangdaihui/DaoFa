@@ -53,17 +53,20 @@ void ACreature::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 }
 
-void ACreature::BeAttacked(APackObject* PackObject, float DamageMultiplier)
-{
-	FAttackReturnValue ReturnValue = UCalAttackLibrary::CalculateAttack(PackObject, this, DamageMultiplier);
-	HealthComponent->SubtractValue(ReturnValue.Damage);
 
+void ACreature::BeAttacked(FAttackReturnValue AttackReturnValue)
+{
+	HealthComponent->SubtractValue(AttackReturnValue.Damage);
+}
+
+FDefenderInfo ACreature::GetDefenderInfo()
+{
+	return UCalAttackLibrary::CreateDefenderInfo(DefenseComponent);
 }
 
 void ACreature::SetSpeedToWalk()
 {
 	GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
-
 }
 
 void ACreature::SetSpeedToRun()

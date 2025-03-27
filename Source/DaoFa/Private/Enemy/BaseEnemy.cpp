@@ -9,8 +9,3 @@ ABaseEnemy::ABaseEnemy()
 	EnemyController = CreateDefaultSubobject<UEnemyController>(TEXT("EnemyController"));
 }
 
-void ABaseEnemy::BeAttacked(APackObject* PackObject, float DamageMultiplier)
-{
-	Super::BeAttacked(PackObject, DamageMultiplier);
-	OnAttacked.Broadcast(PackObject);
-}

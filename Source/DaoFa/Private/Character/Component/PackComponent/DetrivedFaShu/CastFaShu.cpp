@@ -8,7 +8,7 @@
 #include "Character/Component/PackComponent/SpellCoolComponent.h"
 ACastFaShu::ACastFaShu()
 {
-	POAttackAttributeComponent = CreateDefaultSubobject<UPOAttackAttributeComponent>(TEXT("POAttackAttributeComponent"));
+	AttackAttributeComponent = CreateDefaultSubobject<UAttackAttributeComponent>(TEXT("AttackAttributeComponent"));
 	EquipmentModeType = EEquipmentModeType::Attack;
 
 
@@ -41,7 +41,7 @@ void ACastFaShu::BaseCastSpell()
 				EndLocation = FindTarget()->GetActorLocation();
 			else
 				EndLocation = GetOwner()->GetActorLocation() + GetOwner()->GetActorForwardVector() * SpellMaxDistance;
-			CastFaShuProjectile->BeginSpell(EndLocation, SpellSpeed,SpellMaxDistance);
+			CastFaShuProjectile->BeginSpell(EndLocation, SpellSpeed, SpellMaxDistance, UCalAttackLibrary::CreateAttackerInfo(AttackAttributeComponent));
 			CastFaShuProjectile->OnProjectileHit.AddDynamic(this, &ACastFaShu::OnOverlapBegin);
 		}
 	}
@@ -61,14 +61,33 @@ AActor* ACastFaShu::FindTarget()
 	return nullptr;
 }
 
-void ACastFaShu::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor)
+void ACastFaShu::OnOverlapBegin(ACastFaShuProjectile* FaShuProjectile, AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult& SweepResult)
 {
-	ACreature* Creature = Cast<ACreature>(OtherActor);
-	if (Creature)
+	if (OtherComp->GetCollisionObjectType() == ECC_WorldStatic)
 	{
-		Creature->BeAttacked(this, DamageMutiplier);
+		FaShuProjectile->Explode(SweepResult.ImpactPoint);
+		return;
 	}
+	IBeAttacked* BeAttacked = Cast<IBeAttacked>(OtherActor);
+	if (BeAttacked)
+	{
+		AttackAttributeComponent->AttackByAttackerInfo(FaShuProjectile->GetAttackerInfo(), BeAttacked);
+		return;
+	}
+	IAttacker* Attacker = Cast<IAttacker>(OtherActor);
+	if (Attacker)
+	{
+		EAttackCompareType CompareType = UCompareAttackLibrary::CompareAttack(FaShuProjectile, Attacker);
+		if (CompareType!=EAttackCompareType::GREATER)
+		{
+			FaShuProjectile->Destroy();
+		}
+		return;
+	}
+	
 }
+
+
 
 
 void ACastFaShu::TriggeredByLongPress()

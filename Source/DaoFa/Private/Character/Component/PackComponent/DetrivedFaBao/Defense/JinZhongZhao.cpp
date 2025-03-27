@@ -73,11 +73,16 @@ void AJinZhongZhao::AttachToCreature(ACreature* Creature)
 	IsSpell = false;
 }
 
-void AJinZhongZhao::BeAttacked(APackObject* PackObject, float DamageMultiplier)
+void AJinZhongZhao::BeAttacked(FAttackReturnValue AttackReturnValue)
 {
-	FAttackReturnValue ReturnValue = UCalAttackLibrary::CalculateAttack(PackObject, PODefenseComponent, StateComponent->GetState(), DamageMultiplier);
-	PODefenseComponent->GetHealthComponent()->SubtractValue(ReturnValue.Damage);
-	
+	PODefenseComponent->GetHealthComponent()->SubtractValue(AttackReturnValue.Damage);
 }
+
+FDefenderInfo AJinZhongZhao::GetDefenderInfo()
+{
+	return UCalAttackLibrary::CreateDefenderInfo(PODefenseComponent->GetDefenseComponent());
+}
+
+
 
 

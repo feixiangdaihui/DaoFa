@@ -4,8 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
-#include "Character/Component/PackComponent/PackObject.h"
-
+#include "General/ElementSetting.h"
 #include"General/StateComponent.h"
 #include "CalAttackLibrary.generated.h"
 
@@ -80,8 +79,7 @@ private:
 	static EInterruptType CalculateInterrupt(EInterruptAblity InterruptAblity, EAvoidInterruptAblity AvoidAblity);
 
 
-	//计算公式：攻击力*角色与法宝不匹配度带来的伤害倍率*境界差异带来的伤害倍率/对方的防御力*元素克制倍率*灵力密度
-	static  float CalculateDamage(FAttackerInfo AttackerInfo, FDefenderInfo DefenderInfo);
+
 
 	UFUNCTION(BlueprintCallable, Category = "Attack")
 	static EInterruptDir CalculateInterruptDir(AActor* SelfActor,AActor* OtherActor);
@@ -89,15 +87,20 @@ private:
 	static bool IsTest;
 
 public:
-
+	//计算公式：攻击力*角色与法宝不匹配度带来的伤害倍率*境界差异带来的伤害倍率/对方的防御力*元素克制倍率*灵力密度
+	static  float CalculateDamage(FAttackerInfo AttackerInfo, FDefenderInfo DefenderInfo);
 	
+	static float CalculateAttackNum(FAttackerInfo AttackerInfo);
+
+	static float CalculateDefenseNum(FDefenderInfo DefenderInfo);
+
 	UFUNCTION(BlueprintCallable, Category = "Attack")
 	static  FAttackReturnValue CalculateAttack(FAttackerInfo AttackerInfo, FDefenderInfo DefenderInfo, AActor* SelfActor, AActor* OtherActor);
 
 	UFUNCTION(BlueprintCallable, Category = "Attack")
-	static FAttackerInfo CreateAttackerInfo(UAttackAttributeComponent* AttackAttributeComponent, float DamageMultiplier);
+	static FAttackerInfo CreateAttackerInfo(UAttackAttributeComponent* AttackAttributeComponent);
 
 	UFUNCTION(BlueprintCallable, Category = "Attack")
 	static FDefenderInfo CreateDefenderInfo(UDefenseComponent* DefenseComponent);
-	
+
 };

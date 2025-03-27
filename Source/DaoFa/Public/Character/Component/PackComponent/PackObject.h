@@ -4,7 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Character/Component/PackComponent/POAttackAttributeComponent.h"
+#include "General/AttackAttributeComponent.h"
+#include "General/DefenseComponent.h"
 #include "PackObject.generated.h"
 class UBlueCostComponent;
 class UAttackAttributeComponent;
@@ -63,37 +64,10 @@ public:
 	EEquipmentModeType EquipmentModeType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
-	float BaseDamage;
+	FAttackAttributeInfo AttackAttributeInfo;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
-	float AttackMutiplier;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
-	float CriticalHitChance;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
-	float CriticalHitMultiplier;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
-	GElement Element;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
-	EInterruptAblity InterruptAblity;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
-	float ShortPressDamageMultiplier;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
-	float LongPressDamageMultiplier;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
-	float Defense;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
-	GElement DefenseElement;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
-	EAvoidInterruptAblity AvoidInterruptAblity;
+	FDefenseAttributeInfo DefenseAttributeInfo;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
 	float MaxHealth = 100.0f;
@@ -143,7 +117,7 @@ protected:
 	TObjectPtr<UBlueCostComponent> BlueCostComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
-	TObjectPtr<UPOAttackAttributeComponent> POAttackAttributeComponent;
+	TObjectPtr<UAttackAttributeComponent> AttackAttributeComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
 	TObjectPtr<UPODefenseComponent> PODefenseComponent;
@@ -226,8 +200,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "PackObject")
 	FPackObjectInfo GetPackObjectInfo() const;
 
-	UFUNCTION(BlueprintCallable, Category = "PackObject")
-	UPOAttackAttributeComponent* GetPOAttackAttributeComponent() { return POAttackAttributeComponent; } 
+	UAttackAttributeComponent* GetAttackAttributeComponent() { return AttackAttributeComponent; }
 
 	UFUNCTION(BlueprintCallable, Category = "PackObject")
 	UStateComponent* GetStateComponent() { return StateComponent; }

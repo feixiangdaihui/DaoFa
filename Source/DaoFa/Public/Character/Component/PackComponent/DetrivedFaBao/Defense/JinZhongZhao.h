@@ -39,7 +39,9 @@ public:
 	virtual void AttachToCreature(ACreature* Creature) override;
 
 
-	virtual void BeAttacked(APackObject* PackObject, float DamageMultiplier) override;
+	virtual void BeAttacked(FAttackReturnValue AttackReturnValue) override;
+
+	virtual FDefenderInfo GetDefenderInfo() override;
 
 
 

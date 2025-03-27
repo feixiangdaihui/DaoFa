@@ -38,14 +38,7 @@ ACastFaShuProjectile::ACastFaShuProjectile()
 
 void ACastFaShuProjectile::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	//获取碰撞到的最终位置
-	FVector HitLocation = SweepResult.ImpactPoint;
-	if (EndNiagaraSystem)
-	{
-		UNiagaraComponent* NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), EndNiagaraSystem, HitLocation, GetActorRotation());
-	}
-	OnProjectileHit.Broadcast(this, OtherActor);
-	Destroy();
+	OnProjectileHit.Broadcast(this, OtherActor, OtherComp, SweepResult);
 }
 
 
@@ -60,15 +53,26 @@ void ACastFaShuProjectile::Tick(float DeltaTime)
 
 }
 
-void ACastFaShuProjectile::BeginSpell(FVector EndLocation, float Speed, float MaxDistance)
+
+
+void ACastFaShuProjectile::BeginSpell(FVector EndLocation, float Speed, float MaxDistance, FAttackerInfo InAttackerInfo)
 {
 	SetActorRotation((EndLocation - GetActorLocation()).Rotation());
 	ProjectileMovementComponent->Velocity = (EndLocation - GetActorLocation()).GetSafeNormal() * Speed;
 	SpellMaxDistance = MaxDistance;
 	StartLocation = GetActorLocation();
 	ProjectileMovementComponent->Activate();
-
-
+	AttackerInfo = InAttackerInfo;
 }
+
+void ACastFaShuProjectile::Explode(const FVector& HitLocation)
+{
+	if (EndNiagaraSystem)
+	{
+		UNiagaraComponent* NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), EndNiagaraSystem, HitLocation, GetActorRotation());
+	}
+	Destroy();
+}
+
 
 

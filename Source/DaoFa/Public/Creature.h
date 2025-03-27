@@ -78,7 +78,8 @@ public:
 	UCreatureBehavior* GetCreatureBehavior()const { return CreatureBehavior.Get(); }
 	UGongFaComponent* GetGongFaComponent()const { return GongFaComponent.Get(); }
 
-	virtual void BeAttacked(APackObject* PackObject, float DamageMultiplier) override;
+	virtual void BeAttacked(FAttackReturnValue AttackReturnValue) override;
+	virtual FDefenderInfo GetDefenderInfo() override;
 
 	UFUNCTION()
 	void SetSpeedToWalk();
