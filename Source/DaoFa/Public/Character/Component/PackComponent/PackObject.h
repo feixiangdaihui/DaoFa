@@ -95,7 +95,7 @@ protected:
 
 	//物品的名字
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
-	FText Name;
+	FText ObjectName;
 
 
 	//物品的描述
@@ -173,6 +173,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "PackObject")
 	virtual void AttachToCreature(class ACreature* Creature);
 
+	void AttachToCreatureByActor(AActor* Actor);
+
 
 	UFUNCTION(BlueprintCallable, Category = "PackObject")
 	bool GetCanBeWearOrTakeOff() { return CanBeWearOrTakeOff; }
@@ -199,6 +201,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "PackObject")
 	FPackObjectInfo GetPackObjectInfo() const;
+
+	UFUNCTION(BlueprintCallable, Category = "PackObject")
+	FText GetObjectName() const { return ObjectName; }
 
 	UAttackAttributeComponent* GetAttackAttributeComponent() { return AttackAttributeComponent; }
 

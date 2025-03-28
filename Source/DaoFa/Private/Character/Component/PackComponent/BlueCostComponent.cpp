@@ -4,6 +4,7 @@
 #include "Character/Component/PackComponent/BlueCostComponent.h"
 #include "Creature.h"
 #include "Character/Component/AttributeComponent/BlueComponent.h"
+#include "Character/Component/PackComponent/PackObject.h"
 
 
 // Sets default values for this component's properties
@@ -21,11 +22,10 @@ UBlueCostComponent::UBlueCostComponent()
 void UBlueCostComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	AActor* CreatureActor = GetOwner()->GetOwner();
-	ACreature* Creature = Cast<ACreature>(CreatureActor);
-	if (Creature)
+	OwnerPackObject = Cast<APackObject>(GetOwner());
+	if(!OwnerPackObject)
 	{
-		BlueValue = Creature->GetBlueComponent();
+		UE_LOG(LogTemp, Error, TEXT("%s OwnerPackObject is nullptr"), *this->GetName());
 	}
 
 	// ...
@@ -46,11 +46,25 @@ void UBlueCostComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 
 bool UBlueCostComponent::ShortPressCostBlue()
 {
-	return BlueValue->SubtractValue(ShortPressBlueCost);
+	if(ACreature* OwnerCreature= OwnerPackObject->GetOwnerCreature())
+	{
+		if (UBlueComponent* BlueComponent = OwnerCreature->GetBlueComponent())
+		{
+			return BlueComponent->SubtractValue(ShortPressBlueCost);
+		}
+	}
+	return false;
 }
 bool UBlueCostComponent::LongPressCostBlue()
 {
-	return BlueValue->SubtractValue(LongPressBlueCost);
+	if (ACreature* OwnerCreature = OwnerPackObject->GetOwnerCreature())
+	{
+		if (UBlueComponent* BlueComponent = OwnerCreature->GetBlueComponent())
+		{
+			return BlueComponent->SubtractValue(LongPressBlueCost);
+		}
+	}
+	return false;
 }
 
 
@@ -59,10 +73,19 @@ void UBlueCostComponent::OngoingCostBlue()
 {
     if (OngoingMode)
     {
-        if (BlueValue->SubtractValue(OngoingBlueCost))
-        {
-			GetWorld()->GetTimerManager().SetTimer(OngoingTimer, [this]() {BlueValue->SubtractValue(OngoingBlueCost); }, OngoingInterval, true);
-        }
+		if (ACreature* OwnerCreature = OwnerPackObject->GetOwnerCreature())
+		{
+			if (UBlueComponent* BlueComponent = OwnerCreature->GetBlueComponent())
+			{
+				GetWorld()->GetTimerManager().SetTimer(OngoingTimer, [this, BlueComponent]()
+					{if (!BlueComponent->SubtractValue(OngoingBlueCost))
+					{
+						OwnerPackObject->TriggeredEnd();
+						EndOngoingCostBlue();
+					}
+						; }, OngoingInterval, true);
+			}
+		}
     }
 }
 

@@ -24,12 +24,6 @@ APackObject::APackObject()
 void APackObject::BeginPlay()
 {
 	Super::BeginPlay();
-	OwnerCreature = Cast<ACreature>(GetOwner());
-	if (!OwnerCreature)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("OwnerCreature is nullptr"));
-	}
-	
 
 }
 
@@ -42,9 +36,25 @@ void APackObject::Tick(float DeltaTime)
 
 void APackObject::AttachToCreature(ACreature* Creature)
 {
+	SetOwner(Creature);
 	AttachToActor(Creature, FAttachmentTransformRules::SnapToTargetIncludingScale);
 	OwnerCreature = Creature;
 }
+
+void APackObject::AttachToCreatureByActor(AActor* Actor)
+{
+	ACreature* Temp = Cast<ACreature>(Actor);
+	if (!Temp)
+	{
+		AttachToActor(Actor, FAttachmentTransformRules::SnapToTargetIncludingScale);
+		SetOwner(Actor);
+		//打印类名
+		UE_LOG(LogTemp, Warning, TEXT("AttachToCreatureByActor %s ,NULL"), *Actor->GetClass()->GetName());
+	}
+	AttachToCreature(Temp);
+}
+
+
 
 bool APackObject::TriggeredBegin()
 {
@@ -111,7 +121,7 @@ FPackObjectInfo APackObject::GetPackObjectInfo() const
 {
 	FPackObjectInfo PackObjectInfo;
 	PackObjectInfo.Icon = Icon;
-	PackObjectInfo.Name = Name;
+	PackObjectInfo.Name = ObjectName;
 	PackObjectInfo.Description = Description;
 	PackObjectInfo.Quantity = Quantity;
 	PackObjectInfo.SizeInPack = SizeInPack;

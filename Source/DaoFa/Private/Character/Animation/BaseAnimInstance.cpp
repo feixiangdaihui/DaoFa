@@ -2,7 +2,7 @@
 
 
 #include "Character/Animation/BaseAnimInstance.h"
-#include "Character/BaseCharacter.h"
+#include "Creature.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 
@@ -28,7 +28,7 @@ TSet<InputAnimation> UBaseAnimInstance::FlexibleState = { InputAnimation::Run, I
 //Input==NONE时表示中止当前蒙太奇动画
 void UBaseAnimInstance::UpdateInput(InputAnimation Input)
 {
-	if (OwnerCharacter)
+	if (OwnerCreature)
 	{
 
 		if (FlexibleState.Contains(Input))
@@ -49,7 +49,7 @@ void UBaseAnimInstance::UpdateInput(InputAnimation Input)
 
 bool UBaseAnimInstance::CheckInput(InputAnimation Input)
 {
-	if (OwnerCharacter)
+	if (OwnerCreature)
 	{
 		if (CurrentMontageState != InputAnimation::NONE && !InputBlendAgree[CurrentMontageState].Contains(Input))
 			return false;
@@ -61,10 +61,10 @@ bool UBaseAnimInstance::CheckInput(InputAnimation Input)
 void UBaseAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
-	if (OwnerCharacter)
+	if (OwnerCreature)
 	{
-		ZVelocity = OwnerCharacter->GetCharacterMovement()->Velocity.Z;
-		IsFalling = OwnerCharacter->GetCharacterMovement()->IsFalling();
+		ZVelocity = OwnerCreature->GetCharacterMovement()->Velocity.Z;
+		IsFalling = OwnerCreature->GetCharacterMovement()->IsFalling();
 		if(!IsFalling&& CurrentMontageState == InputAnimation::Jump)
 			CurrentMontageState = InputAnimation::NONE;
 		
@@ -74,7 +74,7 @@ void UBaseAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 void UBaseAnimInstance::NativeBeginPlay()
 {
 	Super::NativeBeginPlay();
-	OwnerCharacter = Cast<ABaseCharacter>(GetOwningActor());
+	OwnerCreature = Cast<ACreature>(GetOwningActor());
 }
 
 

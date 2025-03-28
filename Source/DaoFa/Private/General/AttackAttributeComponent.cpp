@@ -69,7 +69,7 @@ void UAttackAttributeComponent::Attack(IBeAttacked* BeAttacked)
 {
 	if(AActor* Other=Cast<AActor>(BeAttacked))
 	{
-		FAttackReturnValue ReturnValue = UCalAttackLibrary::CalculateAttack(UCalAttackLibrary::CreateAttackerInfo(this), BeAttacked->GetDefenderInfo(), GetOwner(), Other);
+		FAttackReturnValue ReturnValue = UCalAttackLibrary::CalculateAttack(UCalAttackLibrary::CreateAttackerInfo(this), BeAttacked->GetDefenderInfo());
 		BeAttacked->BeAttacked(ReturnValue);
 	}
 }
@@ -78,7 +78,7 @@ void UAttackAttributeComponent::AttackByAttackerInfo(FAttackerInfo AttackerInfo,
 {
 	if (AActor* Other = Cast<AActor>(BeAttacked))
 	{
-		FAttackReturnValue ReturnValue = UCalAttackLibrary::CalculateAttack(AttackerInfo, BeAttacked->GetDefenderInfo(), nullptr, Other);
+		FAttackReturnValue ReturnValue = UCalAttackLibrary::CalculateAttack(AttackerInfo, BeAttacked->GetDefenderInfo());
 		BeAttacked->BeAttacked(ReturnValue);
 	}
 }

@@ -13,7 +13,7 @@
  */
 
 
-class ABaseCharacter;
+class ACreature;
 
 UCLASS()
 class DAOFA_API UBaseAnimInstance : public UAnimInstance ,public IInputUpdateInterface
@@ -67,7 +67,7 @@ protected:
 	InputAnimation CurrentSequenceState= InputAnimation::Idle;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
-	TObjectPtr<ABaseCharacter> OwnerCharacter;
+	TObjectPtr<ACreature> OwnerCreature;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
 	bool IsFalling = false;

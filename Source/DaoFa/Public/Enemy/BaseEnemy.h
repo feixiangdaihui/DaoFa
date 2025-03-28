@@ -17,7 +17,7 @@ class DAOFA_API ABaseEnemy : public ACreature
 
 protected: 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
-	FText Name;
+	FText ObjectName;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
 	TObjectPtr<UEnemyController> EnemyController;
 
@@ -25,7 +25,7 @@ protected:
 public:
 
 	UFUNCTION(BlueprintCallable, Category = "Enemy")
-	FText GetName() const { return Name; }
+	FText GetObjectName() const { return ObjectName; }
 
 	ABaseEnemy();
 	

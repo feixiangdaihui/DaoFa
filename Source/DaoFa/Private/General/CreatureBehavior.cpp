@@ -32,25 +32,20 @@ void UCreatureBehavior::BeginPlay()
 	{
 		OwnerAnimInstance = Cast<UBaseAnimInstance>(OwnerCreature->GetMesh()->GetAnimInstance());
 		UPhysicalPowerComponent* OwnerPhysicalPowerComponent = OwnerCreature->GetPhysicalPowerComponent();
-		UBlueComponent* OwnerBlueComponent = OwnerCreature->GetBlueComponent();
-		if (OwnerBlueComponent)
-			OwnerBlueComponent->OnBlueEmpty.AddDynamic(this, &UCreatureBehavior::OnBlueEmpty);
-		else
-			UE_LOG(LogTemp, Error, TEXT("OwnerBlueComponent is nullptr"));
 
 		if (OwnerAnimInstance != nullptr)
 			InputUpdateInterfaces.Add(OwnerAnimInstance);
 		else
-			UE_LOG(LogTemp, Error, TEXT("OwnerAnimInstance is nullptr"));
+			UE_LOG(LogTemp, Error, TEXT("%s OwnerAnimInstance is nullptr"), *this->GetName());
 		if (OwnerPhysicalPowerComponent != nullptr)
 			InputUpdateInterfaces.Add(OwnerPhysicalPowerComponent);
 		else
-			UE_LOG(LogTemp, Error, TEXT("OwnerPhysicalPowerComponent is nullptr"));
+			UE_LOG(LogTemp, Error, TEXT("%s OwnerPhysicalPowerComponent is nullptr"), *this->GetName());
 
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("OwnerCreature is nullptr"));
+		UE_LOG(LogTemp, Error, TEXT("%s OwnerCreature is nullptr"), *this->GetName());
 	}
 
 }
@@ -211,16 +206,7 @@ void UCreatureBehavior::Spell(APackObject* Equipment, bool Begin)
 	}
 }
 
-void UCreatureBehavior::OnBlueEmpty()
-{
-	if (CurrentEquipment)
-	{
-		CurrentEquipment->TriggeredEnd();
-		UpdateInput(InputAnimation::SpellEnd);
-		CurrentEquipment = nullptr;
-	}
 
-}
 
 void UCreatureBehavior::FirstAttack()
 {

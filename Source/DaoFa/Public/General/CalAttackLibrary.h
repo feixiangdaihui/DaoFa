@@ -47,6 +47,8 @@ public:
 	GElement Element;
 	UPROPERTY(BlueprintReadWrite, Category = "Attack")
 	EInterruptAblity InterruptAblity;
+	UPROPERTY(BlueprintReadWrite, Category = "Attack")
+	AActor* Attacker;
 };
 
 USTRUCT(BlueprintType)
@@ -54,14 +56,16 @@ struct FDefenderInfo
 {
 	GENERATED_BODY()
 public:
-	UPROPERTY(BlueprintReadWrite, Category = "Attack")
+	UPROPERTY(BlueprintReadWrite, Category = "Defend")
 	FState State;
-	UPROPERTY(BlueprintReadWrite, Category = "Attack")
+	UPROPERTY(BlueprintReadWrite, Category = "Defend")
 	float Defense;
-	UPROPERTY(BlueprintReadWrite, Category = "Attack")
+	UPROPERTY(BlueprintReadWrite, Category = "Defend")
 	GElement Element;
-	UPROPERTY(BlueprintReadWrite, Category = "Attack")	
+	UPROPERTY(BlueprintReadWrite, Category = "Defend")	
 	EAvoidInterruptAblity AvoidAblity;
+	UPROPERTY(BlueprintReadWrite, Category = "Defend")
+	AActor* Defender;
 };
 
 
@@ -95,7 +99,7 @@ public:
 	static float CalculateDefenseNum(FDefenderInfo DefenderInfo);
 
 	UFUNCTION(BlueprintCallable, Category = "Attack")
-	static  FAttackReturnValue CalculateAttack(FAttackerInfo AttackerInfo, FDefenderInfo DefenderInfo, AActor* SelfActor, AActor* OtherActor);
+	static  FAttackReturnValue CalculateAttack(FAttackerInfo AttackerInfo, FDefenderInfo DefenderInfo);
 
 	UFUNCTION(BlueprintCallable, Category = "Attack")
 	static FAttackerInfo CreateAttackerInfo(UAttackAttributeComponent* AttackAttributeComponent);

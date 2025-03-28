@@ -56,20 +56,19 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Pack")
+	void WearEquipmentByClass(TSubclassOf<APackObject> EquipmentClass, int SpecificIndex = -1);
+
+	UFUNCTION(BlueprintCallable, Category = "Pack")
 	virtual void WearEquipment( APackObject* Equipment, int SpecificIndex = -1) ;
 
 	UFUNCTION(BlueprintCallable, Category = "Pack")
 	virtual void TakeOffEquipment(APackObject* Equipment);
 
 
-
-
-
-
-
-
 	UFUNCTION(BlueprintCallable, Category = "Pack")
 	TArray<APackObject*> GetArrayByType(EEquipmentType TypeIndex);
+
+	APackObject* GetPackObjectByTypeAndIndex(EEquipmentType TypeIndex, int Index);
 
 
 

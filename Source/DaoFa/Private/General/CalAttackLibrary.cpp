@@ -75,7 +75,7 @@ float UCalAttackLibrary::CalculateDefenseNum(FDefenderInfo DefenderInfo)
 //返回值是对方的中断方向
 EInterruptDir UCalAttackLibrary::CalculateInterruptDir(AActor* SelfActor,AActor* OtherActor)
 {
-	if (OtherActor)
+	if (OtherActor&&SelfActor)
 	{
 		FVector Direction = (SelfActor->GetActorLocation() - OtherActor->GetActorLocation()).GetSafeNormal();
 		FVector Forward = OtherActor->GetActorForwardVector();
@@ -104,11 +104,11 @@ EInterruptDir UCalAttackLibrary::CalculateInterruptDir(AActor* SelfActor,AActor*
 }
 
 
-FAttackReturnValue UCalAttackLibrary::CalculateAttack(FAttackerInfo AttackerInfo, FDefenderInfo DefenderInfo, AActor* SelfActor, AActor* OtherActor)
+FAttackReturnValue UCalAttackLibrary::CalculateAttack(FAttackerInfo AttackerInfo, FDefenderInfo DefenderInfo)
 {
 	FAttackReturnValue ReturnValue;
 	ReturnValue.Damage = CalculateDamage(AttackerInfo, DefenderInfo);
-	ReturnValue.InterruptDir = CalculateInterruptDir(SelfActor, OtherActor);
+	ReturnValue.InterruptDir = CalculateInterruptDir(AttackerInfo.Attacker, DefenderInfo.Defender);
 	ReturnValue.InterruptType = CalculateInterrupt(AttackerInfo.InterruptAblity, DefenderInfo.AvoidAblity);
 	if (IsTest)
 		UE_LOG(LogTemp, Warning, TEXT("Damage:%f,InterruptType:%d,InterruptDir:%d"), ReturnValue.Damage, ReturnValue.InterruptType, ReturnValue.InterruptDir);
@@ -124,25 +124,18 @@ FAttackerInfo UCalAttackLibrary::CreateAttackerInfo(UAttackAttributeComponent* A
 	AttackerInfo.Element = AttackAttributeComponent->Element;
 	AttackerInfo.InterruptAblity = AttackAttributeComponent->InterruptAblity;
 	AActor* Owner = AttackAttributeComponent->GetOwner();
+	AttackerInfo.Attacker = Owner;
 	if (Owner)
 	{
-		ACreature* Creature = Cast<ACreature>(Owner);
-		if (Creature)
+		
+		APackObject* PackObject = Cast<APackObject>(Owner);
+		if (PackObject)
 		{
-			AttackerInfo.State = Creature->GetStateComponent()->GetState();
-			AttackerInfo.OwnerState = Creature->GetStateComponent()->GetState();
-			AttackerInfo.BlueDensity = Creature->GetBlueComponent()->GetBlueDensity();
+			AttackerInfo.State = PackObject->GetStateComponent()->GetState();
+			AttackerInfo.OwnerState = PackObject->GetOwnerCreature()->GetStateComponent()->GetState();
+			AttackerInfo.BlueDensity = PackObject->GetOwnerCreature()->GetBlueComponent()->GetBlueDensity();
 		}
-		else 
-		{
-			APackObject* PackObject = Cast<APackObject>(Owner);
-			if (PackObject)
-			{
-				AttackerInfo.State = PackObject->GetStateComponent()->GetState();
-				AttackerInfo.OwnerState = PackObject->GetOwnerCreature()->GetStateComponent()->GetState();
-				AttackerInfo.BlueDensity = PackObject->GetOwnerCreature()->GetBlueComponent()->GetBlueDensity();
-			}
-		}
+
 	}
 	return AttackerInfo;
 }
@@ -154,6 +147,7 @@ FDefenderInfo UCalAttackLibrary::CreateDefenderInfo(UDefenseComponent* DefenseCo
 	DefenderInfo.Element = DefenseComponent->DefenseElement;
 	DefenderInfo.AvoidAblity = DefenseComponent->AvoidAblity;
 	AActor* Owner = DefenseComponent->GetOwner();
+	DefenderInfo.Defender = Owner;
 	if (Owner)
 	{
 		ACreature* Creature = Cast<ACreature>(Owner);

@@ -38,6 +38,7 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	UFUNCTION(BlueprintCallable, Category = "Enemy")
 	void InitEnemyController(TSubclassOf<UEnemyBehavior> InEnemyBehavior);
 
 };

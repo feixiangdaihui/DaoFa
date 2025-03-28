@@ -49,10 +49,19 @@ void UPackComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 	// ...
 }
 
+void UPackComponent::WearEquipmentByClass(TSubclassOf<APackObject> EquipmentClass, int SpecificIndex)
+{
+	APackObject* Equipment = GetWorld()->SpawnActor<APackObject>(EquipmentClass);
+	if (Equipment)
+	{
+		WearEquipment(Equipment, SpecificIndex);
+	}
+}
+
 void UPackComponent::WearEquipment( APackObject* Equipment, int SpecificIndex)
 {
+	Equipment->AttachToCreatureByActor(GetOwner());
 	int Size = Equipment->GetSizeInPack();
-	
 	if (Size + CurrentSize > SumSize)
 	{
 		return;
@@ -136,6 +145,16 @@ TArray<APackObject*> UPackComponent::GetArrayByType(EEquipmentType TypeIndex)
 		break;
 	}
 	return TArray<TObjectPtr<APackObject>>();
+}
+
+APackObject* UPackComponent::GetPackObjectByTypeAndIndex(EEquipmentType TypeIndex, int Index)
+{
+	TArray<APackObject*> TempArray = GetArrayByType(TypeIndex);
+	if (TempArray.IsValidIndex(Index))
+	{
+		return TempArray[Index];
+	}
+	return nullptr;
 }
 
 

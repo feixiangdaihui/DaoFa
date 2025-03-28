@@ -2,7 +2,6 @@
 
 
 #include "Creature.h"
-#include "Character/Component/PackComponent/PackComponent.h"
 #include "General/DefenseComponent.h"
 #include "General/StateComponent.h"
 #include"General/CalAttackLibrary.h"
@@ -23,7 +22,7 @@ ACreature::ACreature()
 	BlueComponent = CreateDefaultSubobject<UBlueComponent>(TEXT("BlueComponent"));
 	PhysicalPowerComponent = CreateDefaultSubobject<UPhysicalPowerComponent>(TEXT("PhysicalPowerComponent"));
 
-	PackComponent = CreateDefaultSubobject<UPackComponent>(TEXT("PackComponent"));
+
 	DefenseComponent = CreateDefaultSubobject<UDefenseComponent>(TEXT("DefenseComponent"));
 	StateComponent = CreateDefaultSubobject<UStateComponent>(TEXT("StateComponent"));
 	CreatureBehavior = CreateDefaultSubobject<UCreatureBehavior>(TEXT("CreatureBehavior"));

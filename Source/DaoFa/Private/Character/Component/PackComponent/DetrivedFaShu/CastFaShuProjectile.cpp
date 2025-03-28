@@ -63,6 +63,7 @@ void ACastFaShuProjectile::BeginSpell(FVector EndLocation, float Speed, float Ma
 	StartLocation = GetActorLocation();
 	ProjectileMovementComponent->Activate();
 	AttackerInfo = InAttackerInfo;
+	AttackerInfo.Attacker = this;
 }
 
 void ACastFaShuProjectile::Explode(const FVector& HitLocation)

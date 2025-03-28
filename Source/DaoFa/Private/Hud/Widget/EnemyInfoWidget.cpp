@@ -21,7 +21,7 @@ void UEnemyInfoWidget::UpdateEnemy()
 				if (Enemy)
 				{
 					EnemyHealthValue->InitProgressBar(Enemy->GetHealthComponent());
-					EnemyName = Enemy->GetName();
+					EnemyName = Enemy->GetObjectName();
 					IsEnemyPresent = true;
 				}
 			}
