@@ -112,7 +112,15 @@ private:
 
 	void Look(const FInputActionValue& Value);
 
+	void Walk(const FInputActionValue& Value);
 
+	void Idle();
+
+	void Run();
+
+	bool IsRun = false;
+
+	void StopRun();
 
 	void OpenPack();
 

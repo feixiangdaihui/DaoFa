@@ -18,7 +18,6 @@ UPhysicalPowerComponent::UPhysicalPowerComponent()
 void UPhysicalPowerComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
 	// ...
 	
 }
@@ -26,10 +25,6 @@ void UPhysicalPowerComponent::BeginPlay()
 void UPhysicalPowerComponent::RecoverPhysicalPowerBySecond(float DeltaTime)
 {
 	if (RecoverLock)
-	{
-		return;
-	}
-	if (IsRun)
 	{
 		return;
 	}
@@ -41,111 +36,16 @@ void UPhysicalPowerComponent::RecoverPhysicalPowerBySecond(float DeltaTime)
 	}
 }
 
-void UPhysicalPowerComponent::RunLossPhysicalPower(float DeltaTime)
-{
-	if (IsRun)
-	{
-		CurrentPhysicalPower -= RunLossPhysicalPowerAmountBySecond * DeltaTime;
-		if (CurrentPhysicalPower < 0)
-		{
-			CurrentPhysicalPower = 0;
-		}
-	}
-}
 
-
-bool UPhysicalPowerComponent::LossPhysicalPower(float value)
-{
-	if (CurrentPhysicalPower >= value)
-	{
-		CurrentPhysicalPower -= value;
-		return true;
-	}
-	return false;
-}
 
 // Called every frame
 void UPhysicalPowerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
 	RecoverPhysicalPowerBySecond(DeltaTime);
-	RunLossPhysicalPower(DeltaTime);
-	if (JumpLockTimer > 0)
-	{
-		JumpLockTimer -= DeltaTime;
-	}
-	if (DodgeLockTimer > 0)
-	{
-		DodgeLockTimer -= DeltaTime;
-	}
-	if (RunLockTimer > 0)
-	{
-		RunLockTimer -= DeltaTime;
-	}
-
 	// ...
 }
 
-void UPhysicalPowerComponent::UpdateInput(InputAnimation Input)
-{
-	switch (Input)
-	{
-	case::InputAnimation::Idle:
-		IsRun = false;
-		break;
-	case::InputAnimation::Walk:
-		IsRun = false;
-		break;
-	case::InputAnimation::EndRun:
-		IsRun = false;
-		break;
-	case InputAnimation::Run:
-		IsRun = true;
-		break;
-	case InputAnimation::Jump:
 
-		LossPhysicalPower(JumpLoss);
-		JumpLockTimer = JumpLockTime;
-		break;
-	case InputAnimation::Dodge:
-		LossPhysicalPower(DodgeLoss);
-		DodgeLockTimer = DodgeLockTime;
-		break;
-	default:
-		break;
-	}
-}
-
-bool UPhysicalPowerComponent::CheckInput(InputAnimation Input)
-{
-	switch (Input)
-	{
-	case InputAnimation::Run:
-		if (IsEmpty())
-		{
-			RunLockTimer = RunLockTime;
-			return false;
-		}
-		if (RunLockTimer > 0)
-			return false;
-		break;
-	case InputAnimation::Jump:
-		if (JumpLockTimer > 0)
-			return false;
-		if (CurrentPhysicalPower < JumpLoss)
-			return false;
-		break;
-	case InputAnimation::Dodge:
-		if (DodgeLockTimer > 0)
-			return false;
-		if (CurrentPhysicalPower < DodgeLoss)
-			return false;
-		break;
-	default:
-		break;
-	}
-	return true;
-}
 
 

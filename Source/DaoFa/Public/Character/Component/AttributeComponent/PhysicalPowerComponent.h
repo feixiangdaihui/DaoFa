@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Character/Component/AttributeComponent/SetValueInterface.h"
 #include "Character/Component/AttributeComponent/GetValueInterface.h"
-#include "Character/Interface/InputUpdateInterface.h"
 #include "PhysicalPowerComponent.generated.h"
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class DAOFA_API UPhysicalPowerComponent : public UActorComponent, public IGetValueInterface, public IInputUpdateInterface
+class DAOFA_API UPhysicalPowerComponent : public UActorComponent, public ISetValueInterface, public IGetValueInterface
 
 {
 	GENERATED_BODY()
@@ -40,43 +40,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PhysicalPower")
 	bool RecoverLock = false;
 
-	//跑步消耗体力
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PhysicalPower")
-	float RunLossPhysicalPowerAmountBySecond = 1.0f;
-
-	UFUNCTION(BlueprintCallable, Category = "PhysicalPower")
-	void RunLossPhysicalPower(float DeltaTime);
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PhysicalPower")
-	bool IsRun = false;
-
-	//跑步锁
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PhysicalPower")
-	float RunLockTime = 1.0f;
-	float RunLockTimer = 0.0;
-
-
-	//一次性消耗体力
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PhysicalPower")
-	float JumpLoss = 10.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PhysicalPower")
-	float DodgeLoss = 10.0f;
-
-	//消耗体力
-	UFUNCTION(BlueprintCallable, Category = "PhysicalPower")
-	bool LossPhysicalPower(float value);
-
-	//跳跃锁
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PhysicalPower")
-	float JumpLockTime = 1.0f;
-	float JumpLockTimer = 0.0;
-
-	//翻滚锁
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PhysicalPower")
-	float DodgeLockTime = 1.0f;
-	float DodgeLockTimer = 0.0;
-
 
 public:	
 	// Called every frame
@@ -94,10 +57,28 @@ public:
 	virtual bool IsEmpty() const override { return CurrentPhysicalPower == 0; }
 
 	UFUNCTION(BlueprintCallable, Category = "PhysicalPower")
-	virtual void UpdateInput(InputAnimation Input) override;
-	virtual bool CheckInput(InputAnimation Input) override;
+	void SetRecoverLock(bool lock) { RecoverLock = lock; }
+
+	UFUNCTION(BlueprintCallable, Category = "PhysicalPower")
+	virtual void SetCurrentValue(float NewValue) override { CurrentPhysicalPower = FMath::Clamp(NewValue, 0.0f, MaxPhysicalPower); }
+	UFUNCTION(BlueprintCallable, Category = "PhysicalPower")
+	virtual void SetMaxValue(float NewValue) override { MaxPhysicalPower = FMath::Max(NewValue, 0.0f); SetCurrentValue(MaxPhysicalPower); }
+	UFUNCTION(BlueprintCallable, Category = "PhysicalPower")
+	virtual void SetPercentage(float NewValue) override { SetCurrentValue(MaxPhysicalPower * FMath::Max(NewValue, 0.0f)); }
+	UFUNCTION(BlueprintCallable, Category = "PhysicalPower")
+	virtual void SetFull() override { SetCurrentValue(MaxPhysicalPower); }
+	UFUNCTION(BlueprintCallable, Category = "PhysicalPower")
+	virtual void SetEmpty() override { SetCurrentValue(0.0f); }
+	UFUNCTION(BlueprintCallable, Category = "PhysicalPower")
+	virtual void AddValue(float Value) override { SetCurrentValue(CurrentPhysicalPower + Value); }
+	UFUNCTION(BlueprintCallable, Category = "PhysicalPower")
+	virtual void AddPercentage(float Value) override { SetPercentage(GetPercentage() + Value); }
+	UFUNCTION(BlueprintCallable, Category = "PhysicalPower")
+	virtual bool SubtractValue(float Value) override { SetCurrentValue(CurrentPhysicalPower - Value); return true; }
+	UFUNCTION(BlueprintCallable, Category = "PhysicalPower")
+	virtual bool SubtractPercentage(float Value) override { SetPercentage(GetPercentage() - Value); return true; }
 
 
 
-		
+
 };

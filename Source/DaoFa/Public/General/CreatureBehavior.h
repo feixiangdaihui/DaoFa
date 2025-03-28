@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Character/Interface/InputUpdateInterface.h"
+
 #include "CreatureBehavior.generated.h"
 
 
@@ -17,12 +17,13 @@ class UBaseAnimInstance;
 class USumEquipmentBarWidget;
 class ABaseHud;
 class APackObject;
+class UMoveManagement;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSpell, APackObject*, Equipment);
 
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class DAOFA_API UCreatureBehavior : public UActorComponent, public IInputUpdateInterface
+class DAOFA_API UCreatureBehavior : public UActorComponent
 {
 	GENERATED_BODY()
 
@@ -36,19 +37,14 @@ public:
 
 	FOnSpell OnSpell;
 
-	void SetMoveForbid(bool NewValue);
 
 	void Jump();
 
-	void Walk(const FInputActionValue& Value);
+	void Walk(const FVector2D& MovementVector);
 
-	void BaseWalk(const FInputActionValue& Value);
+	void Run(const FVector2D& MovementVector);
 
-	void StopWalk();
-
-	void Run();
-
-	void StopRun();
+	void Idle();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	float DodgeUnbeatableTime = 0.5f;
@@ -61,25 +57,23 @@ public:
 
 	void SecondAttack();
 
+	void SetMoveForbid(bool value) { IsMoveForbid = value; }
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Creature")
+	TObjectPtr<UMoveManagement> MoveManagement;
+
 private:
 
-
+	void BaseMove(const FVector2D& MovementVector);
 
 	APackObject* CurrentEquipment = nullptr;
 
-	bool IsRunning = false;
-
 	bool IsMoveForbid = false;
 
-	virtual void UpdateInput(InputAnimation Input) override;
-
-	virtual bool CheckInput(InputAnimation Input) override;
-
-	TArray<TScriptInterface<IInputUpdateInterface>> InputUpdateInterfaces;
 
 	ACreature* OwnerCreature;
 

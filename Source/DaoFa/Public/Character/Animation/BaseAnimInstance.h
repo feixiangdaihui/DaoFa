@@ -4,28 +4,42 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
-#include "Character/Interface/InputUpdateInterface.h"
 #include "Character/Component/InputOperationComponent.h"
 #include "BaseAnimInstance.generated.h"
 
 /**
  * 
  */
+UENUM(BlueprintType)
+enum class AnimationType : uint8
+{
+	Idle,
+	Walk,
+	Run,
+	Jump,
+	Dodge,
+	FirstAttack,
+	SecondAttack,
+	SpellLoop,
+	SpellEnd,
+	NONE
+
+};
 
 
 class ACreature;
 
 UCLASS()
-class DAOFA_API UBaseAnimInstance : public UAnimInstance ,public IInputUpdateInterface
+class DAOFA_API UBaseAnimInstance : public UAnimInstance 
 {
 	GENERATED_BODY()
 
 
 	
-	static TMap<InputAnimation, TArray<InputAnimation>> InputBlendAgree;
+	static TMap<AnimationType, TArray<AnimationType>> InputBlendAgree;
 
 	//记录使用动画序列完成的动画状态
-	static TSet<InputAnimation> FlexibleState;
+	static TSet<AnimationType> FlexibleState;
 public:
 
 	//更新动画状态
@@ -33,9 +47,9 @@ public:
 	//val:动画状态的值
 	//返回值:是否更新成功
 	UFUNCTION(BlueprintCallable, Category = "Animation")
-	virtual void UpdateInput(InputAnimation Input) override;
+	void UpdateAnim(AnimationType Input) ;
 
-	virtual bool CheckInput(InputAnimation Input) override;
+	bool CheckAnim(AnimationType Input) ;
 
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
@@ -44,12 +58,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Animation")
 	void SetIsMontageForbiden(bool value) { IsMontageForbiden = value; }
 
-
+	AnimationType GetSequenceState() { return CurrentSequenceState; }
 
 protected:
 	//记录一次性完成的动画状态
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Animation")
-	InputAnimation CurrentMontageState = InputAnimation::NONE;
+	AnimationType CurrentMontageState = AnimationType::NONE;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Animation")
 	bool IsMontageForbiden = false;
@@ -57,14 +71,9 @@ protected:
 	FOnMontageEnded MontageEndDelegate;
 
 
-
-
-
-
-
 	//记录持续更新类的动画状态
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
-	InputAnimation CurrentSequenceState= InputAnimation::Idle;
+	AnimationType CurrentSequenceState= AnimationType::Idle;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
 	TObjectPtr<ACreature> OwnerCreature;

@@ -55,10 +55,10 @@ void UInputOperationComponent::SetupPlayerInputComponent(UInputComponent* Player
 		// Jumping
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, OwnerCreatureBehavior, &UCreatureBehavior::Jump);
 		// Moving
-		EnhancedInputComponent->BindAction(WalkAction, ETriggerEvent::Triggered, OwnerCreatureBehavior, &UCreatureBehavior::Walk);
-		EnhancedInputComponent->BindAction(WalkAction, ETriggerEvent::Completed, OwnerCreatureBehavior, &UCreatureBehavior::StopWalk);
-		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Started, OwnerCreatureBehavior, &UCreatureBehavior::Run);
-		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Completed, OwnerCreatureBehavior, &UCreatureBehavior::StopRun);
+		EnhancedInputComponent->BindAction(WalkAction, ETriggerEvent::Triggered, this, &UInputOperationComponent::Walk);
+		EnhancedInputComponent->BindAction(WalkAction, ETriggerEvent::Completed, this, &UInputOperationComponent::Idle);
+		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Started, this, &UInputOperationComponent::Run);
+		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Completed, this, &UInputOperationComponent::StopRun);
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &UInputOperationComponent::Look);
 		//Dodge
@@ -109,7 +109,36 @@ void UInputOperationComponent::Look(const FInputActionValue& Value)
 	}
 }
 
+void UInputOperationComponent::Walk(const FInputActionValue& Value)
+{
+	if (OwnerCreatureBehavior)
+	{
+		if (IsRun)
+			OwnerCreatureBehavior->Run(Value.Get<FVector2D>());
+		else
+			OwnerCreatureBehavior->Walk(Value.Get<FVector2D>());
+	}
+}
 
+void UInputOperationComponent::Idle()
+{
+	if (OwnerCreatureBehavior)
+	{
+		OwnerCreatureBehavior->Idle();
+	}
+}
+
+void UInputOperationComponent::Run()
+{
+	IsRun = true;
+}
+
+
+
+void UInputOperationComponent::StopRun()
+{
+	IsRun = false;
+}
 
 void UInputOperationComponent::OpenPack()
 {

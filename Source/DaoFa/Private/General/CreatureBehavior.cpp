@@ -8,15 +8,15 @@
 #include "Creature.h"
 #include "Character/Component/GongFa/BaseMainGongFa.h"
 #include "Character/Component/GongFa/GongFaComponent.h"
-
 #include"Character/BaseCharacter.h"
+#include "General/CreatureBehaviorManagement/MoveManagement.h"
 // Sets default values for this component's properties
 UCreatureBehavior::UCreatureBehavior()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
+	MoveManagement = CreateDefaultSubobject<UMoveManagement>(TEXT("MoveManagement"));
 	// ...
 }
 
@@ -32,14 +32,10 @@ void UCreatureBehavior::BeginPlay()
 	{
 		OwnerAnimInstance = Cast<UBaseAnimInstance>(OwnerCreature->GetMesh()->GetAnimInstance());
 		UPhysicalPowerComponent* OwnerPhysicalPowerComponent = OwnerCreature->GetPhysicalPowerComponent();
-
-		if (OwnerAnimInstance != nullptr)
-			InputUpdateInterfaces.Add(OwnerAnimInstance);
-		else
+		MoveManagement->InitMoveManagement(OwnerPhysicalPowerComponent, OwnerPhysicalPowerComponent);
+		if (!OwnerAnimInstance )
 			UE_LOG(LogTemp, Error, TEXT("%s OwnerAnimInstance is nullptr"), *this->GetName());
-		if (OwnerPhysicalPowerComponent != nullptr)
-			InputUpdateInterfaces.Add(OwnerPhysicalPowerComponent);
-		else
+		if (!OwnerPhysicalPowerComponent )
 			UE_LOG(LogTemp, Error, TEXT("%s OwnerPhysicalPowerComponent is nullptr"), *this->GetName());
 
 	}
@@ -50,79 +46,8 @@ void UCreatureBehavior::BeginPlay()
 
 }
 
-
-// Called every frame
-void UCreatureBehavior::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UCreatureBehavior::BaseMove(const FVector2D& MovementVector)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
-}
-
-void UCreatureBehavior::SetMoveForbid(bool NewValue)
-{
-	if (NewValue)
-		UpdateInput(InputAnimation::Idle);
-	IsMoveForbid = NewValue;
-}
-
-void UCreatureBehavior::UpdateInput(InputAnimation Input)
-{
-	for (auto InputUpdateInterface : InputUpdateInterfaces)
-	{
-		InputUpdateInterface->UpdateInput(Input);
-	}
-}
-
-bool UCreatureBehavior::CheckInput(InputAnimation Input)
-{
-	for (auto InputUpdateInterface : InputUpdateInterfaces)
-	{
-		if (!InputUpdateInterface->CheckInput(Input))
-			return false;
-	}
-	return true;
-}
-
-
-
-
-void UCreatureBehavior::Jump()
-{
-	if (CheckInput(InputAnimation::Jump))
-	{
-		OwnerCreature->Jump();
-		UpdateInput(InputAnimation::Jump);
-	}
-}
-
-
-void UCreatureBehavior::Walk(const FInputActionValue& Value)
-{
-
-	if (OwnerCreature != nullptr&&!IsMoveForbid)
-	{
-		if (IsRunning && CheckInput(InputAnimation::Run))
-		{
-			OwnerCreature->SetSpeedToRun();
-			UpdateInput(InputAnimation::Run);
-			BaseWalk(Value);
-		}
-		else if (CheckInput(InputAnimation::Walk))
-		{
-			OwnerCreature->SetSpeedToWalk();
-			UpdateInput(InputAnimation::Walk);
-			BaseWalk(Value);
-
-		}
-
-	}
-
-}
-
-void UCreatureBehavior::BaseWalk(const FInputActionValue& Value)
-{
-	FVector2D MovementVector = Value.Get<FVector2D>();
 	// find out which way is forward
 	const FRotator Rotation = OwnerCreature->Controller->GetControlRotation();
 	const FRotator YawRotation(0, Rotation.Yaw, 0);
@@ -135,32 +60,73 @@ void UCreatureBehavior::BaseWalk(const FInputActionValue& Value)
 	OwnerCreature->AddMovementInput(RightDirection, MovementVector.X);
 }
 
-void UCreatureBehavior::StopWalk()
+
+// Called every frame
+void UCreatureBehavior::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
-	UpdateInput(InputAnimation::Idle);
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	if(OwnerAnimInstance&& MoveManagement&&OwnerAnimInstance->GetSequenceState()!=AnimationType::Run)
+		MoveManagement->StopRun();
+
+	// ...
 }
 
-void UCreatureBehavior::Run()
+
+
+
+
+
+void UCreatureBehavior::Jump()
 {
-	IsRunning = true;
+	if (MoveManagement->CheckForJump() && OwnerAnimInstance->CheckAnim(AnimationType::Jump))
+	{
+		OwnerCreature->Jump();
+		MoveManagement->Jump();
+		OwnerAnimInstance->UpdateAnim(AnimationType::Jump);
+	}
 }
 
-void UCreatureBehavior::StopRun()
+void UCreatureBehavior::Walk(const FVector2D& MovementVector)
 {
-	IsRunning = false;
+	if (!IsMoveForbid && OwnerAnimInstance->CheckAnim(AnimationType::Walk))
+	{
+		OwnerCreature->SetSpeedToWalk();
+		BaseMove(MovementVector);
+		OwnerAnimInstance->UpdateAnim(AnimationType::Walk);
+	}
 }
+
+
+
+void UCreatureBehavior::Run(const FVector2D& MovementVector)
+{
+	if (!IsMoveForbid && MoveManagement->CheckForRun() && OwnerAnimInstance->CheckAnim(AnimationType::Run))
+	{
+		OwnerCreature->SetSpeedToRun();
+		MoveManagement->Run();
+		OwnerAnimInstance->UpdateAnim(AnimationType::Run);
+		BaseMove(MovementVector);
+	}
+}
+
+void UCreatureBehavior::Idle()
+{
+	if (OwnerAnimInstance->CheckAnim(AnimationType::Idle))
+	{
+		OwnerAnimInstance->UpdateAnim(AnimationType::Idle);
+	}
+}
+
 
 
 
 void UCreatureBehavior::Dodge()
 {
-	if (CheckInput(InputAnimation::Dodge))
+	if (MoveManagement->CheckForDodge() && OwnerAnimInstance->CheckAnim(AnimationType::Dodge))
 	{
-		UpdateInput(InputAnimation::Dodge);
-		OwnerCreature->SetUnbeatable(true);
-		//设置定时器
-		FTimerHandle TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]() {OwnerCreature->SetUnbeatable(false); }, DodgeUnbeatableTime, false);
+		MoveManagement->Dodge();
+		OwnerAnimInstance->UpdateAnim(AnimationType::Dodge);
 	}
 
 }
@@ -171,46 +137,13 @@ void UCreatureBehavior::Dodge()
 
 void UCreatureBehavior::Spell(APackObject* Equipment, bool Begin)
 {
-	if (Begin)
-	{
-		if (CheckInput(InputAnimation::SpellLoop))
-		{
-			if (Equipment)
-			{
-				if (Equipment->TriggeredBegin())
-				{
-					UpdateInput(InputAnimation::SpellLoop);
-					CurrentEquipment = Equipment;
-				}
-			}
-		}
-	}
-	else
-	{
-		if (CheckInput(InputAnimation::SpellEnd))
-		{
-			if (Equipment)
-			{
-				if (Equipment->TriggeredEnd())
-				{
-					UpdateInput(InputAnimation::SpellEnd);
-					OnSpell.Broadcast(Equipment);
-				}
-				else
-				{
-					UpdateInput(InputAnimation::NONE);
-				}
-				CurrentEquipment = nullptr;
-			}
-		}
-	}
 }
 
 
 
 void UCreatureBehavior::FirstAttack()
 {
-	if (CheckInput(InputAnimation::FirstAttack))
+	if (OwnerAnimInstance->CheckAnim(AnimationType::FirstAttack))
 	{
 		UGongFaComponent* GongFaComponent = OwnerCreature->GetGongFaComponent();
 		if (GongFaComponent)
@@ -221,17 +154,16 @@ void UCreatureBehavior::FirstAttack()
 				if (MainGongFa->CheckFirstAttack())
 				{
 					MainGongFa->FirstAttack();
-					UpdateInput(InputAnimation::FirstAttack);
+					OwnerAnimInstance->UpdateAnim(AnimationType::FirstAttack);
 				}
 			}
 		}
-
 	}
 }
 
 void UCreatureBehavior::SecondAttack()
 {
-	if (CheckInput(InputAnimation::SecondAttack))
+	if (OwnerAnimInstance->CheckAnim(AnimationType::SecondAttack))
 	{
 		UGongFaComponent* GongFaComponent = OwnerCreature->GetGongFaComponent();
 		if (GongFaComponent)
@@ -242,7 +174,7 @@ void UCreatureBehavior::SecondAttack()
 				if (MainGongFa->CheckSecondAttack())
 				{
 					MainGongFa->SecondAttack();
-					UpdateInput(InputAnimation::SecondAttack);
+					OwnerAnimInstance->UpdateAnim(AnimationType::SecondAttack);
 				}
 			}
 		}
