@@ -1,5 +1,6 @@
 #include "General/CreatureBehaviorManagement/MoveManagement.h"
 #include"Character/Component/AttributeComponent/SetValueInterface.h"
+#include "Character/Component/AttributeComponent/GetValueInterface.h"
 // Sets default values for this component's properties
 UMoveManagement::UMoveManagement()
 {

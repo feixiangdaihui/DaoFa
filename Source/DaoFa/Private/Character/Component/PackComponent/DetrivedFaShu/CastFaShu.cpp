@@ -20,8 +20,11 @@ ACastFaShu::ACastFaShu()
 	EnemyDetector->EnemyClasses.Empty();
 	EnemyDetector->EnemyClasses.Add(ACreature::StaticClass());
 
-	//需要蓄力，只有长按才能发射
-	IsShortPressPermit = false;
+	SpellInfo.ShortPressBlueCost = 0;
+	SpellInfo.LongPressBlueCost = 10;
+	SpellInfo.OngoingBlueCostBySecond = 0;
+	SpellInfo.EquipmentSpellType = EEquipmentSpellType::OnlyLongPress;
+
 
 	StartLocation = FVector(0, 0, 0);
 	

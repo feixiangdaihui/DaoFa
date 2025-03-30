@@ -6,8 +6,10 @@
 #define EQUIPMENTBAR_NUM 3
 #define EQUIPMENTBAR_SIZE 4
 
+//委托，无参数
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnEquipmentBarChange);
+
 class APackObject;
-class USumEquipmentBarWidget;
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class DAOFA_API UEquipmentBarComponent : public UActorComponent
 {
@@ -26,7 +28,6 @@ protected:
 
 	int CurrentChosenIndex = 0;
 
-	USumEquipmentBarWidget* SumEquipmentBarWidget;
 
 public:
 	// Called every frame
@@ -39,14 +40,27 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "SumEquipmentBar")
 	virtual void TakeOffEquipment(APackObject* Equipment);
 
+	UPROPERTY(BlueprintAssignable, Category = "SumEquipmentBar")
+	FOnEquipmentBarChange OnEquipmentBarChange;
 
 
 	void ChangeChosenEquipmentBarToSmall();
 
 	void ChangeChosenEquipmentBarToBig();
 
-	void InitSumEquipmentBarWidget(USumEquipmentBarWidget* InSumEquipmentBarWidget);
 
 	APackObject* GetEquipment(int Index) { return EquipmentBar[CurrentChosenIndex][Index]; }
+
+	int GetCurrentChosenIndex() { return CurrentChosenIndex; }
+
+	UFUNCTION(BlueprintCallable, Category = "SumEquipmentBar")
+	TArray<APackObject*> GetEquipmentBar(int TypeIndex)
+	{ 
+		if (TypeIndex < 0 || TypeIndex >= EQUIPMENTBAR_NUM)
+		{
+			return TArray<APackObject*>();
+		}
+		return TArray<APackObject*>(EquipmentBar[TypeIndex], EQUIPMENTBAR_SIZE); 
+	}
 
 };

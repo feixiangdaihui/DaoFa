@@ -168,7 +168,16 @@ void UInputOperationComponent::Spell(int32 Index, bool Begin)
 		if(OwnerCreatureBehavior)
 		{
 			if (APackObject* Temp=OwnerEquipmentBarComponent->GetEquipment(Index))
-				OwnerCreatureBehavior->Spell(Temp, Begin);
+			{
+				if (Begin)
+				{
+					OwnerCreatureBehavior->BeginSpell(Temp);
+				}
+				else
+				{
+					OwnerCreatureBehavior->EndSpell(Temp);
+				}
+			}
 		}
 	}
 }

@@ -23,9 +23,25 @@ enum class AnimationType : uint8
 	SpellLoop,
 	SpellEnd,
 	NONE
-
 };
 
+USTRUCT(BlueprintType)
+struct FMontageInfo
+{
+	GENERATED_BODY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montage")
+	UAnimMontage* Montage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montage")
+	float PlayRate = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montage")
+	bool IsLooping = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montage")
+	bool ShouldStopOtherMontage = false;
+
+};
 
 class ACreature;
 
@@ -83,6 +99,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Animation")
 	float ZVelocity = 0;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animation")
+	TMap<AnimationType, FMontageInfo> MontageMap;
 
 
 };

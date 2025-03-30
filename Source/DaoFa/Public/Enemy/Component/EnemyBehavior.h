@@ -26,6 +26,23 @@ class DAOFA_API UEnemyBehavior : public UActorComponent
 public:
 	// Sets default values for this component's properties
 	UEnemyBehavior();
+private:
+	void UpdateBehaveTimer(float DeltaTime);
+
+	void LockBehaveFrontNear() { BehaveFrontNearTimer = BehaveFrontNearTime; }
+	void LockBehaveFrontFar() { BehaveFrontFarTimer = BehaveFrontFarTime; }
+	void LockBehaveBackNear() { BehaveBackNearTimer = BehaveBackNearTime; }
+	void LockBehaveBackFar() { BehaveBackFarTimer = BehaveBackFarTime; }
+	void LockBehaveSideNear() { BehaveSideNearTimer = BehaveSideNearTime; }
+	void LockBehaveSideFar() { BehaveSideFarTimer = BehaveSideFarTime; }
+
+	bool IsBehaveFrontNearLocked() { return BehaveFrontNearTimer > 0; }
+	bool IsBehaveFrontFarLocked() { return BehaveFrontFarTimer > 0; }
+	bool IsBehaveBackNearLocked() { return BehaveBackNearTimer > 0; }
+	bool IsBehaveBackFarLocked() { return BehaveBackFarTimer > 0; }
+	bool IsBehaveSideNearLocked() { return BehaveSideNearTimer > 0; }
+	bool IsBehaveSideFarLocked() { return BehaveSideFarTimer > 0; }
+
 
 protected:
 	// Called when the game starts
@@ -54,6 +71,19 @@ protected:
 	float BackAngleDomain = 120.0f;
 
 
+	float BehaveFrontNearTime = 0.0f;
+	float BehaveFrontFarTime = 0.0f;
+	float BehaveBackNearTime = 0.0f;
+	float BehaveBackFarTime = 0.0f;
+	float BehaveSideNearTime = 0.0f;
+	float BehaveSideFarTime = 0.0f;
+
+	float BehaveFrontNearTimer = 0.0f;
+	float BehaveFrontFarTimer = 0.0f;
+	float BehaveBackNearTimer = 0.0f;
+	float BehaveBackFarTimer = 0.0f;
+	float BehaveSideNearTimer = 0.0f;
+	float BehaveSideFarTimer = 0.0f;
 
 	virtual void BehaveWhenTargetIsFrontNear(){}
 	virtual void BehaveWhenTargetIsFrontFar(){}
@@ -71,7 +101,8 @@ protected:
 
 	void UpdateBehavior();
 
-	bool IsTest = false;
+
+
 
 public:
 	// Called every frame

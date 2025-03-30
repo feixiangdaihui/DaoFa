@@ -5,7 +5,6 @@
 #include "General/CalAttackLibrary.h"
 #include "General/CreatureBehavior.h"
 #include "Creature.h"
-#include "Character/Component/PackComponent/BlueCostComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Character/Component/PackComponent/SpellCoolComponent.h"
 #include "Character/Component/PackComponent/PODefenseComponent.h"
@@ -32,12 +31,8 @@ AJinZhongZhao::AJinZhongZhao()
 	StaticMeshComponent->SetGenerateOverlapEvents(true);
 
 
-
-
-	IsLongPressPermit = false;
-
-	BlueCostComponent->OngoingMode = true;
-	BlueCostComponent->OngoingBlueCost = 0.2;
+	SpellInfo.EquipmentSpellType = EEquipmentSpellType::Continuous;
+	SpellInfo.OngoingBlueCostBySecond = 1;
 }
 
 void AJinZhongZhao::TriggeredByShortPress()

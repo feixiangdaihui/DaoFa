@@ -7,7 +7,7 @@
 #include "General/AttackAttributeComponent.h"
 #include "General/DefenseComponent.h"
 #include "PackObject.generated.h"
-class UBlueCostComponent;
+
 class UAttackAttributeComponent;
 class UPOAttackAttributeComponent;
 class UStateComponent;
@@ -34,6 +34,42 @@ enum class EEquipmentModeType : uint8
 	Defense,
 	Blend
 };
+
+UENUM(BlueprintType)
+enum class EEquipmentSpellType : uint8
+{
+	Continuous,
+	ShortAndLongPress,
+	OnlyLongPress,
+	OnlyShortPress
+};
+
+USTRUCT(BlueprintType)
+struct FPackObjectSpellInfo
+{
+	GENERATED_USTRUCT_BODY()
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BlueCost")
+	float ShortPressBlueCost = 0.0f;
+
+	//属于在短按基础上的额外消耗
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BlueCost")
+	float LongPressBlueCost = 0.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "BlueCost")
+	float OngoingBlueCostBySecond = 0.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spell")
+	float LongPressTime = 1.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spell")
+	EEquipmentSpellType EquipmentSpellType = EEquipmentSpellType::ShortAndLongPress;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PackObjectInfo")
+	TObjectPtr<USpellCoolComponent> SpellCoolComponent;
+
+};
+
+
 
 //背包中要显示的信息的结构体
 USTRUCT(BlueprintType)
@@ -75,6 +111,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PackObjectInfo")
 	float CurrentHealth = 100.0f;
 
+
 };
 
 
@@ -92,11 +129,9 @@ protected:
 	// Called when the game starts or when spawned
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
 	UTexture2D* Icon;
-
 	//物品的名字
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
 	FText ObjectName;
-
 
 	//物品的描述
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
@@ -108,13 +143,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
 	EEquipmentModeType EquipmentModeType;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
-	float LongPressTime = 1.0f;
-	float LongPressTimeCounter = 0.0f;
 
 	virtual void BeginPlay() override;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
-	TObjectPtr<UBlueCostComponent> BlueCostComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
 	TObjectPtr<UAttackAttributeComponent> AttackAttributeComponent;
@@ -125,32 +155,23 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
 	TObjectPtr<USpellCoolComponent> SpellCoolComponent;
 
-
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PackObject")
     EEquipmentType EquipmentType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
 	TObjectPtr<UStateComponent> StateComponent;
 
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
 	int SizeInPack = 1;
 
 	ACreature* OwnerCreature;
 
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
-	bool IsLongPressPermit = true;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
-	bool IsShortPressPermit = true;
-
-	virtual void TriggeredByShortPress() {}
-
-	virtual void TriggeredByLongPress() {}
-
-
 	bool CanBeWearOrTakeOff = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
+	FPackObjectSpellInfo SpellInfo;
+
+
 public:	
 
 	EEquipmentModeType GetEquipmentModeType() { return EquipmentModeType; }
@@ -166,7 +187,6 @@ public:
 	virtual UTexture2D* GetIcon()const  { return Icon; }
 
 
-
 	UFUNCTION(BlueprintCallable, Category = "IShowTrigger")
 	virtual int GetQunatity() const { return Quantity; }
 
@@ -179,18 +199,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "PackObject")
 	bool GetCanBeWearOrTakeOff() { return CanBeWearOrTakeOff; }
 
-	//允许长按且允许短按的模式：
-	//1.begin后什么都不做，直到end，判断是否长按，如果是长按，触发长按，否则触发短按
-	//不允许长按的模式：
-	//1.begin直接触发短按
-	//2.end再次触发短按，所以该模式下的物品应该在再次触发短按时处理收尾逻辑
-	//不允许短按的模式：
-	//1.begin后什么都不做，直到end，判断是否长按，如果是长按，触发长按，否则什么都不做
-	bool TriggeredBegin();
 
-	bool TriggeredEnd();
+	virtual void TriggeredByShortPress() {}
 
-
+	virtual void TriggeredByLongPress() {}
 
 
 	UFUNCTION(BlueprintCallable, Category = "PackObject")
@@ -216,8 +228,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "PackObject")
 	USpellCoolComponent* GetSpellCoolComponent() { return SpellCoolComponent; }
 	
+	UFUNCTION(BlueprintCallable, Category = "PackObject")
+	FPackObjectSpellInfo GetSpellInfo() { return SpellInfo; }
 	
-
+	UFUNCTION(BlueprintCallable, Category = "PackObject")
+	void SetCanBeWearOrTakeOff(bool value) { CanBeWearOrTakeOff = value; }
 
 
 };

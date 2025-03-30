@@ -34,7 +34,7 @@ void ABaseHud::BeginPlay()
 		if(SumEquipmentBarWidget)
 		{
 			SumEquipmentBarWidget->AddToViewport();
-			OwnerCharacter->GetEquipmentBarComponent()->InitSumEquipmentBarWidget(SumEquipmentBarWidget);
+			SumEquipmentBarWidget->Init(OwnerCharacter->GetEquipmentBarComponent());
 		}
 
 

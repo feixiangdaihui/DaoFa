@@ -2,11 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Character/Component/AttributeComponent/SetValueInterface.h"
-#include "Character/Component/AttributeComponent/GetValueInterface.h"
+
 #include "MoveManagement.generated.h"
 
 class ISetValueInterface;
+class IGetValueInterface;
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class DAOFA_API UMoveManagement : public UActorComponent
 {
@@ -77,7 +77,7 @@ public:
 	void Dodge();
 	void StopRun();
 
-	void InitMoveManagement(TScriptInterface<ISetValueInterface> InSetPhysicalValue, TScriptInterface<IGetValueInterface> InGetPhysicalValue)
+	void Init(TScriptInterface<ISetValueInterface> InSetPhysicalValue, TScriptInterface<IGetValueInterface> InGetPhysicalValue)
 	{
 		SetPhysicalValue = InSetPhysicalValue;
 		GetPhysicalValue = InGetPhysicalValue;

@@ -8,16 +8,12 @@
 
 
 
-class UInputAction;
+
 class ACreature;
-class UInputComponent;
-struct FInputActionValue;
-class UInputMappingContext;
 class UBaseAnimInstance;
-class USumEquipmentBarWidget;
-class ABaseHud;
 class APackObject;
 class UMoveManagement;
+class USpellManagement;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSpell, APackObject*, Equipment);
 
@@ -50,8 +46,14 @@ public:
 	float DodgeUnbeatableTime = 0.5f;
 	void Dodge();
 
-	//1表示开始释放技能，0表示结束释放技能
-	void Spell(APackObject* Equipment, bool Begin);
+	FTimerHandle SpellTimerHandle;
+
+	void BeginSpell(APackObject* Equipment);
+
+	void EndSpell(APackObject* Equipment);
+
+	void Spell(APackObject* Equipment, float SpellTime);
+	
 
 	void FirstAttack();
 
@@ -59,12 +61,17 @@ public:
 
 	void SetMoveForbid(bool value) { IsMoveForbid = value; }
 
+	APackObject* GetCurrentEquipment() { return CurrentEquipment; }
+
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Creature")
 	TObjectPtr<UMoveManagement> MoveManagement;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Creature")
+	TObjectPtr<USpellManagement> SpellManagement;
 
 private:
 
@@ -78,6 +85,8 @@ private:
 	ACreature* OwnerCreature;
 
 	UBaseAnimInstance* OwnerAnimInstance;
+
+
 
 
 };

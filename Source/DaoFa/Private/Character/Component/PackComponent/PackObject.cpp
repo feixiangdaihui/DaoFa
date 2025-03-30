@@ -2,7 +2,6 @@
 
 
 #include "Character/Component/PackComponent/PackObject.h"
-#include "Character/Component/PackComponent/BlueCostComponent.h"
 #include "Character/BaseCharacter.h"
 #include "General/AttackAttributeComponent.h"
 #include "Character/Component/PackComponent/SpellCoolComponent.h"
@@ -15,9 +14,9 @@ APackObject::APackObject()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	BlueCostComponent = CreateDefaultSubobject<UBlueCostComponent>(TEXT("BlueCostComponent"));
 	StateComponent = CreateDefaultSubobject<UStateComponent>(TEXT("StateComponent"));
 	SpellCoolComponent = CreateDefaultSubobject<USpellCoolComponent>(TEXT("SpellCoolComponent"));
+	SpellInfo.SpellCoolComponent = SpellCoolComponent;
 }
 
 // Called when the game starts or when spawned
@@ -54,65 +53,6 @@ void APackObject::AttachToCreatureByActor(AActor* Actor)
 	AttachToCreature(Temp);
 }
 
-
-
-bool APackObject::TriggeredBegin()
-{
-	CanBeWearOrTakeOff = false;
-	if (SpellCoolComponent->IsCoolingNow())
-	{
-		return false;
-	}
-
-
-	if (!IsLongPressPermit )
-	{
-		BlueCostComponent->OngoingCostBlue();
-		TriggeredByShortPress();
-		LongPressTimeCounter = GetWorld()->GetTimeSeconds();
-		return true;
-	}
-
-	if (BlueCostComponent->ShortPressCostBlue())
-	{
-		LongPressTimeCounter = GetWorld()->GetTimeSeconds();
-		return true;
-	}
-	else
-		return false;
-}
-
-bool APackObject::TriggeredEnd()
-{
-	CanBeWearOrTakeOff = true;
-
-	if (LongPressTimeCounter == 0)
-		return false;
-
-
-	if (!IsLongPressPermit)
-	{
-		TriggeredByShortPress();
-		BlueCostComponent->EndOngoingCostBlue();
-	}
-	else
-	{
-		LongPressTimeCounter = GetWorld()->GetTimeSeconds() - LongPressTimeCounter;
-		if (LongPressTimeCounter > LongPressTime && BlueCostComponent->LongPressCostBlue())
-		{
-			TriggeredByLongPress();
-		}
-		else if (IsShortPressPermit)
-			TriggeredByShortPress();
-		else
-		{
-			LongPressTimeCounter = 0;
-			return false;
-		}
-	}
-	LongPressTimeCounter = 0;
-	return true;
-}
 
 
 

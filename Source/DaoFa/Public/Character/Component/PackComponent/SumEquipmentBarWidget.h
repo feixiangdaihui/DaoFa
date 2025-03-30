@@ -8,9 +8,9 @@
 #include "Character/Component/PackComponent/PackObject.h"
 #include "SumEquipmentBarWidget.generated.h"
 
-#define EQUIPMENTBAR_NUM 3
 
 
+class UEquipmentBarComponent;
 /**
  * 
  */
@@ -30,16 +30,20 @@ protected:
 	TObjectPtr<UEquipmentBarWidget> FuLuEquipmentBar;
 
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "EquipmentBar")
+	UEquipmentBarComponent* EquipmentBarComponent;
+
+	UFUNCTION()
+	void OnEquipmentBarChange();
+
+
+	void SetChosenEquipmentBar(int Index);
 
 public:
 
     virtual void NativeConstruct() override;
 
-	void SetEquipmentBar(int Index, TArray<APackObject*> EquipmentBar);
 
-	//蓝图中实现
-	
-	void SetChosenEquipmentBar(int Index);
 
-	
+	void Init(UEquipmentBarComponent* InEquipmentBarComponent);
 };

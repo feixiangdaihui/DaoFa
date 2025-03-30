@@ -50,6 +50,11 @@ AFeiJian::AFeiJian()
 	CapsuleComponent->SetSimulatePhysics(false);
 	CapsuleComponent->SetEnableGravity(false);
 
+	SpellInfo.EquipmentSpellType = EEquipmentSpellType::ShortAndLongPress;
+	SpellInfo.ShortPressBlueCost = 5;
+	SpellInfo.LongPressBlueCost = 10;
+	SpellInfo.OngoingBlueCostBySecond = 0;
+
 
 }
 

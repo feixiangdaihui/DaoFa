@@ -27,5 +27,6 @@ protected:
 
 public:
 	virtual void BeginPlay() override;
+	UTestEnBe();
 	
 };

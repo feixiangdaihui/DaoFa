@@ -12,6 +12,23 @@ UEnemyBehavior::UEnemyBehavior()
 	// ...
 }
 
+void UEnemyBehavior::UpdateBehaveTimer(float DeltaTime)
+{
+	if (BehaveFrontNearTimer > 0)
+		BehaveFrontNearTimer -= DeltaTime;
+	if (BehaveFrontFarTimer > 0)
+		BehaveFrontFarTimer -= DeltaTime;
+	if (BehaveBackNearTimer > 0)
+		BehaveBackNearTimer -= DeltaTime;
+	if (BehaveBackFarTimer > 0)
+		BehaveBackFarTimer -= DeltaTime;
+	if (BehaveSideNearTimer > 0)
+		BehaveSideNearTimer -= DeltaTime;
+	if (BehaveSideFarTimer > 0)
+		BehaveSideFarTimer -= DeltaTime;
+
+}
+
 // Called when the game starts
 void UEnemyBehavior::BeginPlay()
 {
@@ -106,40 +123,43 @@ void UEnemyBehavior::UpdateBehavior()
 			LookRotator = WorldToLocalRotation(LookRotator, GetOwner()->GetTransform());
 			DirectionType Dir = CalDirectionType(LookRotator);
 			DistanceType Distance = CalDistanceType(TargetLocation, OwnerLocation, Dir);
-			if(IsTest)
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Dir:%d,Distance:%d"), (uint8)Dir, (uint8)Distance);
-			}
 			switch (Dir)
 			{
 			case DirectionType::Front:
-				if (Distance == DistanceType::Near)
+				if (Distance == DistanceType::Near&& !IsBehaveFrontNearLocked())
 				{
 					BehaveWhenTargetIsFrontNear();
+					LockBehaveFrontNear();
+
 				}
-				else
+				else if (Distance == DistanceType::Far && !IsBehaveFrontFarLocked())
 				{
 					BehaveWhenTargetIsFrontFar();
+					LockBehaveFrontFar();
 				}
 				break;
 			case DirectionType::Back:
-				if (Distance == DistanceType::Near)
+				if (Distance == DistanceType::Near && !IsBehaveBackNearLocked())
 				{
 					BehaveWhenTargetIsBackNear();
+					LockBehaveBackNear();
 				}
-				else
+				else if (Distance == DistanceType::Far && !IsBehaveBackFarLocked())
 				{
 					BehaveWhenTargetIsBackFar();
+					LockBehaveBackFar();
 				}
 				break;
 			case DirectionType::Side:
-				if (Distance == DistanceType::Near)
+				if (Distance == DistanceType::Near && !IsBehaveSideNearLocked())
 				{
 					BehaveWhenTargetIsSideNear();
+					LockBehaveSideNear();
 				}
-				else
+				else if (Distance == DistanceType::Far && !IsBehaveSideFarLocked())
 				{
 					BehaveWhenTargetIsSideFar();
+					LockBehaveSideFar();
 				}
 				break;
 			default:
@@ -156,6 +176,7 @@ void UEnemyBehavior::TickComponent(float DeltaTime, ELevelTick TickType, FActorC
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	UpdateBehaveTimer(DeltaTime);
 	// ...
 }
 

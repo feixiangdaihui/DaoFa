@@ -1,5 +1,5 @@
 #include "Character/Component/PackComponent/EquipmentBarComponent.h"
-#include "Character/Component/PackComponent/SumEquipmentBarWidget.h"
+#include "Character/Component/PackComponent/PackObject.h"
 // Sets default values for this component's properties
 UEquipmentBarComponent::UEquipmentBarComponent()
 {
@@ -51,18 +51,13 @@ void UEquipmentBarComponent::WearEquipment(APackObject* Equipment, int SpecificI
 					else
 						TakeOffEquipment(Equipment);
 					EquipmentBar[Index][SpecificIndex] = Equipment;
+					OnEquipmentBarChange.Broadcast();
 				}
 				return;
 			}
 		}
 		EquipmentBar[Index][SpecificIndex] = Equipment;
-		if (SumEquipmentBarWidget)
-		{
-			TArray<APackObject*> TempEquipmentBar;
-			TempEquipmentBar.Empty();
-			TempEquipmentBar.Append(EquipmentBar[Index], EQUIPMENTBAR_SIZE);
-			SumEquipmentBarWidget->SetEquipmentBar(Index, TempEquipmentBar);
-		}
+		OnEquipmentBarChange.Broadcast();
 	}
 }
 
@@ -74,13 +69,7 @@ void UEquipmentBarComponent::TakeOffEquipment(APackObject* Equipment)
 		if (EquipmentBar[Index][i] == Equipment)
 		{
 			EquipmentBar[Index][i] = nullptr;
-			if (SumEquipmentBarWidget)
-			{
-				TArray<APackObject*> TempEquipmentBar;
-				TempEquipmentBar.Empty();
-				TempEquipmentBar.Append(EquipmentBar[Index], EQUIPMENTBAR_SIZE);
-				SumEquipmentBarWidget->SetEquipmentBar(Index, TempEquipmentBar);
-			}
+			OnEquipmentBarChange.Broadcast();
 			return;
 		}
 	}
@@ -93,8 +82,8 @@ void UEquipmentBarComponent::ChangeChosenEquipmentBarToSmall()
 		CurrentChosenIndex = EQUIPMENTBAR_NUM - 1;
 	else
 		CurrentChosenIndex--;
-	if (SumEquipmentBarWidget)
-		SumEquipmentBarWidget->SetChosenEquipmentBar(CurrentChosenIndex);
+	OnEquipmentBarChange.Broadcast();
+
 
 }
 
@@ -104,20 +93,5 @@ void UEquipmentBarComponent::ChangeChosenEquipmentBarToBig()
 		CurrentChosenIndex = 0;
 	else
 		CurrentChosenIndex++;
-	if (SumEquipmentBarWidget)
-		SumEquipmentBarWidget->SetChosenEquipmentBar(CurrentChosenIndex);
-}
-
-void UEquipmentBarComponent::InitSumEquipmentBarWidget(USumEquipmentBarWidget* InSumEquipmentBarWidget)
-{
-	SumEquipmentBarWidget = InSumEquipmentBarWidget;
-	if (SumEquipmentBarWidget)
-		SumEquipmentBarWidget->SetChosenEquipmentBar(CurrentChosenIndex);
-	//for (int i = 0; i < EQUIPMENTBAR_NUM; i++)
-	//{
-	//	TArray<APackObject*> TempEquipmentBar;
-	//	TempEquipmentBar.Empty();
-	//	TempEquipmentBar.Append(EquipmentBar[i], EQUIPMENTBAR_SIZE);
-	//	SumEquipmentBarWidget->SetEquipmentBar(i, TempEquipmentBar);
-	//}
+	OnEquipmentBarChange.Broadcast();
 }

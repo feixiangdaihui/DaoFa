@@ -15,14 +15,8 @@ void UTestEnBe::BehaveWhenTargetIsFrontFar()
 		APackObject* PackObject = PackComponent->GetPackObjectByTypeAndIndex(EEquipmentType::FABAO, TestFrontFarFaBaoIndex);
 		if(PackObject)
 		{
-			CreatureBehavior->Spell(PackObject, true);
-			FTimerHandle TimerHandle;
-			GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, PackObject]()
-				{
-					CreatureBehavior->Spell(PackObject, false);
-				}, 0.5f, false);
+			CreatureBehavior->Spell(PackObject, 0.5f);
 		}
-
 	}
 }
 
@@ -30,16 +24,12 @@ void UTestEnBe::BehaveWhenTargetIsFrontNear()
 {
 	if (PackComponent && CreatureBehavior)
 	{
-		APackObject* PackObject = PackComponent->GetPackObjectByTypeAndIndex(EEquipmentType::FASHU, TestFrontNearFaShuIndex);
+		CreatureBehavior->Dodge();
+		/*APackObject* PackObject = PackComponent->GetPackObjectByTypeAndIndex(EEquipmentType::FASHU, TestFrontNearFaShuIndex);
 		if (PackObject)
 		{
-			CreatureBehavior->Spell(PackObject, true);
-			FTimerHandle TimerHandle;
-			GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, PackObject]()
-				{
-					CreatureBehavior->Spell(PackObject, false);
-				}, 1.5f, false);
-		}
+			CreatureBehavior->Spell(PackObject, 1.0f);
+		}*/
 	}
 }
 
@@ -50,12 +40,7 @@ void UTestEnBe::BehaveWhenTargetIsBackNear()
 		APackObject* PackObject = PackComponent->GetPackObjectByTypeAndIndex(EEquipmentType::FABAO, TestBackNearrFaBaoIndex);
 		if (PackObject)
 		{
-			CreatureBehavior->Spell(PackObject, true);
-			FTimerHandle TimerHandle;
-			GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this, PackObject]()
-				{
-					CreatureBehavior->Spell(PackObject, false);
-				}, 10.0f, false);
+			CreatureBehavior->Spell(PackObject, 10.0f);
 		}
 	}
 }
@@ -73,4 +58,12 @@ void UTestEnBe::BeginPlay()
 		if (!CreatureBehavior)
 			UE_LOG(LogTemp, Warning, TEXT("%s CreatureBehavior is nullptr"), *Owner->GetName());
 	}
+}
+
+UTestEnBe::UTestEnBe()
+{
+	PrimaryComponentTick.bCanEverTick = true;
+	BehaveFrontFarTime = 5.0f;
+	BehaveFrontNearTime = 5.0f;
+	BehaveBackNearTime = 15.0f;
 }
