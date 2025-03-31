@@ -1,7 +1,8 @@
 #include "Enemy/Component/EnemyBehavior.h"
 #include "Enemy/Component/EnemyTrace.h"
 #include "Kismet/KismetMathLibrary.h"
-
+#include "Creature.h"
+#include "Enemy/Component/EnemyPackComponent.h"
 // Sets default values for this component's properties
 UEnemyBehavior::UEnemyBehavior()
 {
@@ -36,6 +37,16 @@ void UEnemyBehavior::BeginPlay()
 
 	GetWorld()->GetTimerManager().SetTimer(BehaviorTimer, this, &UEnemyBehavior::UpdateBehavior, UpdateBehaviorInterval, true);
 	// ...
+	ACreature* Owner = Cast<ACreature>(GetOwner());
+	if (Owner)
+	{
+		PackComponent = Cast<UEnemyPackComponent>(Owner->GetPackComponent());
+		CreatureBehavior = Owner->GetCreatureBehavior();
+		if (!PackComponent)
+			UE_LOG(LogTemp, Warning, TEXT("%s PackComponent is nullptr"), *Owner->GetName());
+		if (!CreatureBehavior)
+			UE_LOG(LogTemp, Warning, TEXT("%s CreatureBehavior is nullptr"), *Owner->GetName());
+	}
 
 }
 

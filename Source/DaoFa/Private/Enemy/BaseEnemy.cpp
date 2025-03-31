@@ -8,5 +8,6 @@ ABaseEnemy::ABaseEnemy()
 {
 	PackComponent = CreateDefaultSubobject<UEnemyPackComponent>(TEXT("EnemyPackComponent"));
 	EnemyController = CreateDefaultSubobject<UEnemyController>(TEXT("EnemyController"));
+	WalkSpeed = 50.f;
 }
 

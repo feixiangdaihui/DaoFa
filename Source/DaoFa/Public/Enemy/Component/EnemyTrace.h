@@ -39,4 +39,10 @@ public:
 
 	AActor* GetCurrentTarget() const { return CurrentTarget; }
 
+	FVector2D GetDirAgainstTarget(bool IsAgainst = true);
+
+	FVector2D GetDirVerticalToTarget(bool IsLeft = true);
+
+	float GetDistanceToTarget();
+
 };

@@ -24,12 +24,11 @@ void UTestEnBe::BehaveWhenTargetIsFrontNear()
 {
 	if (PackComponent && CreatureBehavior)
 	{
-		CreatureBehavior->Dodge();
-		/*APackObject* PackObject = PackComponent->GetPackObjectByTypeAndIndex(EEquipmentType::FASHU, TestFrontNearFaShuIndex);
+		APackObject* PackObject = PackComponent->GetPackObjectByTypeAndIndex(EEquipmentType::FASHU, TestFrontNearFaShuIndex);
 		if (PackObject)
 		{
 			CreatureBehavior->Spell(PackObject, 1.0f);
-		}*/
+		}
 	}
 }
 
@@ -48,16 +47,7 @@ void UTestEnBe::BehaveWhenTargetIsBackNear()
 void UTestEnBe::BeginPlay()
 {
 	Super::BeginPlay();
-	ACreature* Owner = Cast<ACreature>(GetOwner());
-	if (Owner)
-	{
-		PackComponent = Cast<UEnemyPackComponent>(Owner->GetPackComponent());
-		CreatureBehavior = Owner->GetCreatureBehavior();
-		if(!PackComponent)
-			UE_LOG(LogTemp, Warning, TEXT("%s PackComponent is nullptr"), *Owner->GetName());
-		if (!CreatureBehavior)
-			UE_LOG(LogTemp, Warning, TEXT("%s CreatureBehavior is nullptr"), *Owner->GetName());
-	}
+
 }
 
 UTestEnBe::UTestEnBe()

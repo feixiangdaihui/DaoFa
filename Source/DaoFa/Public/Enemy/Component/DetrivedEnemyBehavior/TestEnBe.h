@@ -15,8 +15,7 @@ class DAOFA_API UTestEnBe : public UEnemyBehavior
 {
 	GENERATED_BODY()
 private:
-	UEnemyPackComponent* PackComponent;
-	UCreatureBehavior* CreatureBehavior;
+
 	int TestFrontFarFaBaoIndex = 1;
 	int TestFrontNearFaShuIndex = 0;
 	int TestBackNearrFaBaoIndex = 0;

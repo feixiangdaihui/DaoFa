@@ -5,6 +5,7 @@
 #include "EnemyRotator.generated.h"
 
 class UEnemyTrace;
+class UEnemyController;
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class DAOFA_API UEnemyRotator : public UActorComponent
 {
@@ -25,16 +26,15 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
 	float RotateAnglePerSecond = 1.0f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
-	float RotateInterval = 0.1f;
-
 	UEnemyTrace* EnemyTrace = nullptr;
 
-	void RotateToTarget();
+	UEnemyController* EnemyController = nullptr;
+
+	void RotateToTarget(float DeltaTime);
 
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void InitEnemyRotator(UEnemyTrace* InEnemyTrace) { EnemyTrace = InEnemyTrace; }
+	void Init(UEnemyController* InEnemyController, UEnemyTrace* InEnemyTrace) { EnemyController = InEnemyController; EnemyTrace = InEnemyTrace; }
 };

@@ -18,6 +18,8 @@ enum class DistanceType : uint8
 };
 
 class UEnemyTrace;
+class UEnemyPackComponent;
+class UCreatureBehavior;
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class DAOFA_API UEnemyBehavior : public UActorComponent
 {
@@ -45,6 +47,10 @@ private:
 
 
 protected:
+
+	UEnemyPackComponent* PackComponent;
+	UCreatureBehavior* CreatureBehavior;
+
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
@@ -108,7 +114,7 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void InitEnemyBehavior(UEnemyTrace* InEnemyTrace) { EnemyTrace = InEnemyTrace; }
+	void Init(UEnemyTrace* InEnemyTrace) { EnemyTrace = InEnemyTrace; }
 
 
 };

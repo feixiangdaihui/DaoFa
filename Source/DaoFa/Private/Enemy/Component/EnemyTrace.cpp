@@ -45,3 +45,47 @@ void UEnemyTrace::UpdateTarget()
 		CurrentTarget = Enemies[0];
 	}
 }
+
+FVector2D UEnemyTrace::GetDirAgainstTarget(bool IsAgainst)
+{
+	if (CurrentTarget)
+	{
+		FVector TargetLocation = CurrentTarget->GetActorLocation();
+		FVector OwnerLocation = GetOwner()->GetActorLocation();
+		FVector Dir = TargetLocation - OwnerLocation;
+		if (IsAgainst)
+		{
+			Dir = -Dir;
+		}
+		return FVector2D(Dir.X, Dir.Y);
+	}
+	return FVector2D::ZeroVector;
+}
+
+FVector2D UEnemyTrace::GetDirVerticalToTarget(bool IsLeft)
+{
+	if (CurrentTarget)
+	{
+		FVector2D Dir = GetDirAgainstTarget();
+		FVector2D VerticalDir = FVector2D(Dir.Y, -Dir.X);
+		if (IsLeft)
+		{
+			VerticalDir = -VerticalDir;
+		}
+		return VerticalDir;
+	}
+	return FVector2D::ZeroVector;
+}
+
+
+
+float UEnemyTrace::GetDistanceToTarget()
+{
+	if (CurrentTarget)
+	{
+		FVector TargetLocation = CurrentTarget->GetActorLocation();
+		FVector OwnerLocation = GetOwner()->GetActorLocation();
+		return FVector::Dist(TargetLocation, OwnerLocation);
+	}
+	return -1.0f;
+}

@@ -1,6 +1,7 @@
 #include "Enemy/Component/EnemyRotator.h"
 #include "Enemy/Component/EnemyTrace.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Enemy/Component/EnemyController.h"
 
 // Sets default values for this component's properties
 UEnemyRotator::UEnemyRotator()
@@ -16,12 +17,11 @@ UEnemyRotator::UEnemyRotator()
 void UEnemyRotator::BeginPlay()
 {
 	Super::BeginPlay();
-	GetWorld()->GetTimerManager().SetTimer(RotateTimer, this, &UEnemyRotator::RotateToTarget, RotateInterval, true);
 	// ...
 
 }
 
-void UEnemyRotator::RotateToTarget()
+void UEnemyRotator::RotateToTarget(float DeltaTime)
 {
 	if(EnemyTrace)
 	{
@@ -31,7 +31,7 @@ void UEnemyRotator::RotateToTarget()
 			FRotator TargetRot = UKismetMathLibrary::FindLookAtRotation(GetOwner()->GetActorLocation(), CurrentTarget->GetActorLocation());
 			FRotator CurrentRot = GetOwner()->GetActorRotation();
 			const FRotator HorizontalRot(0, TargetRot.Yaw, 0);
-			FRotator NewRot = FMath::RInterpTo(CurrentRot, HorizontalRot, RotateInterval, RotateAnglePerSecond);
+			FRotator NewRot = FMath::RInterpTo(CurrentRot, HorizontalRot, DeltaTime, RotateAnglePerSecond);
 			GetOwner()->SetActorRotation(NewRot);
 		}
 	}
@@ -42,7 +42,10 @@ void UEnemyRotator::RotateToTarget()
 void UEnemyRotator::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
+	if (EnemyController && EnemyController->CanRotateToTarget())
+	{
+		RotateToTarget(DeltaTime);
+	}
 	// ...
 }
 

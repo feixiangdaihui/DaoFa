@@ -7,6 +7,9 @@
 class UEnemyTrace;
 class UEnemyRotator;
 class UEnemyBehavior;
+class UBaseAnimInstance;
+class ACreature;
+class UEnemyMove;
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class DAOFA_API UEnemyController : public UActorComponent
 {
@@ -29,6 +32,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
 	TObjectPtr<UEnemyBehavior> EnemyBehavior;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
+	TObjectPtr<UEnemyMove> EnemyMove;
+
+
+	UBaseAnimInstance* BaseAnimInstance = nullptr;
+
+	ACreature* Owner = nullptr;
+
 
 private:
 
@@ -39,6 +50,12 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable, Category = "Enemy")
-	void InitEnemyController(TSubclassOf<UEnemyBehavior> InEnemyBehavior);
+	void SetEnemyBehavior(TSubclassOf<UEnemyBehavior> InEnemyBehavior);
+
+	UFUNCTION(BlueprintCallable, Category = "Enemy")
+	void SetEnemyMove(TSubclassOf<UEnemyMove> InEnemyMove);
+
+	UFUNCTION(BlueprintCallable, Category = "Enemy")
+	bool CanRotateToTarget() const;
 
 };

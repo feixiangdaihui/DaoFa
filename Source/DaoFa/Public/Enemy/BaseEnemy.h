@@ -27,6 +27,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Enemy")
 	FText GetObjectName() const { return ObjectName; }
 
+	UFUNCTION(BlueprintCallable, Category = "Enemy")
+	UEnemyController* GetEnemyController() const { return EnemyController; }
+
 	ABaseEnemy();
 	
 
