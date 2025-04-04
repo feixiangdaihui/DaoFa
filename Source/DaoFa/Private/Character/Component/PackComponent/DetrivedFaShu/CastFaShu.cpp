@@ -66,15 +66,12 @@ AActor* ACastFaShu::FindTarget()
 
 void ACastFaShu::OnOverlapBegin(ACastFaShuProjectile* FaShuProjectile, AActor* OtherActor, UPrimitiveComponent* OtherComp, const FHitResult& SweepResult)
 {
-	if (OtherComp->GetCollisionObjectType() == ECC_WorldStatic)
-	{
-		FaShuProjectile->Explode(SweepResult.ImpactPoint);
-		return;
-	}
+
 	IBeAttacked* BeAttacked = Cast<IBeAttacked>(OtherActor);
 	if (BeAttacked)
 	{
 		AttackAttributeComponent->AttackByAttackerInfo(FaShuProjectile->GetAttackerInfo(), BeAttacked);
+		FaShuProjectile->Explode(SweepResult.ImpactPoint);
 		return;
 	}
 	IAttacker* Attacker = Cast<IAttacker>(OtherActor);
@@ -87,7 +84,11 @@ void ACastFaShu::OnOverlapBegin(ACastFaShuProjectile* FaShuProjectile, AActor* O
 		}
 		return;
 	}
-	
+	if (OtherComp->GetCollisionObjectType() == ECC_WorldStatic)
+	{
+		FaShuProjectile->Explode(SweepResult.ImpactPoint);
+		return;
+	}
 }
 
 

@@ -11,7 +11,7 @@ FVector2D UTestEnemyMove::CalMoveVec()
         float Distance = EnemyTrace->GetDistanceToTarget();
 		if (Distance < WalkBackDistance)
 		{
-			return EnemyTrace->GetDirAgainstTarget(false);
+			return EnemyTrace->GetDirAgainstTarget();
 		}
 		else if (Distance < WalkVerticalDistance)
 		{
@@ -19,7 +19,7 @@ FVector2D UTestEnemyMove::CalMoveVec()
 		}
 		else
 		{
-			return EnemyTrace->GetDirAgainstTarget();
+			return EnemyTrace->GetDirAgainstTarget(false);
 		}
     }
 	return FVector2D::ZeroVector;

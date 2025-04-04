@@ -106,7 +106,7 @@ void AFeiJian::TriggeredByShortPress()
 	if (IsInHand)
 	{
 		//移动到角色面前
-		FVector NewLocation = GetOwner()->GetActorLocation() + GetOwner()->GetActorForwardVector() * 150;
+		FVector NewLocation = GetOwnerCreature()->GetActorLocation() + GetOwnerCreature()->GetActorForwardVector() * 150;
 		SetActorLocation(NewLocation);
 		StaticMeshComponent->SetVisibility(true);
 
@@ -118,7 +118,7 @@ void AFeiJian::TriggeredByShortPress()
 	FVector EndLocation = GetActorLocation() + GetActorForwardVector() * 1000;
 	for (auto Enemy : DetectedEnemies)
 	{
-		if (Enemy != GetOwner())
+		if (Enemy != GetOwnerCreature())
 		{
 			EndLocation = Enemy->GetActorLocation();
 			break;
@@ -149,7 +149,7 @@ void AFeiJian::TriggeredByLongPress()
 			FVector EndLocation;
 			for (auto Enemy : DetectedEnemies)
 			{
-				if (Enemy != GetOwner())
+				if (Enemy != GetOwnerCreature())
 				{
 					EndLocation = Enemy->GetActorLocation();
 					//飞剑变大
@@ -176,7 +176,7 @@ void AFeiJian::TriggeredByLongPress()
 	}
 	else
 	{
-		FVector EndLocation = Owner->GetActorLocation() + Owner->GetActorForwardVector() * 10;
+		FVector EndLocation = OwnerCreature->GetActorLocation() + OwnerCreature->GetActorForwardVector() * 10;
 		//发射飞剑
 		IsShortPressHurt = true;
 		//调整方向
@@ -196,14 +196,9 @@ void AFeiJian::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Other
 	
 	if (IsSpell)
 	{
-		//如果碰到的物体碰撞预设是WorldStatic，那么endSpell
-		if (OtherComp->GetCollisionObjectType() == ECollisionChannel::ECC_WorldStatic)
-		{
-			EndSpell();
-			return;
-		}
+
 		ACreature* Creature = Cast<ACreature>(OtherActor);
-		if (Creature == Owner)
+		if (Creature == OwnerCreature)
 		{
 			EndSpell();
 			AttachToCreature(Creature);
@@ -213,9 +208,14 @@ void AFeiJian::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Other
 		if (BeAttacked)
 		{
 			AttackAttributeComponent->Attack(BeAttacked);
+			return;
 		}
-		else
+		//如果碰到的物体碰撞预设是WorldStatic，那么endSpell
+		if (OtherComp->GetCollisionObjectType() == ECollisionChannel::ECC_WorldStatic)
+		{
 			EndSpell();
+			return;
+		}
 	}
 
 }
@@ -237,11 +237,11 @@ void AFeiJian::EndSpell()
 		SetActorScale3D(FVector(1, 1, 1));
 		//透明度变回
 		IsLongPressHurt = false;
-		AttachToCreature(Owner);
+		AttachToCreature(OwnerCreature);
 	}
 	if (IsGoHome)
 	{
-		AttachToCreature(Owner);
+		AttachToCreature(OwnerCreature);
 	}
 }
 
@@ -253,9 +253,9 @@ void AFeiJian::BeginSpell(FVector EndLocation,float Speed)
 	ProjectileMovementComponent->Velocity = (EndLocation - GetActorLocation()).GetSafeNormal() * Speed;
 	ProjectileMovementComponent->Activate();
 	StartLocation = GetActorLocation();
-	if (GetOwner())
+	if (GetOwnerCreature())
 	{
-		Owner = Cast<ACreature>(GetOwner());
+		OwnerCreature = Cast<ACreature>(GetOwnerCreature());
 		//不再随着角色变换
 		DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	}

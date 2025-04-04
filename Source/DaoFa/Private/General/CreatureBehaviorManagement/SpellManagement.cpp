@@ -43,8 +43,6 @@ bool USpellManagement::CheckForSpell(APackObject* Equipment)
 			return false;
 		return true;
 	case EEquipmentSpellType::OnlyLongPress:
-		if (GetBlueValue->IsEmpty())
-			return false;
 		return true;
 	case EEquipmentSpellType::ShortAndLongPress:
 		if (GetBlueValue->GetCurrentValue() >= SpellInfo.ShortPressBlueCost)
@@ -77,22 +75,26 @@ void USpellManagement::SpellBegin(APackObject* Equipment)
 	}
 }
 
-void USpellManagement::SpellLoop(APackObject* Equipment, float DeltaTime)
+bool USpellManagement::SpellLoop(APackObject* Equipment, float DeltaTime)
 {
 	FPackObjectSpellInfo SpellInfo = Equipment->GetSpellInfo();
 	switch (SpellInfo.EquipmentSpellType)
 	{
 	case EEquipmentSpellType::Continuous:
-		SetBlueValue->SubtractValue(SpellInfo.OngoingBlueCostBySecond * DeltaTime);
+		if (!SetBlueValue->SubtractValue(SpellInfo.OngoingBlueCostBySecond * DeltaTime))
+		{
+			return false;
+		}
 		break;
 	default:
 		break;
 	}
+	return true;
 }
 
 
 
-void USpellManagement::SpellEnd(APackObject* Equipment)
+bool USpellManagement::SpellEnd(APackObject* Equipment)
 {
 	FPackObjectSpellInfo SpellInfo = Equipment->GetSpellInfo();
 	float BeginTime=0.0f;
@@ -103,7 +105,7 @@ void USpellManagement::SpellEnd(APackObject* Equipment)
 	}
 	else
 	{
-		return;
+		return false;
 	}
 	//先设为可穿戴，再触发，因为触发函数可能会改变可穿戴状态，但是这里太过耦合，先放在这里
 	Equipment->SetCanBeWearOrTakeOff(true);
@@ -139,5 +141,5 @@ void USpellManagement::SpellEnd(APackObject* Equipment)
 	default:
 		break;
 	}
-
+	return true;
 }

@@ -54,16 +54,16 @@ void UCreatureBehavior::BeginPlay()
 
 void UCreatureBehavior::BaseMove(const FVector2D& MovementVector)
 {
-	// find out which way is forward
-	const FRotator Rotation = OwnerCreature->Controller->GetControlRotation();
-	const FRotator YawRotation(0, Rotation.Yaw, 0);
-	// get forward vector
-	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	// get right vector 
-	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-	// add movement 
-	OwnerCreature->AddMovementInput(ForwardDirection, MovementVector.Y);
-	OwnerCreature->AddMovementInput(RightDirection, MovementVector.X);
+	FVector MovementVector3D(MovementVector, 0);
+	OwnerCreature->AddMovementInput(MovementVector3D);
+}
+
+void UCreatureBehavior::OnPackObjectExhausted(APackObject* Equipment)
+{
+	if (CurrentEquipment == Equipment)
+	{
+		EndSpell(Equipment);
+	}
 }
 
 
@@ -148,18 +148,24 @@ void UCreatureBehavior::BeginSpell(APackObject* Equipment)
 		SpellManagement->SpellBegin(Equipment);
 		OwnerAnimInstance->UpdateAnim(AnimationType::SpellLoop);
 		GetWorld()->GetTimerManager().SetTimer(SpellTimerHandle, [this, Equipment]() {
-			SpellManagement->SpellLoop(Equipment, 0.1f);
-			}, 0.1f, true);
+			if (!SpellManagement->SpellLoop(Equipment, 0.1f))
+			{
+				EndSpell(Equipment);
+			}}, 0.1f, true);
 		CurrentEquipment = Equipment;
+		Equipment->OnPackObjectExhausted.AddDynamic(this, &UCreatureBehavior::OnPackObjectExhausted);
 	}
 }
 
 void UCreatureBehavior::EndSpell(APackObject* Equipment)
 {
-	GetWorld()->GetTimerManager().ClearTimer(SpellTimerHandle);
-	SpellManagement->SpellEnd(Equipment);
-	OwnerAnimInstance->UpdateAnim(AnimationType::SpellEnd);
-	CurrentEquipment = nullptr;
+	if (SpellManagement->SpellEnd(Equipment))
+	{
+		GetWorld()->GetTimerManager().ClearTimer(SpellTimerHandle);
+		OwnerAnimInstance->UpdateAnim(AnimationType::SpellEnd);
+		CurrentEquipment->OnPackObjectExhausted.RemoveDynamic(this, &UCreatureBehavior::OnPackObjectExhausted);
+		CurrentEquipment = nullptr;
+	}
 }
 
 void UCreatureBehavior::Spell(APackObject* Equipment, float SpellTime)

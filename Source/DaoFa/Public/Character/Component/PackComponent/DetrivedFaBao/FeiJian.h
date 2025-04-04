@@ -68,7 +68,6 @@ private:
 	bool IsShortPressHurt = false;
 	FVector StartLocation;
 	bool IsSpell = false;
-	ACreature* Owner;
 	bool IsGoHome = false;
 	
 

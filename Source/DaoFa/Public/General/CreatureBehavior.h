@@ -86,6 +86,9 @@ private:
 
 	UBaseAnimInstance* OwnerAnimInstance;
 
+	UFUNCTION()
+	void OnPackObjectExhausted(APackObject* Equipment);
+
 
 
 

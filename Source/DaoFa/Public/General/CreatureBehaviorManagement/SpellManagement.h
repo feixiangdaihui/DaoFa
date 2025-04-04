@@ -26,6 +26,7 @@ protected:
 
 	TMap<APackObject*, float> SpellBeginTimeMap;
 
+
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -35,9 +36,11 @@ public:
 
 	void SpellBegin(APackObject* Equipment);
 
-	void SpellLoop(APackObject* Equipment, float DeltaTime);
+	//返回表示有没有正确完成
+	bool SpellLoop(APackObject* Equipment, float DeltaTime);
 
-	void SpellEnd(APackObject* Equipment);
+	//返回表示有没有正确完成
+	bool SpellEnd(APackObject* Equipment);
 
 
 	void Init(TScriptInterface<ISetValueInterface> InSetBlueValue, TScriptInterface<IGetValueInterface> InGetBlueValue)

@@ -113,10 +113,19 @@ void UInputOperationComponent::Walk(const FInputActionValue& Value)
 {
 	if (OwnerCreatureBehavior)
 	{
+		const FRotator Rotation = OwnerCharacter->Controller->GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
+		// get forward vector
+		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		// get right vector 
+		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		FVector MovementVector = ForwardDirection * Value.Get<FVector2D>().Y + RightDirection * Value.Get<FVector2D>().X;
+		MovementVector.Normalize();
+		FVector2D MovementVector2D(MovementVector.X, MovementVector.Y);
 		if (IsRun)
-			OwnerCreatureBehavior->Run(Value.Get<FVector2D>());
+			OwnerCreatureBehavior->Run(MovementVector2D);
 		else
-			OwnerCreatureBehavior->Walk(Value.Get<FVector2D>());
+			OwnerCreatureBehavior->Walk(MovementVector2D);
 	}
 }
 

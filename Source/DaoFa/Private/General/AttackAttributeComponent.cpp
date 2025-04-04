@@ -76,8 +76,10 @@ void UAttackAttributeComponent::Attack(IBeAttacked* BeAttacked)
 
 void UAttackAttributeComponent::AttackByAttackerInfo(FAttackerInfo AttackerInfo, IBeAttacked* BeAttacked)
 {
+
 	if (AActor* Other = Cast<AActor>(BeAttacked))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("BeAttacked:%s"), *Other->GetName());
 		FAttackReturnValue ReturnValue = UCalAttackLibrary::CalculateAttack(AttackerInfo, BeAttacked->GetDefenderInfo());
 		BeAttacked->BeAttacked(ReturnValue);
 	}
