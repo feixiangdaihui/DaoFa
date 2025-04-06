@@ -56,7 +56,16 @@ protected:
 	EAttackerType AttackerType = EAttackerType::BLOCK;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CastFaShu")
-	FAttackerInfo AttackerInfo;
+	TObjectPtr<UAttackAttributeComponent> AttackAttributeComponent;
+
+
+
+	UFUNCTION()
+	void OnAttenuationComplete(AActor* AttenuationObject);
+
+	void Explode() { Explode(ExplodeLocation); }
+
+	FVector ExplodeLocation;
 
 public:
 	// Called every frame
@@ -65,13 +74,16 @@ public:
 	UProjectileMovementComponent* GetProjectileMovementComponent() const { return ProjectileMovementComponent; }
 	UCapsuleComponent* GetCapsuleComponent() const { return CapsuleComponent; }
 
-	void BeginSpell(FVector EndLocation, float Speed, float MaxDistance, FAttackerInfo InAttackerInfo);
+	void BeginSpell(FVector EndLocation, float Speed, float MaxDistance, AActor* OwnerFaShu);
 
 	void Explode(const FVector& HitLocation);
 
-	virtual FAttackerInfo GetAttackerInfo() override { return AttackerInfo; }
+
+	virtual UAttackAttributeComponent* GetAttackAttributeComponent() override { return AttackAttributeComponent; }
 
 	virtual EAttackerType GetAttackerType() override { return AttackerType; }
+
+
 
 
 	

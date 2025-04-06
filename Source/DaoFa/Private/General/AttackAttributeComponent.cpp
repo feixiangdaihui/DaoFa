@@ -70,27 +70,25 @@ void UAttackAttributeComponent::Attack(IBeAttacked* BeAttacked)
 	if(AActor* Other=Cast<AActor>(BeAttacked))
 	{
 		FAttackReturnValue ReturnValue = UCalAttackLibrary::CalculateAttack(UCalAttackLibrary::CreateAttackerInfo(this), BeAttacked->GetDefenderInfo());
-		BeAttacked->BeAttacked(ReturnValue);
+		float Temp=BeAttacked->BeAttacked(ReturnValue);
+		if (IsAttenuation&& Temp >= 0 && Temp <= 1)
+		{
+			BaseDamage *=(1-Temp);
+			if (BaseDamage <= 0)
+			{
+				BaseDamage = 0;
+				OnAttenuationComplete.Broadcast(GetOwner());
+			}
+
+		}
 	}
 }
 
-void UAttackAttributeComponent::AttackByAttackerInfo(FAttackerInfo AttackerInfo, IBeAttacked* BeAttacked)
-{
-
-	if (AActor* Other = Cast<AActor>(BeAttacked))
-	{
-		UE_LOG(LogTemp, Warning, TEXT("BeAttacked:%s"), *Other->GetName());
-		FAttackReturnValue ReturnValue = UCalAttackLibrary::CalculateAttack(AttackerInfo, BeAttacked->GetDefenderInfo());
-		BeAttacked->BeAttacked(ReturnValue);
-	}
-}
 
 FAttackAttributeInfo UAttackAttributeComponent::GetAttackAttributeInfo()
 {
 	FAttackAttributeInfo Info;
 	Info.BaseDamage = BaseDamage;
-	Info.CriticalHitChance = CriticalHitChance;
-	Info.CriticalHitMultiplier = CriticalHitMultiplier;
 	Info.Element = Element;
 	Info.InterruptAblity = InterruptAblity;
 	return Info;

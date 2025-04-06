@@ -9,6 +9,7 @@
 
 class ACastFaShuProjectile;
 class UEnemyDetector;
+class UAttackAttributeComponent;
 
 /**
  * 
@@ -22,6 +23,7 @@ public:
 	ACastFaShu();
 
 protected:
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "CastFaShu")
 	TSubclassOf<ACastFaShuProjectile> CastFaShuProjectileClass;

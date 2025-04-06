@@ -38,7 +38,7 @@ EAttackCompareType UCompareAttackLibrary::CompareAttack(IAttacker* Attacker1, IA
     
 	if (Attacker1->GetAttackerType() == EAttackerType::BLOCK && Attacker2->GetAttackerType() == EAttackerType::BLOCK)
 	{
-		return CompareAttack(Attacker1->GetAttackerInfo(), Attacker2->GetAttackerInfo());
+		return CompareAttack(UCalAttackLibrary::CreateAttackerInfo(Attacker1->GetAttackAttributeComponent()), UCalAttackLibrary::CreateAttackerInfo(Attacker2->GetAttackAttributeComponent()));
 	}
 	else if (Attacker1->GetAttackerType() == EAttackerType::BLOCK)
 	{

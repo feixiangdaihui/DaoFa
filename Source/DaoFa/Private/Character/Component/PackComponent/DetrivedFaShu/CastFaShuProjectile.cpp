@@ -4,7 +4,7 @@
 #include"NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "NiagaraSystem.h"
-
+#include "General/AttackAttributeComponent.h"
 // Sets default values
 ACastFaShuProjectile::ACastFaShuProjectile()
 {
@@ -29,6 +29,9 @@ ACastFaShuProjectile::ACastFaShuProjectile()
 	StaticMeshComponent->SetEnableGravity(false);
 	StaticMeshComponent->SetCollisionProfileName(TEXT("NoCollision"));
 
+	AttackAttributeComponent = CreateDefaultSubobject<UAttackAttributeComponent>(TEXT("AttackAttributeComponent"));
+	AttackAttributeComponent->OnAttenuationComplete.AddDynamic(this, &ACastFaShuProjectile::OnAttenuationComplete);
+
 
 }
 
@@ -38,9 +41,15 @@ ACastFaShuProjectile::ACastFaShuProjectile()
 
 void ACastFaShuProjectile::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	ExplodeLocation = SweepResult.ImpactPoint;
 	OnProjectileHit.Broadcast(this, OtherActor, OtherComp, SweepResult);
 }
 
+
+void ACastFaShuProjectile::OnAttenuationComplete(AActor* AttenuationObject)
+{
+	Explode();
+}
 
 // Called every frame
 void ACastFaShuProjectile::Tick(float DeltaTime)
@@ -55,15 +64,16 @@ void ACastFaShuProjectile::Tick(float DeltaTime)
 
 
 
-void ACastFaShuProjectile::BeginSpell(FVector EndLocation, float Speed, float MaxDistance, FAttackerInfo InAttackerInfo)
+
+
+void ACastFaShuProjectile::BeginSpell(FVector EndLocation, float Speed, float MaxDistance, AActor* OwnerFaShu)
 {
 	SetActorRotation((EndLocation - GetActorLocation()).Rotation());
 	ProjectileMovementComponent->Velocity = (EndLocation - GetActorLocation()).GetSafeNormal() * Speed;
 	SpellMaxDistance = MaxDistance;
 	StartLocation = GetActorLocation();
 	ProjectileMovementComponent->Activate();
-	AttackerInfo = InAttackerInfo;
-	AttackerInfo.Attacker = this;
+	SetOwner(OwnerFaShu);
 }
 
 void ACastFaShuProjectile::Explode(const FVector& HitLocation)

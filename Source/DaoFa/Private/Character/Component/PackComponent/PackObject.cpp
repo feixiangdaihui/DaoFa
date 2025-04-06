@@ -2,13 +2,9 @@
 
 
 #include "Character/Component/PackComponent/PackObject.h"
-#include "Character/BaseCharacter.h"
-#include "General/AttackAttributeComponent.h"
+#include "Creature.h"
 #include "Character/Component/PackComponent/SpellCoolComponent.h"
 #include"General/StateComponent.h"
-#include "Character/Component/PackComponent/PODefenseComponent.h"
-#include "General/DefenseComponent.h"
-#include "Character/Component/AttributeComponent/HealthComponent.h"
 // Sets default values
 APackObject::APackObject()
 {
@@ -16,15 +12,9 @@ APackObject::APackObject()
 	PrimaryActorTick.bCanEverTick = true;
 	StateComponent = CreateDefaultSubobject<UStateComponent>(TEXT("StateComponent"));
 	SpellCoolComponent = CreateDefaultSubobject<USpellCoolComponent>(TEXT("SpellCoolComponent"));
-	SpellInfo.SpellCoolComponent = SpellCoolComponent;
-}
-
-// Called when the game starts or when spawned
-void APackObject::BeginPlay()
-{
-	Super::BeginPlay();
 
 }
+
 
 // Called every frame
 void APackObject::Tick(float DeltaTime)
@@ -51,33 +41,5 @@ void APackObject::AttachToCreatureByActor(AActor* Actor)
 		UE_LOG(LogTemp, Warning, TEXT("AttachToCreatureByActor %s ,NULL"), *Actor->GetClass()->GetName());
 	}
 	AttachToCreature(Temp);
-}
-
-
-
-
-
-FPackObjectInfo APackObject::GetPackObjectInfo() const 
-{
-	FPackObjectInfo PackObjectInfo;
-	PackObjectInfo.Icon = Icon;
-	PackObjectInfo.Name = ObjectName;
-	PackObjectInfo.Description = Description;
-	PackObjectInfo.Quantity = Quantity;
-	PackObjectInfo.SizeInPack = SizeInPack;
-	PackObjectInfo.EquipmentType = EquipmentType;
-	PackObjectInfo.EquipmentModeType = EquipmentModeType;
-	if (IsValid(AttackAttributeComponent))
-	{
-		PackObjectInfo.AttackAttributeInfo = AttackAttributeComponent->GetAttackAttributeInfo();
-	}
-	if (IsValid(PODefenseComponent))
-	{
-		PackObjectInfo.DefenseAttributeInfo = PODefenseComponent->GetDefenseComponent()->GetDefenseAttributeInfo();
-		PackObjectInfo.MaxHealth = PODefenseComponent->GetHealthComponent()->GetMaxValue();
-		PackObjectInfo.CurrentHealth = PODefenseComponent->GetHealthComponent()->GetCurrentValue();
-
-	}
-	return PackObjectInfo;
 }
 

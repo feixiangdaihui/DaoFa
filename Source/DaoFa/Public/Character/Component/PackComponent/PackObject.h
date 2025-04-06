@@ -4,15 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "General/AttackAttributeComponent.h"
-#include "General/DefenseComponent.h"
+#include "Character/Animation/GetAnimation.h"
+#include "General/ElementSetting.h"
 #include "PackObject.generated.h"
 
 class UAttackAttributeComponent;
 class UPOAttackAttributeComponent;
 class UStateComponent;
 class USpellCoolComponent;
-class UPODefenseComponent;
+class UDurabilityComponent;
 
 //物品耗尽委托，需要一个参数，表示耗尽的物品
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPackObjectExhausted, APackObject*, PackObject);
@@ -27,13 +27,6 @@ enum class EEquipmentType : uint8
 	FULU
 };
 
-UENUM(BlueprintType)
-enum class EEquipmentModeType : uint8
-{
-	Attack,
-	Defense,
-	Blend
-};
 
 UENUM(BlueprintType)
 enum class EEquipmentSpellType : uint8
@@ -63,61 +56,39 @@ struct FPackObjectSpellInfo
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Spell")
 	EEquipmentSpellType EquipmentSpellType = EEquipmentSpellType::ShortAndLongPress;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PackObjectInfo")
-	TObjectPtr<USpellCoolComponent> SpellCoolComponent;
 
 };
-
-
-
-//背包中要显示的信息的结构体
 USTRUCT(BlueprintType)
-struct FPackObjectInfo
+struct FPackObjectBaseInfo
 {
-	GENERATED_USTRUCT_BODY()
 
+	GENERATED_USTRUCT_BODY()
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
 	UTexture2D* Icon;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
-	FText Name;
+	FText ObjectName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
 	FText Description;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
-	int Quantity;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
-	int SizeInPack;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
 	EEquipmentType EquipmentType;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
-	EEquipmentModeType EquipmentModeType;
+	GElement Element;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
-	FAttackAttributeInfo AttackAttributeInfo;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
-	FDefenseAttributeInfo DefenseAttributeInfo;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObjectInfo")
-	float MaxHealth = 100.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PackObjectInfo")
-	float CurrentHealth = 100.0f;
-
-
+	FText PowerDescription;
 };
 
 
 
+
 UCLASS()
-class DAOFA_API APackObject : public AActor
+class DAOFA_API APackObject : public AActor , public IGetAnimation
 {
 	GENERATED_BODY()
 	
@@ -126,44 +97,12 @@ public:
 	APackObject();
 
 protected:
-	// Called when the game starts or when spawned
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
-	UTexture2D* Icon;
-	//物品的名字
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
-	FText ObjectName;
-
-	//物品的描述
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
-	FText Description;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
-	int Quantity = 1;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
-	EEquipmentModeType EquipmentModeType;
-
-
-	virtual void BeginPlay() override;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
-	TObjectPtr<UAttackAttributeComponent> AttackAttributeComponent;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
-	TObjectPtr<UPODefenseComponent> PODefenseComponent;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
-	TObjectPtr<USpellCoolComponent> SpellCoolComponent;
-
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "PackObject")
-    EEquipmentType EquipmentType;
+	FPackObjectBaseInfo BaseInfo;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
 	TObjectPtr<UStateComponent> StateComponent;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
-	int SizeInPack = 1;
-
 	ACreature* OwnerCreature;
 
 	bool CanBeWearOrTakeOff = true;
@@ -171,10 +110,24 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
 	FPackObjectSpellInfo SpellInfo;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "PackObject")
+	FMontageInfo MontageInfo;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PackObjectInfo")
+	TObjectPtr<USpellCoolComponent> SpellCoolComponent;
+
+
+
 
 public:	
 
-	EEquipmentModeType GetEquipmentModeType() { return EquipmentModeType; }
+	USpellCoolComponent* GetSpellCoolComponent() { return SpellCoolComponent; }
+
+	UFUNCTION(BlueprintCallable, Category = "PackObject")
+	virtual FMontageInfo GetMontageInfo() { return MontageInfo; }
+
+	UFUNCTION(BlueprintCallable, Category = "PackObject")
+	FPackObjectBaseInfo GetBaseInfo() { return BaseInfo; }
 
 	UPROPERTY(BlueprintAssignable, Category = "PackObject")
 	FOnPackObjectExhausted OnPackObjectExhausted;
@@ -182,19 +135,10 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-
-	UFUNCTION(BlueprintCallable, Category = "IShowTrigger")
-	virtual UTexture2D* GetIcon()const  { return Icon; }
-
-
-	UFUNCTION(BlueprintCallable, Category = "IShowTrigger")
-	virtual int GetQunatity() const { return Quantity; }
-
 	UFUNCTION(BlueprintCallable, Category = "PackObject")
 	virtual void AttachToCreature(class ACreature* Creature);
 
 	void AttachToCreatureByActor(AActor* Actor);
-
 
 	UFUNCTION(BlueprintCallable, Category = "PackObject")
 	bool GetCanBeWearOrTakeOff() { return CanBeWearOrTakeOff; }
@@ -206,31 +150,17 @@ public:
 
 
 	UFUNCTION(BlueprintCallable, Category = "PackObject")
-	virtual EEquipmentType GetEquipmentType() { return EquipmentType; }
-
-	UFUNCTION(BlueprintCallable, Category = "PackObject")
-	int GetSizeInPack() { return SizeInPack; }
-
-	UFUNCTION(BlueprintCallable, Category = "PackObject")
-	FPackObjectInfo GetPackObjectInfo() const;
-
-	UFUNCTION(BlueprintCallable, Category = "PackObject")
-	FText GetObjectName() const { return ObjectName; }
-
-	UAttackAttributeComponent* GetAttackAttributeComponent() { return AttackAttributeComponent; }
+	virtual EEquipmentType GetEquipmentType() { return BaseInfo.EquipmentType; }
 
 	UFUNCTION(BlueprintCallable, Category = "PackObject")
 	UStateComponent* GetStateComponent() { return StateComponent; }
 
 	UFUNCTION(BlueprintCallable, Category = "PackObject")
 	ACreature* GetOwnerCreature() { return OwnerCreature; }
-
-	UFUNCTION(BlueprintCallable, Category = "PackObject")
-	USpellCoolComponent* GetSpellCoolComponent() { return SpellCoolComponent; }
 	
 	UFUNCTION(BlueprintCallable, Category = "PackObject")
 	FPackObjectSpellInfo GetSpellInfo() { return SpellInfo; }
-	
+
 	UFUNCTION(BlueprintCallable, Category = "PackObject")
 	void SetCanBeWearOrTakeOff(bool value) { CanBeWearOrTakeOff = value; }
 

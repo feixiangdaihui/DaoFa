@@ -7,14 +7,13 @@
 #include "Creature.h"
 #include "Components/CapsuleComponent.h"
 #include "Character/Component/PackComponent/SpellCoolComponent.h"
-#include "Character/Component/PackComponent/PODefenseComponent.h"
+#include"General/DefenseComponent.h"
 #include "Character/Component/AttributeComponent/HealthComponent.h"
+#include "Character/Component/PackComponent/DurabilityComponent.h"
 
 AJinZhongZhao::AJinZhongZhao()
 {
-	PODefenseComponent = CreateDefaultSubobject<UPODefenseComponent>(TEXT("PODefenseComponent"));
-	EquipmentModeType = EEquipmentModeType::Defense;
-	PODefenseComponent->GetHealthComponent()->OnDeath.AddDynamic(this, &AJinZhongZhao::OnDeath);
+	DefenseComponent = CreateDefaultSubobject<UDefenseComponent>(TEXT("PODefenseComponent"));
 
 
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("CapsuleComponent"));
@@ -29,6 +28,7 @@ AJinZhongZhao::AJinZhongZhao()
 	//overlap
 	StaticMeshComponent->SetCollisionProfileName(TEXT("NOCollision"));
 	StaticMeshComponent->SetGenerateOverlapEvents(true);
+
 
 
 	SpellInfo.EquipmentSpellType = EEquipmentSpellType::Continuous;
@@ -53,13 +53,6 @@ void AJinZhongZhao::TriggeredByShortPress()
 	}
 }
 
-
-void AJinZhongZhao::OnDeath()
-{
-	OnPackObjectExhausted.Broadcast(this);
-	Destroy();
-}
-
 void AJinZhongZhao::AttachToCreature(ACreature* Creature)
 {
 	Super::AttachToCreature(Creature);
@@ -68,14 +61,16 @@ void AJinZhongZhao::AttachToCreature(ACreature* Creature)
 	IsSpell = false;
 }
 
-void AJinZhongZhao::BeAttacked(FAttackReturnValue AttackReturnValue)
+float AJinZhongZhao::BeAttacked(FAttackReturnValue AttackReturnValue)
 {
-	PODefenseComponent->GetHealthComponent()->SubtractValue(AttackReturnValue.Damage);
+	float Percent = DurabilityComponent->GetCurrentValue()/AttackReturnValue.Damage ;
+	DurabilityComponent->SubtractValue(AttackReturnValue.Damage);
+	return FMath::Clamp(Percent, 0.0f, 1.0f);
 }
 
 FDefenderInfo AJinZhongZhao::GetDefenderInfo()
 {
-	return UCalAttackLibrary::CreateDefenderInfo(PODefenseComponent->GetDefenseComponent());
+	return UCalAttackLibrary::CreateDefenderInfo(DefenseComponent);
 }
 
 

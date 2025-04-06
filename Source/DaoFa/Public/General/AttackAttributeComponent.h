@@ -7,6 +7,9 @@
 #include "General/ElementSetting.h"
 #include "AttackAttributeComponent.generated.h"
 
+
+//委托：对于可衰减的对象，在完全衰减后，调用该委托
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAttenuationComplete, AActor*,AttenuationObject);
 UENUM()
 enum class EInterruptType
 {
@@ -67,6 +70,9 @@ class IBeAttacked;
 class ACreature;
 struct FAttackerInfo;
 
+
+
+
 //本类用于存储攻击属性，包括基础伤害，伤害倍率，暴击率，暴击倍率，元素属性，中断属性，并囊括与之相关的方法，如攻击，攻击属性的比较等
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class DAOFA_API UAttackAttributeComponent : public UActorComponent
@@ -88,12 +94,6 @@ protected:
 	float BaseDamage = 10.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
-	float CriticalHitChance = 0.1f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
-	float CriticalHitMultiplier = 2.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
 	GElement Element = GElement::Matel;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
@@ -102,10 +102,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
 	float DamageMultiplier = 1.0f;
 
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Attack")
+	bool IsAttenuation = false;
 
 
 public:
+
+	UPROPERTY(BlueprintAssignable, Category = "Attack")
+	FOnAttenuationComplete OnAttenuationComplete;
 
 
 
@@ -124,8 +128,6 @@ public:
 	void MultiplyDamageMultiplier(float Multiplier, bool bIsPermanent = false, float Duration = 0.0f);
 
 	void Attack(IBeAttacked* BeAttacked);
-
-	static void AttackByAttackerInfo(FAttackerInfo AttackerInfo, IBeAttacked* BeAttacked);
 
 
 	UFUNCTION(BlueprintCallable, Category = "Attack")

@@ -18,12 +18,22 @@ public:
 
 
 protected:
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "FaBao")
+	TObjectPtr<UDurabilityComponent> DurabilityComponent;
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	virtual void TriggeredByLongPress() override;
 
 	virtual void TriggeredByShortPress() override;
+
+    UFUNCTION(BlueprintCallable, Category = "PackObject")
+    void OnDurabilityExhausted(UDurabilityComponent* InDurabilityComponent)
+    {
+		OnPackObjectExhausted.Broadcast(this);
+		Destroy();
+    }
 
 public:	
 	// Called every frame

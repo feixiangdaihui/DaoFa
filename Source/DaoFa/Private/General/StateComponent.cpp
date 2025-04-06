@@ -178,6 +178,7 @@ bool UStateComponent::UpgradeState()
 			LastUpgradeExp = 0;
 			CurrentState = GetNextState();
 			OnStateUpgrade.Broadcast(CurrentState);
+			StateExp = 0;
 			return true;
 		}
 		else

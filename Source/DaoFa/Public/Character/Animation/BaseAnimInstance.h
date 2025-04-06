@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
 #include "Character/Component/InputOperationComponent.h"
+#include "Character/Animation/GetAnimation.h"
 #include "BaseAnimInstance.generated.h"
 
 /**
@@ -25,23 +26,7 @@ enum class AnimationType : uint8
 	NONE
 };
 
-USTRUCT(BlueprintType)
-struct FMontageInfo
-{
-	GENERATED_BODY()
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montage")
-	UAnimMontage* Montage;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montage")
-	float PlayRate = 1.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montage")
-	bool IsLooping = false;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Montage")
-	bool ShouldStopOtherMontage = false;
-
-};
 
 class ACreature;
 

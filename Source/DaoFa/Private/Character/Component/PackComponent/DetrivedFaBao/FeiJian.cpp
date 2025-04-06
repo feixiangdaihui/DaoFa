@@ -9,10 +9,10 @@
 #include "Creature.h"
 #include "General/Interface/BeAttacked.h"
 #include "Character/Component/PackComponent/SpellCoolComponent.h"
+#include "General/AttackAttributeComponent.h"
 AFeiJian::AFeiJian()
 {
 	AttackAttributeComponent = CreateDefaultSubobject<UAttackAttributeComponent>(TEXT("AttackAttributeComponent"));
-	EquipmentModeType = EEquipmentModeType::Attack;
 
 
 	LongPressEnemyDetector = CreateDefaultSubobject<UEnemyDetector>(TEXT("LongPressEnemyDetector"));
@@ -91,10 +91,6 @@ void AFeiJian::Tick(float DeltaTime)
 	}
 }
 
-FAttackerInfo AFeiJian::GetAttackerInfo()
-{
-	return UCalAttackLibrary::CreateAttackerInfo(AttackAttributeComponent);
-}
 
 
 
@@ -213,6 +209,7 @@ void AFeiJian::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Other
 		//如果碰到的物体碰撞预设是WorldStatic，那么endSpell
 		if (OtherComp->GetCollisionObjectType() == ECollisionChannel::ECC_WorldStatic)
 		{
+			UE_LOG(LogTemp, Warning, TEXT("%s"), *OtherActor->GetName());
 			EndSpell();
 			return;
 		}

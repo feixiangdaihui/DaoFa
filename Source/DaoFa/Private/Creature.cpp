@@ -53,9 +53,11 @@ void ACreature::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 }
 
 
-void ACreature::BeAttacked(FAttackReturnValue AttackReturnValue)
+float ACreature::BeAttacked(FAttackReturnValue AttackReturnValue)
 {
+	float Percent = HealthComponent->GetCurrentValue()/ AttackReturnValue.Damage  ;
 	HealthComponent->SubtractValue(AttackReturnValue.Damage);
+	return FMath::Clamp(Percent, 0.0f, 1.0f);
 }
 
 FDefenderInfo ACreature::GetDefenderInfo()

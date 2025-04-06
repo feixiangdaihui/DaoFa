@@ -10,6 +10,7 @@ class UEnemyDetector;
 class UCapsuleComponent;
 class UProjectileMovementComponent;
 class ACreature;
+class UAttackAttributeComponent;
 /**
  * 
  */
@@ -20,6 +21,8 @@ class DAOFA_API AFeiJian : public AFaBao, public IAttacker
 protected:
 
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FeiJian")
+	TObjectPtr<UAttackAttributeComponent> AttackAttributeComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FeiJian")
 	TObjectPtr<UEnemyDetector> ShortPressEnemyDetector;
@@ -59,7 +62,7 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-	virtual FAttackerInfo GetAttackerInfo() override;
+	virtual UAttackAttributeComponent* GetAttackAttributeComponent() override { return AttackAttributeComponent; }
 
 	virtual EAttackerType GetAttackerType() override { return AttackerType; }
 private:

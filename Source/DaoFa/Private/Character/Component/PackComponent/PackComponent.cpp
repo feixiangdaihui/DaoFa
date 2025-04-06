@@ -7,6 +7,8 @@
 #include"PlayerController/BasePlayerController.h"
 #include "Character/Component/PackComponent/EquipmentBarComponent.h"
 #include "Character/Component/PackComponent/PackObject.h"
+#include "General/Interface/PileAbility.h"
+
 // Sets default values for this component's properties
 UPackComponent::UPackComponent()
 {
@@ -61,13 +63,24 @@ void UPackComponent::WearEquipmentByClass(TSubclassOf<APackObject> EquipmentClas
 void UPackComponent::WearEquipment( APackObject* Equipment, int SpecificIndex)
 {
 	Equipment->AttachToCreatureByActor(GetOwner());
-	int Size = Equipment->GetSizeInPack();
-	if (Size + CurrentSize > SumSize)
-	{
-		return;
-	}
-	CurrentSize += Size;
 	Equipment->OnPackObjectExhausted.AddDynamic(this, &UPackComponent::OnPackObjectExhausted);
+
+	//对于可叠加的物品的处理
+	IPileAbility* PileAbility = Cast<IPileAbility>(Equipment);
+	if (PileAbility)
+	{
+		TPair<APackObject*, bool> FindResult = FindPackObjectByClass(Equipment->GetClass());
+		if (FindResult.Value)
+		{
+			IPileAbility* FindPileAbility = Cast<IPileAbility>(FindResult.Key);
+			if (FindPileAbility)
+			{
+				FindPileAbility->Pile(TScriptInterface<IPileAbility>(Equipment));
+			}
+			return;
+		}
+	}
+
 	switch (Equipment->GetEquipmentType())
 	{
 	case EEquipmentType::FASHU:
@@ -94,7 +107,6 @@ void UPackComponent::WearEquipment( APackObject* Equipment, int SpecificIndex)
 
 void UPackComponent::TakeOffEquipment(APackObject* Equipment)
 {
-	CurrentSize -= Equipment->GetSizeInPack();
 	if (EquipmentBarComponent)
 	{
 		EquipmentBarComponent->TakeOffEquipment(Equipment);
@@ -157,5 +169,31 @@ APackObject* UPackComponent::GetPackObjectByTypeAndIndex(EEquipmentType TypeInde
 	return nullptr;
 }
 
+TPair<APackObject*, bool> UPackComponent::FindPackObjectByClass(TSubclassOf<APackObject> PackObjectClass)
+{
+	for (auto PackObject : FaShuArray)
+	{
+		if (PackObject->GetClass() == PackObjectClass)
+		{
+			return TPair<APackObject*, bool>(PackObject, true);
+		}
+	}
+	for (auto PackObject : FaBaoArray)
+	{
+		if (PackObject->GetClass() == PackObjectClass)
+		{
+			return TPair<APackObject*, bool>(PackObject, true);
+		}
+	}
+	for (auto PackObject : FuLuArray)
+	{
+		if (PackObject->GetClass() == PackObjectClass)
+		{
+			return TPair<APackObject*, bool>(PackObject, true);
+		}
+	}
+
+	return TPair<APackObject*, bool>(nullptr, false);
+}
 
 

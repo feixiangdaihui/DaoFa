@@ -24,7 +24,8 @@ class DAOFA_API IBeAttacked
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 
-	virtual void BeAttacked(FAttackReturnValue AttackReturnValue) = 0;
+	//返回值代表对于攻击的吸收程度，取值范围为0-1，数值越大，吸收程度越高
+	virtual float BeAttacked(FAttackReturnValue AttackReturnValue) = 0;
 
 	virtual FDefenderInfo GetDefenderInfo() = 0;
 	

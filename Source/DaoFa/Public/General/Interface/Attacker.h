@@ -42,7 +42,7 @@ class IAttacker
 public:
 
 	
-	virtual FAttackerInfo GetAttackerInfo() = 0;
+	virtual UAttackAttributeComponent* GetAttackAttributeComponent() = 0;
 	virtual EAttackerType GetAttackerType() = 0;
 };
 

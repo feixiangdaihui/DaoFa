@@ -2,6 +2,7 @@
 
 
 #include "Character/Component/PackComponent/FaBao.h"
+#include "Character/Component/PackComponent/DurabilityComponent.h"
 
 
 // Sets default values
@@ -11,8 +12,9 @@ AFaBao::AFaBao()
 	PrimaryActorTick.bCanEverTick = true;
 
 
-	EquipmentType = EEquipmentType::FABAO;
-
+	BaseInfo.EquipmentType = EEquipmentType::FABAO;
+	DurabilityComponent = CreateDefaultSubobject<UDurabilityComponent>(TEXT("DurabilityComponent"));
+	DurabilityComponent->OnDurabilityExhausted.AddDynamic(this, &AFaBao::OnDurabilityExhausted);
 
 
 

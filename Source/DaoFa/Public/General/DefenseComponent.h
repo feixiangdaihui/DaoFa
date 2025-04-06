@@ -41,7 +41,7 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defense")
-	float Defense;
+	float Defense=10.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Defense")
 	GElement DefenseElement;

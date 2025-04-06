@@ -3,14 +3,12 @@
 
 #include "Character/Component/PackComponent/DetrivedFaShu/CastFaShu.h"
 #include "Character/Component/PackComponent/DetrivedFaShu/CastFaShuProjectile.h"
+#include"General/AttackAttributeComponent.h"
 #include "General/EnemyDetector.h"
 #include "Creature.h"
 #include "Character/Component/PackComponent/SpellCoolComponent.h"
 ACastFaShu::ACastFaShu()
 {
-	AttackAttributeComponent = CreateDefaultSubobject<UAttackAttributeComponent>(TEXT("AttackAttributeComponent"));
-	EquipmentModeType = EEquipmentModeType::Attack;
-
 
 	EnemyDetector = CreateDefaultSubobject<UEnemyDetector>(TEXT("EnemyDetector"));
 	EnemyDetector->DetectionRadius = 3000;
@@ -44,7 +42,7 @@ void ACastFaShu::BaseCastSpell()
 				EndLocation = FindTarget()->GetActorLocation();
 			else
 				EndLocation = GetOwner()->GetActorLocation() + GetOwner()->GetActorForwardVector() * SpellMaxDistance;
-			CastFaShuProjectile->BeginSpell(EndLocation, SpellSpeed, SpellMaxDistance, UCalAttackLibrary::CreateAttackerInfo(AttackAttributeComponent));
+			CastFaShuProjectile->BeginSpell(EndLocation, SpellSpeed, SpellMaxDistance,this);
 			CastFaShuProjectile->OnProjectileHit.AddDynamic(this, &ACastFaShu::OnOverlapBegin);
 		}
 	}
@@ -70,8 +68,7 @@ void ACastFaShu::OnOverlapBegin(ACastFaShuProjectile* FaShuProjectile, AActor* O
 	IBeAttacked* BeAttacked = Cast<IBeAttacked>(OtherActor);
 	if (BeAttacked)
 	{
-		AttackAttributeComponent->AttackByAttackerInfo(FaShuProjectile->GetAttackerInfo(), BeAttacked);
-		FaShuProjectile->Explode(SweepResult.ImpactPoint);
+		FaShuProjectile->GetAttackAttributeComponent()->Attack(BeAttacked);
 		return;
 	}
 	IAttacker* Attacker = Cast<IAttacker>(OtherActor);

@@ -7,13 +7,12 @@
 #include"General/AttackAttributeComponent.h"
 #include "Character/Component/AttributeComponent/HealthComponent.h"
 #include "General/ElementSetting.h"
-#include "Character/Component/PackComponent/PODefenseComponent.h"
 #include "Character/Component/AttributeComponent/BlueComponent.h"
 #include "Character/Component/PackComponent/PackObject.h"
 
 
 
-bool UCalAttackLibrary::IsTest = false;
+bool UCalAttackLibrary::IsTest = true;
 
 EInterruptType UCalAttackLibrary::CalculateInterrupt(EInterruptAblity InterruptAblity, EAvoidInterruptAblity AvoidAblity)
 {
@@ -52,6 +51,8 @@ float UCalAttackLibrary::CalculateDamage(FAttackerInfo AttackerInfo, FDefenderIn
 	float AttackNum = CalculateAttackNum(AttackerInfo);
 	float DefenseNum = CalculateDefenseNum(DefenderInfo);
 	float Result = AttackNum * ElementRestrainMultiplier * StateDamageMultiplier / DefenseNum;
+	if (IsTest)
+		UE_LOG(LogTemp, Warning, TEXT("AttackNum:%f,DefenseNum:%f,ElementRestrainMultiplier:%f,StateDamageMultiplier:%f"), AttackNum, DefenseNum, ElementRestrainMultiplier, StateDamageMultiplier);
 	return Result;
 }
 
@@ -61,12 +62,16 @@ float UCalAttackLibrary::CalculateAttackNum(FAttackerInfo AttackerInfo)
 	float DamageMultiplier = AttackerInfo.DamageMultiplier;
 	float BlueDensity = AttackerInfo.BlueDensity;
 	float StateDamageMultiplier = UStateComponent::CalCreatureStateDamageMultiplier(AttackerInfo.State, AttackerInfo.OwnerState);
+	if(IsTest)
+		UE_LOG(LogTemp, Warning, TEXT("BaseDamage:%f,DamageMultiplier:%f,StateDamageMultiplier:%f,BlueDensity:%f"), BaseDamage, DamageMultiplier, StateDamageMultiplier, BlueDensity);
 	return BaseDamage * DamageMultiplier * StateDamageMultiplier * BlueDensity;
 }
 
 float UCalAttackLibrary::CalculateDefenseNum(FDefenderInfo DefenderInfo)
 {
 	float Defense = DefenderInfo.Defense;
+	if (IsTest)
+		UE_LOG(LogTemp, Warning, TEXT("Defense:%f"), Defense);
 	return Defense;
 }
 
@@ -127,8 +132,9 @@ FAttackerInfo UCalAttackLibrary::CreateAttackerInfo(UAttackAttributeComponent* A
 	AttackerInfo.Attacker = Owner;
 	if (Owner)
 	{
-		
 		APackObject* PackObject = Cast<APackObject>(Owner);
+		if(!PackObject)
+			PackObject = Cast<APackObject>(Owner->GetOwner());
 		if (PackObject)
 		{
 			AttackerInfo.State = PackObject->GetStateComponent()->GetState();

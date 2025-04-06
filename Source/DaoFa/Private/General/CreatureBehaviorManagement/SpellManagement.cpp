@@ -32,7 +32,7 @@ void USpellManagement::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 bool USpellManagement::CheckForSpell(APackObject* Equipment)
 {
-	if (Equipment->GetSpellInfo().SpellCoolComponent->IsCoolingNow())
+	if (Equipment->GetSpellCoolComponent()->IsCoolingNow())
 		return false;
 
 	FPackObjectSpellInfo SpellInfo = Equipment->GetSpellInfo();

@@ -27,13 +27,6 @@ protected:
 	virtual void BeginPlay() override;
 
 
-
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pack")
-	int SumSize = 100;
-
-	int CurrentSize = 0;
-
 	UPROPERTY()
 	ABasePlayerController* OwnerController;
 
@@ -70,6 +63,7 @@ public:
 
 	APackObject* GetPackObjectByTypeAndIndex(EEquipmentType TypeIndex, int Index);
 
+	TPair<APackObject*, bool> FindPackObjectByClass(TSubclassOf<APackObject> PackObjectClass);
 
 
 	

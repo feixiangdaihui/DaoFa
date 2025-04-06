@@ -8,6 +8,7 @@
 #include "JinZhongZhao.generated.h"
 class ACreature;
 class UCapsuleComponent;
+class UDefenseComponent;
 /**
  * 
  */
@@ -16,6 +17,8 @@ class DAOFA_API AJinZhongZhao : public AFaBao, public IBeAttacked
 {
 	GENERATED_BODY()
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "JinZhongZhao")
+	TObjectPtr<UDefenseComponent> DefenseComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "JinZhongZhao")
 	TObjectPtr<UCapsuleComponent> CapsuleComponent;
@@ -24,8 +27,6 @@ protected:
 	TObjectPtr<UStaticMeshComponent> StaticMeshComponent;
 
 
-	UFUNCTION()
-	void OnDeath();
 
 	bool IsSpell = false;
 
@@ -39,7 +40,7 @@ public:
 	virtual void AttachToCreature(ACreature* Creature) override;
 
 
-	virtual void BeAttacked(FAttackReturnValue AttackReturnValue) override;
+	virtual float BeAttacked(FAttackReturnValue AttackReturnValue) override;
 
 	virtual FDefenderInfo GetDefenderInfo() override;
 
