@@ -64,7 +64,7 @@ void UEquipmentBarComponent::WearEquipment(APackObject* Equipment, int SpecificI
 void UEquipmentBarComponent::TakeOffEquipment(APackObject* Equipment)
 {
 	int Index = static_cast<int>(Equipment->GetEquipmentType());
-	for (int i = 0; i < EQUIPMENTBAR_NUM; i++)
+	for (int i = 0; i < EQUIPMENTBAR_SIZE; i++)
 	{
 		if (EquipmentBar[Index][i] == Equipment)
 		{
