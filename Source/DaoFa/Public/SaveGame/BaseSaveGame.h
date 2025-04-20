@@ -14,29 +14,27 @@ UCLASS()
 class DAOFA_API UBaseSaveGame : public USaveGame
 {
 	GENERATED_BODY()
-private:
+protected:
 
 	UPROPERTY(SaveGame)
 	FString SaveDataString;
 
-	TArray<TScriptInterface<ISaveLoadData>> ISaveLoadDataArray;
 
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SaveGame", meta = (AllowPrivateAccess = "true"))
 	bool IsTest = false;
 
-public:
 
 	void SetIsTest(bool Value) { IsTest = Value; }
 
-	void InitISaveLoadData(TArray<TScriptInterface<ISaveLoadData>> InISaveLoadDataArray) {
-		ISaveLoadDataArray.Empty();
-		ISaveLoadDataArray = InISaveLoadDataArray;
+	UBaseSaveGame* GetBaseSaveGame(FString SlotName);
 
-	}
 
-	UFUNCTION(BlueprintCallable)
-	void SaveGameMethod(FString SlotName);
+	void SaveISaveLoadDataArray(FString SlotName, TArray<TScriptInterface<ISaveLoadData>> ISaveLoadDataArray);
 
-	UFUNCTION(BlueprintCallable)
-	void LoadGameMethod(FString SlotName);
+	void LoadISaveLoadDataArray(UBaseSaveGame* LoadBaseSaveGame, TArray<TScriptInterface<ISaveLoadData>> ISaveLoadDataArray);
+
+
+
 
 };

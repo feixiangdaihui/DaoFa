@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Creature.h"
-#include "General/Interface/SaveLoadData.h"
 #include "BaseCharacter.generated.h"
 
 class USpringArmComponent;
@@ -15,7 +14,7 @@ class UPackComponent;
 class UEnemyDetector;
 class UEquipmentBarComponent;
 UCLASS()
-class DAOFA_API ABaseCharacter : public ACreature, public ISaveLoadData
+class DAOFA_API ABaseCharacter : public ACreature
 {
 	GENERATED_BODY()
 
@@ -49,8 +48,6 @@ protected:
 	TObjectPtr<UEquipmentBarComponent> EquipmentBarComponent;
 
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Save")
-	TArray<TScriptInterface<ISaveLoadData>> SaveLoadDataArray;
 
 	
 
@@ -66,11 +63,6 @@ public:
 
 	UEnemyDetector* GetEnemyDetector() const { return EnemyDetector; }
 
-
-	//存档
-	virtual FJsonObject SaveDataMethod() const override;
-
-	virtual void LoadDataMethod(const TSharedPtr<FJsonObject> JsonObject) override;
 
 	virtual FString GetKey() const override { return TEXT("BaseCharacter"); }
 

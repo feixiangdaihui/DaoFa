@@ -70,14 +70,7 @@ ABaseCharacter::ABaseCharacter()
 
 
 
-	if (IsValid(BlueComponent))
-	{
-		SaveLoadDataArray.Add(TScriptInterface<ISaveLoadData>(BlueComponent));
-	}
-	if (IsValid(StateComponent))
-	{
-		SaveLoadDataArray.Add(TScriptInterface<ISaveLoadData>(StateComponent.Get()));
-	}
+
 
 }
 
@@ -118,32 +111,6 @@ void ABaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 
 
-FJsonObject ABaseCharacter::SaveDataMethod() const
-{
-	TSharedPtr<FJsonObject> SaveData = MakeShared<FJsonObject>();
-	TArray<TSharedPtr<FJsonObject>> TempArray;
-	TempArray.SetNum(SaveLoadDataArray.Num());
-	for (int i = 0; i < SaveLoadDataArray.Num(); i++)
-	{
-		if (SaveLoadDataArray[i].GetObject() != nullptr)
-		{
-			TempArray[i] = MakeShared<FJsonObject>(SaveLoadDataArray[i]->SaveDataMethod());
-			SaveData->SetObjectField(SaveLoadDataArray[i]->GetKey(), TempArray[i]);
-		}
-	}
-	return *SaveData;
-
-}
-
-void ABaseCharacter::LoadDataMethod(const TSharedPtr<FJsonObject> JsonObject)
-{
-	UE_LOG(LogTemp, Warning, TEXT("ABaseCharacter::LoadDataMethod"));
-	for (auto ISaveLoadData : SaveLoadDataArray)
-	{
-		if (ISaveLoadData.GetObject() != nullptr)
-			ISaveLoadData->LoadDataMethod(JsonObject->GetObjectField(ISaveLoadData->GetKey()));
-	}
-}
 
 
 

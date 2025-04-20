@@ -6,7 +6,14 @@
 
 
 
-void UBaseSaveGame::SaveGameMethod(FString SlotName)
+UBaseSaveGame* UBaseSaveGame::GetBaseSaveGame(FString SlotName)
+{
+	USaveGame* SaveGame = UGameplayStatics::LoadGameFromSlot(SlotName, 0);
+	UBaseSaveGame* BaseSaveGame = Cast<UBaseSaveGame>(SaveGame);
+	return BaseSaveGame;
+}
+
+void UBaseSaveGame::SaveISaveLoadDataArray(FString SlotName, TArray<TScriptInterface<ISaveLoadData>> ISaveLoadDataArray)
 {
 	TSharedPtr<FJsonObject> SaveData = MakeShared<FJsonObject>();
 	TArray<TSharedPtr<FJsonObject>> TempSaveData;
@@ -15,39 +22,46 @@ void UBaseSaveGame::SaveGameMethod(FString SlotName)
 	{
 		if (ISaveLoadDataArray[i].GetObject() != nullptr)
 		{
-			if(IsTest)
-			{
-				TempSaveData[i] = MakeShared<FJsonObject>(ISaveLoadDataArray[i]->SaveDataMethod());
-				//输出jsonobject
-				FString TestString;
-				TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&TestString);
-				FJsonSerializer::Serialize(TempSaveData[i].ToSharedRef(), Writer);
-				// 输出日志  
-				UE_LOG(LogTemp, Display, TEXT("JSON内容：\n%s"), *TestString);
-			}
+			TempSaveData[i] = MakeShared<FJsonObject>(ISaveLoadDataArray[i]->SaveDataMethod());
+
 			SaveData->SetObjectField(ISaveLoadDataArray[i]->GetKey(), TempSaveData[i]);
 		}
 	}
 	if (SaveData.IsValid())
 	{
+		if (IsTest)
+		{
+			//输出jsonobject
+			FString TestString;
+			TSharedRef<TJsonWriter<>> Writer = TJsonWriterFactory<>::Create(&TestString);
+			FJsonSerializer::Serialize(SaveData.ToSharedRef(), Writer);
+			UE_LOG(LogTemp, Display, TEXT("JSON内容：\n%s"), *TestString);
+		}
 		FString OutputString;
 		TSharedRef<TJsonWriter<TCHAR>> Writer = TJsonWriterFactory<>::Create(&OutputString);
 		FJsonSerializer::Serialize(SaveData.ToSharedRef(), Writer);
 		SaveDataString = OutputString;
 		UGameplayStatics::SaveGameToSlot(this, SlotName, 0);
 	}
-	
 }
 
-void UBaseSaveGame::LoadGameMethod(FString SlotName)
+void UBaseSaveGame::LoadISaveLoadDataArray(UBaseSaveGame* LoadBaseSaveGame, TArray<TScriptInterface<ISaveLoadData>> ISaveLoadDataArray)
 {
-	TSharedPtr<FJsonObject> SaveData;
-	USaveGame* LoadGameInstance = UGameplayStatics::LoadGameFromSlot(SlotName, 0);
-	UBaseSaveGame* LoadBaseSaveGame = Cast<UBaseSaveGame>(LoadGameInstance);
+	if (LoadBaseSaveGame == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("LoadBaseSaveGame is null"));
+		return;
+	}
+	if (LoadBaseSaveGame->SaveDataString.IsEmpty())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SaveDataString is empty"));
+		return;
+	}
+	TSharedPtr<FJsonObject> SaveData = MakeShared<FJsonObject>();
 	if (LoadBaseSaveGame)
 	{
 		SaveDataString = LoadBaseSaveGame->SaveDataString;
-		TSharedRef<TJsonReader<TCHAR>> Reader = TJsonReaderFactory<TCHAR>::Create(SaveDataString);
+		TSharedRef<TJsonReader<TCHAR>> Reader = TJsonReaderFactory<TCHAR>::Create(LoadBaseSaveGame->SaveDataString);
 		FJsonSerializer::Deserialize(Reader, SaveData);
 		for (auto ISaveLoadData : ISaveLoadDataArray)
 		{

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "General/Interface/BeAttacked.h"
+#include "General/Interface/SaveLoadData.h"
 #include "Creature.generated.h"
 class UHealthComponent;
 class UBlueComponent;
@@ -16,7 +17,7 @@ class APackObject;
 class UCreatureBehavior;
 class UGongFaComponent;
 UCLASS()
-class DAOFA_API ACreature : public ACharacter, public IBeAttacked
+class DAOFA_API ACreature : public ACharacter, public IBeAttacked, public ISaveLoadData
 {
 	GENERATED_BODY()
 
@@ -57,6 +58,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Walk")
 	float RunSpeed = 500.f;
 
+
+	//savegame
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Save")
+	TArray<TScriptInterface<ISaveLoadData>> SaveLoadDataArray;
 public:
 	// Sets default values for this character's properties
 	ACreature();
@@ -78,6 +84,7 @@ public:
 	UCreatureBehavior* GetCreatureBehavior()const { return CreatureBehavior.Get(); }
 	UGongFaComponent* GetGongFaComponent()const { return GongFaComponent.Get(); }
 
+
 	virtual float BeAttacked(FAttackReturnValue AttackReturnValue) override;
 	virtual FDefenderInfo GetDefenderInfo() override;
 
@@ -89,5 +96,13 @@ public:
 
 	void SetUnbeatable(bool NewValue);
 
+
+	///ISaveLoadData
+	virtual FJsonObject SaveDataMethod() const override;
+	virtual void LoadDataMethod(const TSharedPtr<FJsonObject> JsonObject) override;
+	virtual FString GetKey() const override
+	{
+		return GetName();
+	}
 
 };

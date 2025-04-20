@@ -29,6 +29,16 @@ ACreature::ACreature()
 	StateComponent->InitStateComponent(BlueComponent);
 
 	GongFaComponent = CreateDefaultSubobject<UGongFaComponent>(TEXT("GongFaComponent"));
+
+
+	if (IsValid(BlueComponent))
+	{
+		SaveLoadDataArray.Add(TScriptInterface<ISaveLoadData>(BlueComponent));
+	}
+	if (IsValid(StateComponent))
+	{
+		SaveLoadDataArray.Add(TScriptInterface<ISaveLoadData>(StateComponent.Get()));
+	}
 }
 
 // Called when the game starts or when spawned
@@ -78,6 +88,31 @@ void ACreature::SetSpeedToRun()
 void ACreature::SetUnbeatable(bool NewValue)
 {
 	HealthComponent->CanBeHurt = !NewValue;
+}
+
+FJsonObject ACreature::SaveDataMethod() const
+{
+	TSharedPtr<FJsonObject> SaveData = MakeShared<FJsonObject>();
+	TArray<TSharedPtr<FJsonObject>> TempArray;
+	TempArray.SetNum(SaveLoadDataArray.Num());
+	for (int i = 0; i < SaveLoadDataArray.Num(); i++)
+	{
+		if (SaveLoadDataArray[i].GetObject() != nullptr)
+		{
+			TempArray[i] = MakeShared<FJsonObject>(SaveLoadDataArray[i]->SaveDataMethod());
+			SaveData->SetObjectField(SaveLoadDataArray[i]->GetKey(), TempArray[i]);
+		}
+	}
+	return *SaveData;
+}
+
+void ACreature::LoadDataMethod(const TSharedPtr<FJsonObject> JsonObject)
+{
+	for (auto ISaveLoadData : SaveLoadDataArray)
+	{
+		if (ISaveLoadData.GetObject() != nullptr)
+			ISaveLoadData->LoadDataMethod(JsonObject->GetObjectField(ISaveLoadData->GetKey()));
+	}
 }
 
 
