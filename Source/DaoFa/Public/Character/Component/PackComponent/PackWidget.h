@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Hud/Interface/InitWidgetByCharacter.h"
 #include "PackWidget.generated.h"
 class UPackComponent;
 /**
@@ -11,7 +12,7 @@ class UPackComponent;
  */
 class USumEquipmentBarWidget;
 UCLASS()
-class DAOFA_API UPackWidget : public UUserWidget
+class DAOFA_API UPackWidget : public UUserWidget, public IInitWidgetByCharacter
 {
 	GENERATED_BODY()
 	
@@ -27,6 +28,7 @@ public:
 	
 	void OpenClosePack();
 
-	void InitPackWidget(UPackComponent* InPackComponent);
+
+	virtual void InitWidgetByCharacter(ABaseCharacter* Character) override;
 
 };

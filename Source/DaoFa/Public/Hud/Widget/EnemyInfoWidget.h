@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Hud/Interface/InitWidgetByCharacter.h"
 #include "EnemyInfoWidget.generated.h"
 class IGetValueInterface;
 class UMyProgressBar;
@@ -13,7 +14,7 @@ class ACreature;
  * 
  */
 UCLASS()
-class DAOFA_API UEnemyInfoWidget : public UUserWidget
+class DAOFA_API UEnemyInfoWidget : public UUserWidget, public IInitWidgetByCharacter
 {
 	GENERATED_BODY()
 	
@@ -51,7 +52,8 @@ protected:
 
 
 public:
-	void InitEnemyInfoWidget(UEnemyDetector* NewEnemyDetector);
+
+	virtual void InitWidgetByCharacter(ABaseCharacter* Character) override;
 	virtual void NativeConstruct() override;
 	
 

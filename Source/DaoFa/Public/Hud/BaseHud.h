@@ -12,9 +12,32 @@ class UPackWidget;
 class ABasePlayerController;
 class URealTimeWidget;
 class UEnemyInfoWidget;
+class IInitWidgetByCharacter;
 /**
  * 
  */
+USTRUCT(BlueprintType)
+struct FWidgetMessage
+{
+	GENERATED_BODY()
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget")
+	TSubclassOf<UUserWidget> WidgetClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget")
+	TObjectPtr<UUserWidget> Widget;
+
+	FWidgetMessage()
+	{
+		WidgetClass = nullptr;
+		Widget = nullptr;
+	}
+	FWidgetMessage(TSubclassOf<UUserWidget> InWidgetClass, UUserWidget* InWidget)
+	{
+		WidgetClass = InWidgetClass;
+		Widget = InWidget;
+	}
+};
+
 UCLASS()
 class DAOFA_API ABaseHud : public AHUD
 {
@@ -22,39 +45,13 @@ class DAOFA_API ABaseHud : public AHUD
 protected:
 
 
+	TArray<TScriptInterface<IInitWidgetByCharacter>> InitWidgetByCharacterArray;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Character")
 	ABaseCharacter* OwnerCharacter;
 
-	//装备栏
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pack")
-	TSubclassOf<USumEquipmentBarWidget> SumEquipmentBarWidgetClass;
-	TObjectPtr<USumEquipmentBarWidget> SumEquipmentBarWidget;
-	UUserWidget* EquipmentBarWidget;
-
-	//背包
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Pack")
-	TSubclassOf<UPackWidget> PackWidgetClass;
-	UPROPERTY(BlueprintReadOnly, Category = "Pack")
-	TObjectPtr<UPackWidget> PackWidget;
-
-
-	//角色实时信息
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "RealTime")
-	TSubclassOf<URealTimeWidget> RealTimeWidgetClass;
-
-	UPROPERTY(BlueprintReadOnly, Category = "RealTime")
-	TObjectPtr<URealTimeWidget> RealTimeWidget;
-
-
-	//敌人信息
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy")
-	TSubclassOf<UEnemyInfoWidget> EnemyInfoWidgetClass;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Enemy")
-	TObjectPtr<UEnemyInfoWidget> EnemyInfoWidget;
-
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget")
+	TMap<FString, FWidgetMessage> WidgetMap;
 
 	ABasePlayerController* OwnerController;
 	

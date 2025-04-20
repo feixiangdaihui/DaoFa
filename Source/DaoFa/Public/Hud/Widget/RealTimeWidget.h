@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Hud/Interface/InitWidgetByCharacter.h"
 #include "RealTimeWidget.generated.h"
 
 class UMyProgressBar;
@@ -12,7 +13,7 @@ class IGetValueInterface;
  * 
  */
 UCLASS()
-class DAOFA_API URealTimeWidget : public UUserWidget
+class DAOFA_API URealTimeWidget : public UUserWidget, public IInitWidgetByCharacter
 {
 	GENERATED_BODY()
 protected:
@@ -24,7 +25,7 @@ protected:
 	TObjectPtr<UMyProgressBar> PhysicalPowerValue;
 
 public:
-	void InitRealTimeWidget(TScriptInterface<IGetValueInterface> NewHealthValue, TScriptInterface<IGetValueInterface> NewBlueValue, TScriptInterface<IGetValueInterface> NewPhysicalPowerValue);
 
+	virtual void InitWidgetByCharacter(ABaseCharacter* Character) override;
 	virtual void NativeConstruct() override;
 };

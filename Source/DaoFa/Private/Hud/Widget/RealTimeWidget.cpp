@@ -3,12 +3,20 @@
 
 #include "Hud/Widget/RealTimeWidget.h"
 #include "Hud/Widget/MyProgressBar.h"
+#include "Character/BaseCharacter.h"
+#include "Character/Component/AttributeComponent/HealthComponent.h"
+#include "Character/Component/AttributeComponent/BlueComponent.h"
+#include "Character/Component/AttributeComponent/PhysicalPowerComponent.h"
 
-void URealTimeWidget::InitRealTimeWidget(TScriptInterface<IGetValueInterface> NewHealthValue, TScriptInterface<IGetValueInterface> NewBlueValue, TScriptInterface<IGetValueInterface> NewPhysicalPowerValue)
+
+void URealTimeWidget::InitWidgetByCharacter(ABaseCharacter* Character)
 {
-	HealthValue->InitProgressBar(NewHealthValue);
-	BlueValue->InitProgressBar(NewBlueValue);
-	PhysicalPowerValue->InitProgressBar(NewPhysicalPowerValue);
+	if (Character)
+	{
+		HealthValue->InitProgressBar(Character->GetHealthComponent());
+		BlueValue->InitProgressBar(Character->GetBlueComponent());
+		PhysicalPowerValue->InitProgressBar(Character->GetPhysicalPowerComponent());
+	}
 }
 
 void URealTimeWidget::NativeConstruct()

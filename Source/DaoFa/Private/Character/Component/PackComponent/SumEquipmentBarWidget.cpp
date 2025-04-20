@@ -3,6 +3,7 @@
 
 #include "Character/Component/PackComponent/SumEquipmentBarWidget.h"
 #include "Character/Component/PackComponent/EquipmentBarComponent.h"
+#include "Character/BaseCharacter.h"
 
 
 
@@ -31,11 +32,14 @@ void USumEquipmentBarWidget::SetChosenEquipmentBar(int Index)
 	FuLuEquipmentBar->SetChosen(Index == 2);
 }
 
-void USumEquipmentBarWidget::Init(UEquipmentBarComponent* InEquipmentBarComponent)
+
+
+void USumEquipmentBarWidget::InitWidgetByCharacter(ABaseCharacter* Character)
 {
-	EquipmentBarComponent = InEquipmentBarComponent;
+	EquipmentBarComponent = Character->GetEquipmentBarComponent();
 	EquipmentBarComponent->OnEquipmentBarChange.AddDynamic(this, &USumEquipmentBarWidget::OnEquipmentBarChange);
 	OnEquipmentBarChange();
+
 }
 
 

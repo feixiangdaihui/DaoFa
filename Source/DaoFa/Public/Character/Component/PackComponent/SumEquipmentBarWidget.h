@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Character/Component/PackComponent/EquipmentBarWidget.h"
 #include "Character/Component/PackComponent/PackObject.h"
+#include "Hud/Interface/InitWidgetByCharacter.h"
 #include "SumEquipmentBarWidget.generated.h"
 
 
@@ -15,7 +16,7 @@ class UEquipmentBarComponent;
  * 
  */
 UCLASS()
-class DAOFA_API USumEquipmentBarWidget : public UUserWidget
+class DAOFA_API USumEquipmentBarWidget : public UUserWidget, public IInitWidgetByCharacter
 {
 	GENERATED_BODY()
 
@@ -44,6 +45,5 @@ public:
     virtual void NativeConstruct() override;
 
 
-
-	void Init(UEquipmentBarComponent* InEquipmentBarComponent);
+	virtual void InitWidgetByCharacter(ABaseCharacter* Character) override;
 };

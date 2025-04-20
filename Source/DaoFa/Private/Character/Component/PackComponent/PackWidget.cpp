@@ -2,8 +2,9 @@
 
 
 #include "Character/Component/PackComponent/PackWidget.h"
-#include "Character/Component/PackComponent/PackComponent.h"
+#include "Character/BaseCharacter.h"
 #include"PlayerController/BasePlayerController.h"
+
 void UPackWidget::OpenClosePack()
 {
 	APlayerController* PlayerController= GetOwningLocalPlayer()->GetPlayerController(GetWorld());
@@ -23,14 +24,12 @@ void UPackWidget::OpenClosePack()
 		}
 	}
 }
-void UPackWidget::InitPackWidget(UPackComponent* InPackComponent)
+void UPackWidget::InitWidgetByCharacter(ABaseCharacter* Character)
 {
-	if (InPackComponent)
+	if (Character)
 	{
-		PackComponent = InPackComponent;
+		PackComponent = Character->GetPackComponent();
+		SetVisibility(ESlateVisibility::Hidden);
 	}
-	else
-		UE_LOG(LogTemp, Error, TEXT("InPackComponent is nullptr"));
 }
-
 

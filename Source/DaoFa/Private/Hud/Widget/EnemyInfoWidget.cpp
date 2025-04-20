@@ -6,6 +6,7 @@
 #include "General/EnemyDetector.h"
 #include "Enemy/BaseEnemy.h"
 #include "Character/Component/AttributeComponent/HealthComponent.h"
+#include "Character/BaseCharacter.h"
 
 void UEnemyInfoWidget::UpdateEnemy()
 {
@@ -36,10 +37,12 @@ void UEnemyInfoWidget::UpdateEnemy()
 
 
 
-
-void UEnemyInfoWidget::InitEnemyInfoWidget(UEnemyDetector* NewEnemyDetector)
+void UEnemyInfoWidget::InitWidgetByCharacter(ABaseCharacter* Character)
 {
-	EnemyDetector = NewEnemyDetector;
+	if (Character) 
+	{
+		EnemyDetector = Character->GetEnemyDetector();
+	}
 }
 
 void UEnemyInfoWidget::NativeConstruct()

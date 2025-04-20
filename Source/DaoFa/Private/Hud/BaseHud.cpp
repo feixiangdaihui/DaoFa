@@ -3,19 +3,21 @@
 
 #include "Hud/BaseHud.h"
 #include "Character/BaseCharacter.h"
-#include "Character/Component/PackComponent/SumEquipmentBarWidget.h"
 #include "Blueprint/UserWidget.h"
 #include "Character/Component/PackComponent/PackWidget.h"
+#include "Character/Component/PackComponent/SumEquipmentBarWidget.h"
 #include "PlayerController/BasePlayerController.h"
 #include "Hud/Widget/RealTimeWidget.h"
 #include "Hud/Widget/EnemyInfoWidget.h"
-#include "Character/Component/AttributeComponent/HealthComponent.h"
-#include "Character/Component/AttributeComponent/PhysicalPowerComponent.h"
-#include "Character/Component/AttributeComponent/BlueComponent.h"
-#include "Character/Component/PackComponent/EquipmentBarComponent.h"
+
 
 ABaseHud::ABaseHud()
 {
+
+	WidgetMap.Add("SumEquipmentBarWidget", { USumEquipmentBarWidget::StaticClass(), nullptr });
+	WidgetMap.Add("RealTimeWidget", { URealTimeWidget::StaticClass(), nullptr });
+	WidgetMap.Add("EnemyInfoWidget", { UEnemyInfoWidget::StaticClass(), nullptr });
+	WidgetMap.Add("PackWidget", { UPackWidget::StaticClass(), nullptr });
 }
 
 void ABaseHud::Tick(float DeltaSeconds)
@@ -30,46 +32,38 @@ void ABaseHud::BeginPlay()
 	OwnerCharacter = Cast<ABaseCharacter>(GetOwningPawn());
 	if (OwnerCharacter)
 	{
-		SumEquipmentBarWidget = CreateWidget<USumEquipmentBarWidget>(GetWorld(), SumEquipmentBarWidgetClass);
-		if(SumEquipmentBarWidget)
+
+		for (auto& WidgetPair : WidgetMap)
 		{
-			SumEquipmentBarWidget->AddToViewport();
-			SumEquipmentBarWidget->Init(OwnerCharacter->GetEquipmentBarComponent());
+			if (WidgetPair.Value.WidgetClass)
+			{
+				auto Widget = CreateWidget<UUserWidget>(GetWorld(), WidgetPair.Value.WidgetClass);
+				if (Widget)
+				{
+					Widget->AddToViewport();
+					if (Widget->Implements<UInitWidgetByCharacter>())
+					{
+						InitWidgetByCharacterArray.Add(Widget);
+					}
+					WidgetPair.Value.Widget = Widget;
+				}
+
+			}
 		}
 
 
-
-		RealTimeWidget = CreateWidget<URealTimeWidget>(GetWorld(), RealTimeWidgetClass);
-		if (RealTimeWidget)
+		for (TScriptInterface<IInitWidgetByCharacter> Widget : InitWidgetByCharacterArray)
 		{
-			RealTimeWidget->AddToViewport();
-			RealTimeWidget->InitRealTimeWidget(OwnerCharacter->GetHealthComponent(), OwnerCharacter->GetBlueComponent(), OwnerCharacter->GetPhysicalPowerComponent());
+			Widget->InitWidgetByCharacter(OwnerCharacter);
 		}
-
-
-		EnemyInfoWidget = CreateWidget<UEnemyInfoWidget>(GetWorld(), EnemyInfoWidgetClass);
-		if (EnemyInfoWidget)
-		{
-			EnemyInfoWidget->AddToViewport();
-			EnemyInfoWidget->InitEnemyInfoWidget(OwnerCharacter->GetEnemyDetector());
-		}
-
-		PackWidget = CreateWidget<UPackWidget>(GetWorld(), PackWidgetClass);
-		if (PackWidget)
-		{
-			PackWidget->InitPackWidget(OwnerCharacter->GetPackComponent());
-			PackWidget->AddToViewport();
-			PackWidget->SetVisibility(ESlateVisibility::Hidden);
-		}
-
 
 		OwnerController = Cast<ABasePlayerController>(GetOwningPlayerController());
 	}
 
+	
 
 
-
-
+	
 }
 
 void ABaseHud::DrawHUD()
@@ -79,6 +73,7 @@ void ABaseHud::DrawHUD()
 }
 void ABaseHud::OpenClosePack()
 {
+	UPackWidget* PackWidget = Cast<UPackWidget>(WidgetMap["PackWidget"].Widget);
 	if (PackWidget)
 	{
 		PackWidget->OpenClosePack();
