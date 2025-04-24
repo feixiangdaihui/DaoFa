@@ -86,6 +86,9 @@ void UInputOperationComponent::SetupPlayerInputComponent(UInputComponent* Player
 		EnhancedInputComponent->BindAction(FirstAttackAction, ETriggerEvent::Started, OwnerCreatureBehavior, &UCreatureBehavior::FirstAttack);
 		EnhancedInputComponent->BindAction(SecondAttackAction, ETriggerEvent::Started, OwnerCreatureBehavior, &UCreatureBehavior::SecondAttack);
 
+		//Interact
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &UInputOperationComponent::Interact);
+
 	}
 }
 
@@ -189,6 +192,11 @@ void UInputOperationComponent::Spell(int32 Index, bool Begin)
 			}
 		}
 	}
+}
+
+void UInputOperationComponent::Interact()
+{
+	OnInteractTriggered.ExecuteIfBound();
 }
 
 

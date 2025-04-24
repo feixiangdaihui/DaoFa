@@ -1,18 +1,20 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/ActorComponent.h"
+#include "Components/SceneComponent.h"
 #include "InteractComponent.generated.h"
 
 
+DECLARE_DELEGATE(FOnInteractTriggered);
+
+class USphereComponent;
+class UInteractManage;
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class DAOFA_API UInteractComponent : public UActorComponent
+class DAOFA_API UInteractComponent : public USceneComponent
 {
 	GENERATED_BODY()
 
-public:	
+public:
 	// Sets default values for this component's properties
 	UInteractComponent();
 
@@ -20,9 +22,35 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interact")
+	FText InteractText;
+
+
+	//胶囊碰撞体
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interact")
+	TObjectPtr<USphereComponent> InteractSphereComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Interact")
+	TObjectPtr<UInteractManage> InteractManage;
+	UFUNCTION()
+	void OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+
+	UFUNCTION()
+	void OnEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	
+public:
 	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	USphereComponent* GetInteractSphereComponent() const { return InteractSphereComponent; }
+
+	FOnInteractTriggered OnInteractTriggered;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interact")
+	bool bIsInteractable = true;
+
 
 		
 };
+
+

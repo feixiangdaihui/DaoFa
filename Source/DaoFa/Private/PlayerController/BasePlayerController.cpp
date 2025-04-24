@@ -7,6 +7,12 @@
 #include "InputActionValue.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/PlayerController.h"
+#include "PlayerController/Component/InteractManage.h"
+ABasePlayerController::ABasePlayerController()
+{
+	PrimaryActorTick.bCanEverTick = true;
+	InteractManage = CreateDefaultSubobject<UInteractManage>(TEXT("InteractManage"));
+}
 void ABasePlayerController::QueryForGamePause(bool WantPause)
 {
 	if (WantPause)

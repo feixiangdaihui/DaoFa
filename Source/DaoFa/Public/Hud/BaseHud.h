@@ -61,6 +61,15 @@ public:
 	virtual void BeginPlay() override;
 	virtual void DrawHUD() override;
 
+	UUserWidget* GetWidgetByName(const FString& WidgetName)
+	{
+		if (WidgetMap.Contains(WidgetName))
+		{
+			return WidgetMap[WidgetName].Widget;
+		}
+		return nullptr;
+	}
+
 
 	void OpenClosePack();
 

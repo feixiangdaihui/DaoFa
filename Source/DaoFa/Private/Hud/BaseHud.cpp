@@ -8,7 +8,9 @@
 #include "Character/Component/PackComponent/SumEquipmentBarWidget.h"
 #include "PlayerController/BasePlayerController.h"
 #include "Hud/Widget/RealTimeWidget.h"
+#include "Hud/Widget/InteractWidget.h"
 #include "Hud/Widget/EnemyInfoWidget.h"
+#include "Hud/Widget/ShoppingWidget.h"
 
 
 ABaseHud::ABaseHud()
@@ -17,6 +19,8 @@ ABaseHud::ABaseHud()
 	WidgetMap.Add("SumEquipmentBarWidget", { USumEquipmentBarWidget::StaticClass(), nullptr });
 	WidgetMap.Add("RealTimeWidget", { URealTimeWidget::StaticClass(), nullptr });
 	WidgetMap.Add("EnemyInfoWidget", { UEnemyInfoWidget::StaticClass(), nullptr });
+	WidgetMap.Add("InteractWidget", { UInteractWidget::StaticClass(), nullptr });
+	WidgetMap.Add("ShoppingWidget", { UShoppingWidget::StaticClass(), nullptr });
 	WidgetMap.Add("PackWidget", { UPackWidget::StaticClass(), nullptr });
 }
 
@@ -73,7 +77,7 @@ void ABaseHud::DrawHUD()
 }
 void ABaseHud::OpenClosePack()
 {
-	UPackWidget* PackWidget = Cast<UPackWidget>(WidgetMap["PackWidget"].Widget);
+	UPackWidget* PackWidget = Cast<UPackWidget>(GetWidgetByName("PackWidget"));
 	if (PackWidget)
 	{
 		PackWidget->OpenClosePack();

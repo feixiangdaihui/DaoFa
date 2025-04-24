@@ -4,17 +4,24 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "Hud/Interface/InitWidgetByCharacter.h"
 #include "InteractWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DAOFA_API UInteractWidget : public UUserWidget, public IInitWidgetByCharacter
+class DAOFA_API UInteractWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+protected:
+	UFUNCTION(BlueprintImplementableEvent, Category = "Interact")
+	void UpdateText(const FText& InteractText);
+
+
 public:
-	virtual void InitWidgetByCharacter(ABaseCharacter* Character) override;
+
+	void PopInteractWidget(FText InteractText);
+
+	void EndPop();
 };

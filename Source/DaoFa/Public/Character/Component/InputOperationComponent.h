@@ -15,6 +15,11 @@ class UEquipmentBarComponent;
 class ABaseHud;
 class APackObject;
 class UCreatureBehavior;
+
+
+//interact委托
+DECLARE_DELEGATE(FOnInteractTriggered);
+
 //负责告诉动画实例类现在的输入状态
 //动画实例类根据输入状态来判断是否播放动画
 //该类从而判断是否进行移动或者其他
@@ -29,6 +34,8 @@ public:
 	void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent);
 	//设置输入映射上下文为当前组件所指定的上下文
 	void SetInputMappingContext(ULocalPlayer* LocalPlayer);
+
+	FOnInteractTriggered OnInteractTriggered;
 
 protected:
 
@@ -105,9 +112,17 @@ private:
 	UInputAction* OpenPackAction;
 
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* InteractAction;
+
+
+
 	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
+
+
+
 
 
 	void Look(const FInputActionValue& Value);
@@ -130,6 +145,7 @@ private:
 
 	void Spell(int32 Index, bool Begin);
 
+	void Interact();
 
 
 		

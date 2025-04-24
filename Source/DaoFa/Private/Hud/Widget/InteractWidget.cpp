@@ -2,7 +2,24 @@
 
 
 #include "Hud/Widget/InteractWidget.h"
+#include "Character/BaseCharacter.h"
+#include "Character/Component/InputOperationComponent.h"
+#include"PlayerController/BasePlayerController.h"
 
-void UInteractWidget::InitWidgetByCharacter(ABaseCharacter* Character)
+
+
+
+
+void UInteractWidget::PopInteractWidget(FText InteractText)
 {
+
+	UpdateText(InteractText);
+	SetVisibility(ESlateVisibility::Visible);
+
 }
+
+void UInteractWidget::EndPop()
+{
+	SetVisibility(ESlateVisibility::Hidden); 
+}
+

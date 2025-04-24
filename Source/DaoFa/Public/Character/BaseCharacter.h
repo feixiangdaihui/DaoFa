@@ -47,7 +47,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "EquipmentBar")
 	TObjectPtr<UEquipmentBarComponent> EquipmentBarComponent;
 
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Input")
+	TObjectPtr<UInputOperationComponent> InputOperationComponent;
 
 	
 
@@ -56,8 +57,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Input")
-	TObjectPtr<UInputOperationComponent> InputOperationComponent;
+	UInputOperationComponent* GetInputOperationComponent() const { return InputOperationComponent; }
 	// Called to bind functionality to input
 
 
