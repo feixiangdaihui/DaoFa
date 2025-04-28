@@ -42,7 +42,6 @@ protected:
 public:
 	// Called every frame
 
-	USphereComponent* GetInteractSphereComponent() const { return InteractSphereComponent; }
 
 	FOnInteractTriggered OnInteractTriggered;
 

@@ -1,6 +1,29 @@
 #include "General/StateComponent.h"
 
 #include "Character/Component/AttributeComponent/BlueComponent.h"
+
+
+
+TMap<ELargeState, FText> UStateComponent::LargeStateTextMap =
+{
+	//多语言的宏
+	{ ELargeState::LIANQI, NSLOCTEXT("LargeState", "LIANQI","炼气") },
+	{ ELargeState::ZHUJI, NSLOCTEXT("LargeState", "ZHUJI", "筑基") },
+	{ ELargeState::JINDAN, NSLOCTEXT("LargeState", "JINDAN", "金丹") },
+	{ ELargeState::YUANYING, NSLOCTEXT("LargeState", "YUANYING", "元婴") },
+	{ ELargeState::HUASHEN, NSLOCTEXT("LargeState", "HUASHEN", "化神") }
+};
+TMap<ESmallState, FText> UStateComponent::SmallStateTextMap =
+{
+	{ ESmallState::Early, NSLOCTEXT("SmallState", "Early", "初期") },
+	{ ESmallState::Middle, NSLOCTEXT("SmallState", "Middle", "中期") },
+	{ ESmallState::Late, NSLOCTEXT("SmallState", "Late", "后期") },
+	{ ESmallState::Complete, NSLOCTEXT("SmallState", "Complete", "圆满") }
+};
+
+
+
+
 // Sets default values for this component's properties
 UStateComponent::UStateComponent()
 {

@@ -113,10 +113,33 @@ private:
 	//境界升级成功率
 	static float UpgradeSuccessRate[LARGE_STATE_NUM][SMALL_STATE_NUM];
 
+	static TMap<ELargeState, FText> LargeStateTextMap;
+
+	static TMap<ESmallState, FText> SmallStateTextMap;
+
+
 
 
 
 public:
+
+	UFUNCTION(BlueprintCallable, Category = "State")
+	static FText GetLargeStateText(ELargeState InLargeState)
+	{
+		return LargeStateTextMap.FindChecked(InLargeState);
+	}
+
+	UFUNCTION(BlueprintCallable, Category = "State")
+	static FText GetSmallStateText(ESmallState InSmallState)
+	{
+		return SmallStateTextMap.FindChecked(InSmallState);
+	}
+
+	UFUNCTION(BlueprintCallable, Category = "State")
+	static FText GetStateText(FState InState)
+	{
+		return FText::Format(FText::FromString("{0}{1}"), GetLargeStateText(InState.LargeState), GetSmallStateText(InState.SmallState));
+	}
 
 	UPROPERTY(BlueprintAssignable, Category = "State")
 	FOnStateUpgrade OnStateUpgrade;
