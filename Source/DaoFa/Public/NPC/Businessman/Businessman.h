@@ -8,7 +8,9 @@
 
 
 class UInteractComponent;
-class UBusinessmanPackComponent;
+class UGoodsManage;
+class UReputationComponent;
+class ABaseCharacter;
 /**
  * 
  */
@@ -22,12 +24,28 @@ public:
 
 	ABusinessman();
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Businessman")
-	TObjectPtr<UBusinessmanPackComponent> BusinessmanPackComponent;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Businessman")
 	TObjectPtr<UInteractComponent> InteractComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Businessman")
+	TObjectPtr<UGoodsManage> GoodsManage;
+
+	void OnInteract(AActor* InteractActor);
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Businessman")
+	TWeakObjectPtr<ABaseCharacter> InteractCharacter;
 
 	void OpenShoppingWidget();
+
+public:
+	virtual FString GetKey() const override
+	{
+		return TEXT("Businessman");
+	}
+
+	void SellGoods(APackObject* Goods);
+
+
 
 
 };

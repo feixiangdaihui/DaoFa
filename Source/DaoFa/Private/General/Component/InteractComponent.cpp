@@ -59,7 +59,7 @@ void UInteractComponent::OnComponentBeginOverlap(UPrimitiveComponent* Overlapped
 			if (InteractManage)
 			{
 				// Use a lambda to wrap the member function call
-				InteractManage->AskForInteract(InteractText, [this]() { 	OnInteractTriggered.ExecuteIfBound(); });
+				InteractManage->AskForInteract(InteractText, [this,OtherActor]() { 	OnInteract.ExecuteIfBound(OtherActor); });
 			}
 		}
 	}

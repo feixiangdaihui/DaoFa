@@ -6,10 +6,32 @@
 #include "MyGameInstance.h"
 #include"Character/BaseCharacter.h"
 #include "Kismet/GameplayStatics.h"
+#include"GameMode/Component/SeedsComponent.h"
+
+
+ABaseGameMode::ABaseGameMode(const FObjectInitializer& ObjectInitializer)
+{
+	SeedsComponent = CreateDefaultSubobject<USeedsComponent>(TEXT("SeedsComponent"));
+}
 void ABaseGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 	//获取游戏实例
+
+
+	ACreature* PlayerCharacter = Cast<ACreature>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	if (PlayerCharacter && PlayerCharacter->GetClass()->ImplementsInterface(USaveLoadData::StaticClass()))
+	{
+		// 将PlayerCharacter添加到数组中  
+		TScriptInterface<ISaveLoadData> SaveLoadData;
+		SaveLoadData.SetObject(PlayerCharacter);
+		SaveLoadData.SetInterface(PlayerCharacter);
+		SaveLoadDataArray.Add(SaveLoadData);
+
+	}
+	SaveLoadDataArray.Add(SeedsComponent);
+
+
 	UMyGameInstance* GameInstance = Cast<UMyGameInstance>(GetGameInstance());
 	if (GameInstance)
 	{
@@ -17,7 +39,7 @@ void ABaseGameMode::BeginPlay()
 		if (ArchiveSaveGame)
 		{		
 			//加载存档数据
-			ArchiveSaveGame->LoadArchiveMethod(GetWorld());
+			ArchiveSaveGame->LoadArchiveMethod(GetWorld(), { this });
 		}
 	}
 
@@ -30,9 +52,38 @@ void ABaseGameMode::BeginPlay()
 	}
 	PlayerController->SetInputMode(FInputModeGameOnly());
 
+
+
 }
 
-void ABaseGameMode::EndPlay(const EEndPlayReason::Type EndPlayReason)
+FJsonObject ABaseGameMode::SaveDataMethod() const
 {
-	Super::EndPlay(EndPlayReason);
+	TSharedPtr<FJsonObject> SaveData = MakeShared<FJsonObject>();
+	TArray<TSharedPtr<FJsonObject>> TempArray;
+	TempArray.SetNum(SaveLoadDataArray.Num());
+	for (int i = 0; i < SaveLoadDataArray.Num(); i++)
+	{
+		if (SaveLoadDataArray[i].GetObject() != nullptr)
+		{
+			TempArray[i] = MakeShared<FJsonObject>(SaveLoadDataArray[i]->SaveDataMethod());
+			SaveData->SetObjectField(SaveLoadDataArray[i]->GetKey(), TempArray[i]);
+		}
+	}
+	return *SaveData;
 }
+
+void ABaseGameMode::LoadDataMethod(const TSharedPtr<FJsonObject> JsonObject)
+{
+	for (auto ISaveLoadData : SaveLoadDataArray)
+	{
+		if (ISaveLoadData.GetObject() != nullptr)
+			ISaveLoadData->LoadDataMethod(JsonObject->GetObjectField(ISaveLoadData->GetKey()));
+	}
+}
+
+FRandomStream ABaseGameMode::GetRandomStream() const
+{
+	return SeedsComponent->GetRandomStream();
+}
+
+

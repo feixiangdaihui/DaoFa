@@ -4,8 +4,7 @@
 #include "Components/SceneComponent.h"
 #include "InteractComponent.generated.h"
 
-
-DECLARE_DELEGATE(FOnInteractTriggered);
+DECLARE_DELEGATE_OneParam(FOnInteract, AActor*);
 
 class USphereComponent;
 class UInteractManage;
@@ -43,7 +42,7 @@ public:
 	// Called every frame
 
 
-	FOnInteractTriggered OnInteractTriggered;
+	FOnInteract OnInteract;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Interact")
 	bool bIsInteractable = true;

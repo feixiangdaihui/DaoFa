@@ -4,21 +4,40 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameMode.h"
+#include "General/Interface/SaveLoadData.h"
+
 #include "BaseGameMode.generated.h"
 
+class USeedsComponent;
 /**
  * 
  */
 UCLASS()
-class DAOFA_API ABaseGameMode : public AGameMode
+class DAOFA_API ABaseGameMode : public AGameMode, public ISaveLoadData
 {
 	GENERATED_BODY()
+
+private:
+	TArray<TScriptInterface<ISaveLoadData>> SaveLoadDataArray;
+
+protected:
+	TObjectPtr<USeedsComponent> SeedsComponent;
+
 public:
+
+	ABaseGameMode(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
 	virtual void BeginPlay() override;
 
+	virtual FJsonObject SaveDataMethod() const;
 
+	virtual void LoadDataMethod(const TSharedPtr<FJsonObject> JsonObject) ;
 
+	virtual FString GetKey()const {
+		return TEXT("BaseGameMode");
+	}
 
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	UFUNCTION(BlueprintCallable, Category = "GameMode")
+	FRandomStream GetRandomStream() const;
 	
 };

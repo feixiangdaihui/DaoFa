@@ -13,6 +13,7 @@ class UAttributeComponent;
 class UPackComponent;
 class UEnemyDetector;
 class UEquipmentBarComponent;
+class UReputationComponent;
 UCLASS()
 class DAOFA_API ABaseCharacter : public ACreature
 {
@@ -50,6 +51,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Input")
 	TObjectPtr<UInputOperationComponent> InputOperationComponent;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Reputation")
+	TObjectPtr<UReputationComponent> ReputationComponent;
+
+
 	
 
 
@@ -67,6 +72,8 @@ public:
 	virtual FString GetKey() const override { return TEXT("BaseCharacter"); }
 
 	UEquipmentBarComponent* GetEquipmentBarComponent() const { return EquipmentBarComponent; }
+
+	UReputationComponent* GetReputationComponent() const { return ReputationComponent; }
 
 
 };

@@ -6,7 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "ShoppingWidget.generated.h"
 
-class UBusinessmanPackComponent;
+class ABusinessman;
 /**
  * 
  */
@@ -15,8 +15,22 @@ class DAOFA_API UShoppingWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Shopping")
+	ABusinessman* Businessman;
+
 public:
-	UFUNCTION(BlueprintImplementableEvent, Category = "Shopping")
-	void PopShoppingWidget(UBusinessmanPackComponent* BusinessmanPackComponent);
 	
+	UFUNCTION(BlueprintImplementableEvent, Category = "Shopping")
+	void BPPop(ABusinessman* InBusinessman);
+
+
+	UFUNCTION(BlueprintCallable, Category = "Shopping")
+	void Pop(ABusinessman* InBusinessman);
+
+	UFUNCTION(BlueprintCallable, Category = "Shopping")
+	void EndPop();
+
+
+
 };

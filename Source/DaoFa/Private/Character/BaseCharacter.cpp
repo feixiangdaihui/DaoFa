@@ -17,6 +17,7 @@
 #include "Character/Component/GongFa/BaseMainGongFa.h"
 #include "Character/Component/GongFa/DetriveMainGongFa/WuXingZaoHuaGong.h"
 #include "Character/Component/GongFa/GongFaComponent.h"
+#include"Character/Component/Reputation/ReputationComponent.h"
 
 // Sets default values
 ABaseCharacter::ABaseCharacter()
@@ -65,6 +66,9 @@ ABaseCharacter::ABaseCharacter()
 	EnemyDetector->VerticalAngle = 180.0f;
 	EnemyDetector->EnemyClasses.Empty();
 	EnemyDetector->EnemyClasses.Add(ABaseEnemy::StaticClass());
+
+
+	ReputationComponent = CreateDefaultSubobject<UReputationComponent>(TEXT("ReputationComponent"));
 
 
 

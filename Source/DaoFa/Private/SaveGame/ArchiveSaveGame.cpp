@@ -5,25 +5,7 @@
 
 
 
-TArray<TScriptInterface<ISaveLoadData>> UArchiveSaveGame::GetArchiveWantedToSaveArray(UWorld* World) const  
-{  
-   TArray<TScriptInterface<ISaveLoadData>> ISaveLoadDataArray;  
-   if (World)  
-   {  
-	   //获取控制的角色
-	    ACreature* PlayerCharacter = Cast<ACreature>(UGameplayStatics::GetPlayerCharacter(World, 0));
-        if (PlayerCharacter && PlayerCharacter->GetClass()->ImplementsInterface(USaveLoadData::StaticClass()))  
-        {  
-            // 将PlayerCharacter添加到数组中  
-            TScriptInterface<ISaveLoadData> ISaveLoadData;  
-            ISaveLoadData.SetObject(PlayerCharacter);
-            ISaveLoadData.SetInterface(PlayerCharacter);  
-            ISaveLoadDataArray.Add(ISaveLoadData); 
-        }
 
-   } 
-   return ISaveLoadDataArray;  
-}
 
 TArray<FArchiveData> UArchiveSaveGame::GetArchiveDataArray() const
 {
@@ -64,23 +46,24 @@ void UArchiveSaveGame::SaveArchiveMethod(UWorld* World,bool IsExit)
 
 	//保存当前存档
 	FString SlotName = GetSlotNameByIndex(CurrentSlotIndex);
-	SaveISaveLoadDataArray(SlotName, GetArchiveWantedToSaveArray(World));
+	SaveISaveLoadDataArray(SlotName, SaveLoadDataArray);
 
 
 	if (IsExit)
 	{
 		CurrentSlotIndex = -1;
+		SaveLoadDataArray.Empty();
 	}
 }
 
-void UArchiveSaveGame::LoadArchiveMethod(UWorld* World)
+void UArchiveSaveGame::LoadArchiveMethod(UWorld* World, TArray<TScriptInterface<ISaveLoadData>> InSaveLoadDataArray)
 {
 	if (IsValidCurrentSlotIndex() == false)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Invalid slot index for loading save data"));
 		return;
 	}
-
+	SaveLoadDataArray = InSaveLoadDataArray;
 	FString SlotName = GetSlotNameByIndex(CurrentSlotIndex);
 	UBaseSaveGame* BaseSaveGame = GetBaseSaveGame(SlotName);
 	if (BaseSaveGame == nullptr)
@@ -91,13 +74,12 @@ void UArchiveSaveGame::LoadArchiveMethod(UWorld* World)
 
 	if (LoadArchiveSaveGame)
 	{
-		LoadISaveLoadDataArray(LoadArchiveSaveGame, GetArchiveWantedToSaveArray(World));
+		LoadISaveLoadDataArray(LoadArchiveSaveGame, SaveLoadDataArray);
 		ArchiveData = LoadArchiveSaveGame->ArchiveData;
 	}
-
-
-
 }
+
+
 
 
 

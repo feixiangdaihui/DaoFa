@@ -41,7 +41,7 @@ private:
 		return CurrentSlotIndex >= 0 && CurrentSlotIndex < MAX_SLOT_NUMS;
 	}
 
-	TArray<TScriptInterface<ISaveLoadData>> GetArchiveWantedToSaveArray(UWorld* World)const;
+	TArray<TScriptInterface<ISaveLoadData>> SaveLoadDataArray;
 
 protected:
 
@@ -58,7 +58,7 @@ public:
 	void SaveArchiveMethod(UWorld* World,bool IsExit = false);
 
 
-	void LoadArchiveMethod(UWorld* World);
+	void LoadArchiveMethod(UWorld* World, TArray<TScriptInterface<ISaveLoadData>> InSaveLoadDataArray);
 
 
 	UFUNCTION(BlueprintCallable)
