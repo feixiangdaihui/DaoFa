@@ -44,9 +44,21 @@ void UGoodsManage::InitializeGoodsRandom()
 			const FGoodsPriceInfo& GoodsInfo = MayGoodsAndPriceArray[RandomIndex];
 			int32 RandomPriceFactor = RandomStream.RandRange(1.0f, FMath::Max(GoodsInfo.PriceFloatFactor,1.0f));
 			GoodsPriceArray.Add(FGoodsAndPrice(GoodsInfo.GoodsClass, GoodsInfo.ActualPrice));
+
+			for (int SoldIndex : AlreadySoldGoodsIndex)
+			{
+				SellGoods(SoldIndex);
+			}
 		}
 	}
 
+}
+
+void UGoodsManage::SellGoods(int index)
+{
+	GoodsPriceArray[index].Goods = nullptr;
+	GoodsPriceArray[index].Price = 0.0f;
+	AlreadySoldGoodsIndex.Add(index);
 }
 
 
@@ -64,7 +76,7 @@ float UGoodsManage::SellGoods(APackObject* Goods)
 		if (GoodsPriceArray[i].Goods == Goods)
 		{
 			float Price = GoodsPriceArray[i].Price;
-			GoodsPriceArray.RemoveAt(i);
+			SellGoods(i); 
 			return Price;
 		}
 	}

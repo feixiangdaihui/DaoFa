@@ -18,17 +18,15 @@ void ABaseGameMode::BeginPlay()
 	Super::BeginPlay();
 	//获取游戏实例
 
-
-	ACreature* PlayerCharacter = Cast<ACreature>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-	if (PlayerCharacter && PlayerCharacter->GetClass()->ImplementsInterface(USaveLoadData::StaticClass()))
+	//遍历世界里的所有继承于ACreature角色,加入到SaveLoadDataArray中
+	TArray<AActor*> BaseCharacterArray;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACreature::StaticClass(), BaseCharacterArray);
+	for (AActor* Actor : BaseCharacterArray)
 	{
-		// 将PlayerCharacter添加到数组中  
-		TScriptInterface<ISaveLoadData> SaveLoadData;
-		SaveLoadData.SetObject(PlayerCharacter);
-		SaveLoadData.SetInterface(PlayerCharacter);
-		SaveLoadDataArray.Add(SaveLoadData);
-
+		ACreature* BaseCharacter = Cast<ACreature>(Actor);
+		SaveLoadDataArray.Add(BaseCharacter);
 	}
+	
 	SaveLoadDataArray.Add(SeedsComponent);
 
 

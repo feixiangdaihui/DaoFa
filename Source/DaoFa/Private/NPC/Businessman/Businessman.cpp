@@ -65,10 +65,10 @@ void ABusinessman::SellGoods(APackObject* Goods)
 		if (GoodsManage)
 		{
 			float Price = GoodsManage->GetPriceByGoods(Goods);
-			if (Price > 0.0f)
+			if (Price > 0.0f&& InteractCharacter->GetReputationComponent()->GetFaceComponent()->SubtractValue(Price))
 			{
 				InteractCharacter->GetPackComponent()->WearEquipment(Goods);
-				InteractCharacter->GetReputationComponent()->GetFaceComponent()->SubtractValue(Price);
+				GoodsManage->SellGoods(Goods);
 			}
 		}
 	}

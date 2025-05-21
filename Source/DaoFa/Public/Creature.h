@@ -21,6 +21,9 @@ class DAOFA_API ACreature : public ACharacter, public IBeAttacked, public ISaveL
 {
 	GENERATED_BODY()
 
+private:
+
+	void InitSaveLoadDataArray();
 
 
 protected:
@@ -102,7 +105,7 @@ public:
 	virtual void LoadDataMethod(const TSharedPtr<FJsonObject> JsonObject) override;
 	virtual FString GetKey() const override
 	{
-		return GetName();
+		return TEXT("Creature");
 	}
 
 };

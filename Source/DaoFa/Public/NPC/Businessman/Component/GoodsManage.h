@@ -4,6 +4,7 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Character/Component/PackComponent/PackObject.h"
+#include "General/Interface/SaveLoadData.h"
 #include "GoodsManage.generated.h"
 
 
@@ -52,7 +53,7 @@ public:
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class DAOFA_API UGoodsManage : public UActorComponent
+class DAOFA_API UGoodsManage : public UActorComponent, public ISaveLoadData
 {
 	GENERATED_BODY()
 
@@ -73,12 +74,16 @@ protected:
 
 	TArray<FGoodsAndPrice> GoodsPriceArray; // 物品和价格
 
+	TArray<int32> AlreadySoldGoodsIndex; // 已经出售的物品索引
+
 
 
 
 private:
 
 	void InitializeGoodsRandom();//随机生成物品数组
+
+	void SellGoods(int index); //出售物品
 
 
 public:	
@@ -120,6 +125,42 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Goods")
 	float SellGoods(APackObject* Goods);
 
+
+	virtual FJsonObject SaveDataMethod() const override
+	{
+		TSharedPtr<FJsonObject> SaveData = MakeShared<FJsonObject>();
+		TArray<TSharedPtr<FJsonValue>> TempSoldGoodsArray;
+		for (int32 Index : AlreadySoldGoodsIndex)
+		{
+			TSharedPtr<FJsonObject> TempSoldGoods = MakeShared<FJsonObject>();
+			TempSoldGoods->SetNumberField(TEXT("Index"), Index);
+			TempSoldGoodsArray.Add(MakeShared<FJsonValueObject>(TempSoldGoods));
+		}
+		SaveData->SetArrayField(TEXT("AlreadySoldGoodsIndex"), TempSoldGoodsArray);
+		return *SaveData;
+
+	}
+
+	virtual void LoadDataMethod(const TSharedPtr<FJsonObject> JsonObject) override
+	{
+		if (JsonObject.IsValid())
+		{
+			const TArray<TSharedPtr<FJsonValue>>* TempSoldGoodsArray;
+			if (JsonObject->TryGetArrayField(TEXT("AlreadySoldGoodsIndex"), TempSoldGoodsArray))
+			{
+				for (const TSharedPtr<FJsonValue>& TempSoldGoods : *TempSoldGoodsArray)
+				{
+					int32 Index = TempSoldGoods->AsObject()->GetNumberField(TEXT("Index"));
+					AlreadySoldGoodsIndex.Add(Index);
+				}
+			}
+		}
+	}
+
+	virtual FString GetKey() const override
+	{
+		return TEXT("GoodsManage");
+	} //返回保存的键值
 
 
 

@@ -11,6 +11,7 @@
 #include "Hud/Widget/InteractWidget.h"
 #include "Hud/Widget/EnemyInfoWidget.h"
 #include "Hud/Widget/ShoppingWidget.h"
+#include "Hud/Widget/ReputationWidget.h"
 
 
 ABaseHud::ABaseHud()
@@ -18,10 +19,12 @@ ABaseHud::ABaseHud()
 
 	WidgetMap.Add("SumEquipmentBarWidget", { USumEquipmentBarWidget::StaticClass(), nullptr });
 	WidgetMap.Add("RealTimeWidget", { URealTimeWidget::StaticClass(), nullptr });
+	WidgetMap.Add("ReputationWidget", { UReputationWidget::StaticClass(), nullptr });
 	WidgetMap.Add("EnemyInfoWidget", { UEnemyInfoWidget::StaticClass(), nullptr });
 	WidgetMap.Add("InteractWidget", { UInteractWidget::StaticClass(), nullptr });
 	WidgetMap.Add("ShoppingWidget", { UShoppingWidget::StaticClass(), nullptr });
 	WidgetMap.Add("PackWidget", { UPackWidget::StaticClass(), nullptr });
+
 }
 
 void ABaseHud::Tick(float DeltaSeconds)

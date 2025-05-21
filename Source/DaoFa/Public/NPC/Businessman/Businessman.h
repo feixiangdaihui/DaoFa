@@ -43,6 +43,7 @@ public:
 		return TEXT("Businessman");
 	}
 
+	UFUNCTION(BlueprintCallable, Category = "Businessman")
 	void SellGoods(APackObject* Goods);
 
 

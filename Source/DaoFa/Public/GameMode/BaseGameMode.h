@@ -18,9 +18,12 @@ class DAOFA_API ABaseGameMode : public AGameMode, public ISaveLoadData
 	GENERATED_BODY()
 
 private:
-	TArray<TScriptInterface<ISaveLoadData>> SaveLoadDataArray;
+
 
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GameMode")
+	TArray<TScriptInterface<ISaveLoadData>> SaveLoadDataArray;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "GameMode")
 	TObjectPtr<USeedsComponent> SeedsComponent;
 
 public:

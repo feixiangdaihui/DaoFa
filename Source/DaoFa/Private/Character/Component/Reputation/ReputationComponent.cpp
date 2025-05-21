@@ -52,3 +52,19 @@ void UReputationComponent::SubtractValue(float Value)
 	FaceComponent->SubtractValue(Value);
 }
 
+FJsonObject UReputationComponent::SaveDataMethod() const
+{
+	TSharedPtr<FJsonObject> SaveData = MakeShared<FJsonObject>();
+	SaveData->SetNumberField(TEXT("ReputationValue"), ReputationValue);
+
+	return *SaveData;
+}
+
+void UReputationComponent::LoadDataMethod(const TSharedPtr<FJsonObject> JsonObject)
+{
+	if (JsonObject.IsValid())
+	{
+		ReputationValue = JsonObject->GetNumberField(TEXT("ReputationValue"));
+	}
+}
+

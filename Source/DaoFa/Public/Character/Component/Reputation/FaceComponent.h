@@ -4,11 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "General/Interface/SaveLoadData.h"
 #include "FaceComponent.generated.h"
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class DAOFA_API UFaceComponent : public UActorComponent
+class DAOFA_API UFaceComponent : public UActorComponent, public ISaveLoadData
 {
 	GENERATED_BODY()
 
@@ -33,17 +34,41 @@ public:
 			Value = 0.0f;
 		FaceValue += Value;
 	}
-	void SubtractValue(float Value)
+	bool SubtractValue(float Value)
 	{
+		if (FaceValue < Value)
+			return false;
 		FaceValue -= Value;
-		if (FaceValue < 0.0f)
-			FaceValue = 0.0f;
+		return true;
 	}
+	UFUNCTION(BlueprintCallable, Category = "Face")
 	float GetCurrentValue() const
 	{
 		return FaceValue;
 	}
 
+	virtual FJsonObject SaveDataMethod() const override
+	{
+		TSharedPtr<FJsonObject> SaveData = MakeShared<FJsonObject>();
+		SaveData->SetNumberField(TEXT("FaceValue"), FaceValue);
+		return *SaveData;
+	}
+
+	virtual void LoadDataMethod(const TSharedPtr<FJsonObject> JsonObject) override
+	{
+		if (JsonObject.IsValid())
+		{
+			FaceValue = JsonObject->GetNumberField(TEXT("FaceValue"));
+			if (FaceValue < 0.0f)
+			{
+				FaceValue = 0.0f;
+			}
+		}
+	}
+	virtual FString GetKey() const override
+	{
+		return TEXT("FaceComponent");
+	}
 
 		
 };

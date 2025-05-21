@@ -30,14 +30,21 @@ ACreature::ACreature()
 
 	GongFaComponent = CreateDefaultSubobject<UGongFaComponent>(TEXT("GongFaComponent"));
 
+	
 
-	if (IsValid(BlueComponent))
+}
+
+void ACreature::InitSaveLoadDataArray()
+{
+	//遍历所有的组件，添加到数组中
+	TArray<UActorComponent*> Components;
+	GetComponents(Components);
+	for (UActorComponent* Component : Components)
 	{
-		SaveLoadDataArray.Add(TScriptInterface<ISaveLoadData>(BlueComponent));
-	}
-	if (IsValid(StateComponent))
-	{
-		SaveLoadDataArray.Add(TScriptInterface<ISaveLoadData>(StateComponent.Get()));
+		if (Component->Implements<USaveLoadData>())
+		{
+			SaveLoadDataArray.Add(TScriptInterface<ISaveLoadData>(Component));
+		}
 	}
 }
 
@@ -45,7 +52,7 @@ ACreature::ACreature()
 void ACreature::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 }
 
 // Called every frame
@@ -108,6 +115,7 @@ FJsonObject ACreature::SaveDataMethod() const
 
 void ACreature::LoadDataMethod(const TSharedPtr<FJsonObject> JsonObject)
 {
+	InitSaveLoadDataArray();
 	for (auto ISaveLoadData : SaveLoadDataArray)
 	{
 		if (ISaveLoadData.GetObject() != nullptr)

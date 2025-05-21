@@ -31,6 +31,11 @@ public:
 	UEnemyController* GetEnemyController() const { return EnemyController; }
 
 	ABaseEnemy();
+
+	virtual FString GetKey() const override
+	{
+		return TEXT("BaseEnemy");
+	}
 	
 
 };
